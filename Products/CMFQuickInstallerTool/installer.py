@@ -33,7 +33,6 @@ class ActionInstaller(Installer):
         aparser=ActionParser()
         aparser.parse(product_name)
         actions=aparser.get_data()
-        print actions
         if actions:
             for action in actions:
                 action_data=[]
@@ -43,7 +42,10 @@ class ActionInstaller(Installer):
                 if tool:
                     existing_actions=[a.id for a in tool._cloneActions()]
                     for key in action.keys():
-                        action_data.append("%s='%s'" %(key,action[key]))
+                        if key=='visible':
+                            action_data.append("%s=%s" %(key,action[key]))
+                        else:
+                            action_data.append("%s='%s'" %(key,action[key]))
                     if action['id'] not in existing_actions:
                         eval("tool.addAction(%s)" %join(action_data,','))
                         res += action['name']+'was successfully created\n'

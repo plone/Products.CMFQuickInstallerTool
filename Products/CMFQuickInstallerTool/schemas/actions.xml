@@ -87,6 +87,13 @@
 	    plone yes or not?
 	  </description>
 	</key>
+
+	<key name="appId" datatype="string"
+	     required="no">
+	  <description>
+	    This only usefull for controlpannel actions
+	  </description>
+	</key>
     </sectiontype>
 
     <multisection name="*" type="action" attribute="action">

@@ -13,6 +13,12 @@ class IQuickInstallerTool(Interface):
     def listInstalledProducts(showHidden=0):
         ''' returns a list of products that are installed -> list of strings'''
 
+    def getProductFile(self,p,fname='readme.txt'):
+        ''' returns a file of the product case-insensitive '''
+
+    def getProductReadme(self,p):
+        ''' returns the readme file of the product case-insensitive '''
+
     def installProduct(self,p,locked=0,hidden=0,swallowExceptions=0):
         ''' installs a product by name 
             throws AlreadyInstalled exception, if components of the product are already installed

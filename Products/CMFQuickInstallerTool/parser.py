@@ -13,6 +13,13 @@ import os
 from string import strip,split
 import ZConfig
 
+def _split(s):
+    return s, None, None, None
+
+#We don't nee substitution in value because value can be a python
+#or string expression
+ZConfig.substitution._split=_split
+
 class Parser:
 
     configName=''

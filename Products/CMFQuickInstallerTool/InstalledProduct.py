@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.1.1.2 2003/02/16 13:22:34 zworkb Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.1.1.3 2003/04/02 20:59:41 zworkb Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -52,7 +52,6 @@ class InstalledProduct(SimpleItem):
     error=0 #error flag
     
     def manage_beforeDelete(self,object,container):
-        print 'beforedel'
         self.uninstall()
         
     def __init__(self,id,types,skins,actions,portalobjects,workflows,leftslots,rightslots,logmsg,status='installed',error=0):
@@ -133,12 +132,29 @@ class InstalledProduct(SimpleItem):
         else:
             return 'no messages'
 
+    def getUninstallMethod(self):
+        ''' returns the uninstaller method '''
+        
+        for mod,func in (('Install','uninstall'),('Install','Uninstall'),('install','uninstall'),('install','Uninstall')):
+            try:
+                return ExternalMethod('temp','temp',self.id+'.'+mod, func)    
+            except:
+                pass
+            
+        return None
+
     security.declareProtected(ManagePortal, 'uninstall')
     def uninstall(self,cascade=['types','skins','actions','portalobjects','workflows','slots'],REQUEST=None):
         '''uninstalls the prod and removes its deps'''
 
         portal=getToolByName(self,'portal_url').getPortalObject()
+        res=''
 
+        uninstaller=self.getUninstallMethod()
+        
+        if uninstaller:
+            res=uninstaller(portal)
+            
         if 'types' in cascade:
             portal_types=getToolByName(self,'portal_types')
             portal_types.manage_delObjects(self.types)
@@ -162,11 +178,12 @@ class InstalledProduct(SimpleItem):
             
         if 'slots' in cascade:
             if self.leftslots: 
-                portal.leftslots=[s for s in portal.leftslots if s not in self.leftslots]
+                portal.left_slots=[s for s in portal.left_slots if s not in self.leftslots]
             if self.rightslots:
-                portal.rightslots=[s for s in portal.rightslots if s not in self.rightslots]
+                portal.right_slots=[s for s in portal.right_slots if s not in self.rightslots]
             
         self.status='uninstalled'
+        self.log('uninstalled\n'+res)
         
         if REQUEST and REQUEST.get('nextUrl',None):
             return REQUEST.RESPONSE.redirect(REQUEST['nextUrl'])

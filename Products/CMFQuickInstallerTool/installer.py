@@ -126,7 +126,7 @@ class PropertyInstaller(Installer):
                     else:
                         res += property['id']+'does not exist \n'
                 else:
-                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n'                    
+                    res += tname+' does not longer exist removing of '+property['id']+' is not possible\n'                    
         else:
             res += 'There are no properties to remove\n'
             

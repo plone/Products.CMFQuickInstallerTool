@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.12 2003/07/09 07:25:37 zworkb Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.12.2.1 2003/07/24 00:00:36 zworkb Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -37,7 +37,8 @@ def updatelist(a,b):
             a.append(l)
             
 def delObjects(cont,ids):
-    delids=[id for id in ids if hasattr(cont,id)]
+    obids=cont.objectIds()
+    delids=[id for id in ids if id in obids]
     cont.manage_delObjects(delids)
 
 class InstalledProduct(SimpleItem):

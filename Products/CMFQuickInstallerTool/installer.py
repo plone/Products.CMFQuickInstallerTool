@@ -46,13 +46,13 @@ class ActionInstaller(Installer):
                         action_data.append("%s='%s'" %(key,action[key]))
                     if action['id'] not in existing_actions:
                         eval("tool.addAction(%s)" %join(action_data,','))
-                        res += action['name']+'was successfully created\n\n'
+                        res += action['name']+'was successfully created\n'
                     else:
-                        res += action['name']+'already exists\n\n'
+                        res += action['name']+'already exists\n'
                 else:
-                    res += tname + ' does not exist\n\n'
+                    res += 'tool: '+ tname + ' does not exist\n'
         else:
-            res += 'There are no actions to create\n\n'
+            res += 'There are no actions to create\n'
 
         return res
 
@@ -71,13 +71,13 @@ class ActionInstaller(Installer):
                     existing_actions=[a.id for a in tool._cloneActions()]
                     if action['id'] in existing_actions:
                         tool.deleteActions([existing_actions.index(action['id'])])
-                        res += action['name']+'was successfully removed\n\n'
+                        res += action['name']+'was successfully removed\n'
                     else:
-                        res += action['name']+' does not exists\n\n'
+                        res += action['name']+' does not exists\n'
                 else:
-                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n\n'
+                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n'
         else:
-            res += 'There are no actions to create\n\n'
+            res += 'There are no actions to remove\n'
 
         return res
 
@@ -97,13 +97,13 @@ class PropertyInstaller(Installer):
                 if tool:
                     if not tool.hasProperty(property['id']):
                         tool.manage_addProperty(property['id'],property['value'],property['type'])
-                        res += property['id']+'was successfully created\n\n'
+                        res += property['id']+'was successfully created\n'
                     else:
-                        res += property['id']+'already exists\n\n'
+                        res += property['id']+'already exists\n'
                 else:
-                    res += tname +' does not exist\n\n'
+                    res += 'tool: '+ tname +' does not exist\n'
         else:
-            res += 'There are no properties to create\n\n'
+            res += 'There are no properties to create\n'
             
         return res
 
@@ -120,13 +120,13 @@ class PropertyInstaller(Installer):
                 if tool:
                     if tool.hasProperty(property['id']):
                         tool.manage_delProperties([property['id']])
-                        res += property['id']+'was successfully removed\n\n'
+                        res += property['id']+'was successfully removed\n'
                     else:
-                        res += property['id']+'does not exist \n\n'
+                        res += property['id']+'does not exist \n'
                 else:
-                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n\n'                    
+                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n'                    
         else:
-            res += 'There are no properties to create\n\n'
+            res += 'There are no properties to remove\n'
             
         return res
 
@@ -148,13 +148,13 @@ class ActionIconInstaller(Installer):
                         action_data.append("%s='%s'" %(key,action[key]))
                     if not tool.queryActionIcon(action['category'],action['action_id']):
                         eval("tool.addActionIcon(%s)" %join(action_data,','))
-                        res += action['action_id']+'was successfully created\n\n'
+                        res += action['action_id']+'was successfully created\n'
                     else:
-                        res += action['action_id']+'already exists\n\n'
+                        res += action['action_id']+'already exists\n'
                 else:
-                    res += tname + ' does not exist\n\n'
+                    res += 'tool: '+ tname + ' does not exist\n'
         else:
-            res += 'There are no actions to create\n\n'
+            res += 'There are no actions to create\n'
 
         return res
 
@@ -170,13 +170,13 @@ class ActionIconInstaller(Installer):
                 if tool:
                     if tool.queryActionIcon(action['category'],action['action_id']):
                         tool.removeActionIcon(action['category'],action['action_id'])
-                        res += action['action_id']+'was successfully removed\n\n'
+                        res += action['action_id']+'was successfully removed\n'
                     else:
-                        res += action['action_id']+'already exists\n\n'
+                        res += action['action_id']+'already exists\n'
                 else:
-                    res += tname+' does not longer exist removing of '+action['action_id']+' is not possible\n\n'                    
+                    res += tname+' does not longer exist removing of '+action['action_id']+' is not possible\n'                    
         else:
-            res += 'There are no action icons to remove\n\n'
+            res += 'There are no action icons to remove\n'
 
         return res
 

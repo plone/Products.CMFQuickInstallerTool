@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.20.2.1 2004/06/24 12:08:46 hoka Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.20.2.2 2004/07/06 13:36:03 hoka Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -244,13 +244,12 @@ class InstalledProduct(SimpleItem):
             for p in predicates:
                 registry.removePredicate(p)
 
+        #New part
+        data=uninstall_from_xml(portal,self.id)
 
         self.status='uninstalled'
-        self.log('uninstalled\n'+str(res))
+        self.log('uninstalled\n'+str(res) + '\n\n' + data)
 
-        #New part
-        uninstall_from_xml(portal,self.id)
- 
         if REQUEST and REQUEST.get('nextUrl',None):
             return REQUEST.RESPONSE.redirect(REQUEST['nextUrl'])
 

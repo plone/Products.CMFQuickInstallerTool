@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: QuickInstallerTool.py,v 1.44.2.1 2004/06/29 12:53:45 hoka Exp $
+# RCS-ID:      $Id: QuickInstallerTool.py,v 1.44.2.2 2004/07/06 13:36:03 hoka Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -353,7 +353,8 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
 
         for p in products:        
             data=install_from_xml(self,p)
-            res=res+data
+            tool=eval('self.%s' % p)
+            tool.transcript[0]['msg']=tool.transcript[0]['msg']+'\n'+data
 
         if REQUEST :
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])

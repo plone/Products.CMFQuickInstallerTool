@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: QuickInstallerTool.py,v 1.12 2003/07/19 08:32:42 zworkb Exp $
+# RCS-ID:      $Id: QuickInstallerTool.py,v 1.5 2003/06/09 19:08:28 zworkb Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -33,12 +33,6 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from InstalledProduct import InstalledProduct
 
-from interfaces.portal_quickinstaller import IQuickInstallerTool
-
-class AlreadyInstalled(Exception):
-    """ Would be nice to say what Product was trying to be installed """
-    pass
-
 def addQuickInstallerTool(self,REQUEST=None):
     ''' '''
     qt=QuickInstallerTool()
@@ -50,8 +44,6 @@ def addQuickInstallerTool(self,REQUEST=None):
     
 class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
 
-    __implements__ = IQuickInstallerTool
-    
     meta_type = 'CMF QuickInstaller Tool'
     id='portal_quickinstaller'
     
@@ -99,7 +91,7 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
         sys.stdout.flush()
         
         if skipInstalled:
-            installed=[p['id'] for p in self.listInstalledProducts(showHidden=1)]
+            installed=[p['id'] for p in self.listInstalledProducts()]
             pids=[r for r in pids if r not in installed]
             
         res=[]
@@ -115,20 +107,57 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
     
 
     
-    def listInstalledProducts(self, showHidden=0):
+    def listInstalledProducts(self):
         ''' returns a list of products that are installed -> list of strings'''
-        pids = [o.id for o in self.objectValues() if o.isInstalled() and (o.isVisible() or showHidden )]
+        pids = [o.id for o in self.objectValues() if o.isInstalled()]
 
         res=[]
         
         for r in pids:
             p=self._getOb(r,None)
-            res.append({'id':r,'status':p.getStatus(),'hasError':p.hasError(),'isLocked':p.isLocked(),'isHidden':p.isHidden()})
+            res.append({'id':r,'status':p.getStatus(),'hasError':p.hasError()})
  
         return res
-
+        
+    security.declareProtected(ManagePortal, 'installProducts')
+    def installProducts(self,products=[],stoponerror=0,REQUEST=None):
+        ''' '''
+        res='''
+    Installed Products
+    ====================
+    '''
+        ok=1
+        #return products
+        for p in products:
+            res += p +':'
+            try:
+                r=self.installProduct(p)
+                res +='ok:\n'
+                if r:
+                    r += str(r)+'\n'
+            except Exception,e:
+                ok=0
+                if stoponerror:
+                    raise
+                res += 'failed:'+str(e)+'\n'
+            except :
+                ok=0
+                if stoponerror:
+                    raise
+                res += 'failed\n'
+            
+        if REQUEST :
+            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+                    
+        return res
+    
+    def isProductInstalled(self,productname):
+        ''' checks wether a product is installed (by name) '''
+        o=self._getOb(productname,None)
+        return o and o.isInstalled()
+        
     security.declareProtected(ManagePortal, 'installProduct')
-    def installProduct(self,p,locked=0,hidden=0,swallowExceptions=0):
+    def installProduct(self,p):
         ''' installs a product by name '''
         
         if self.isProductInstalled(p):
@@ -152,35 +181,24 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
         actionsbefore=[a.id for a in portal_actions._actions]
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
-        res=''
-        status=None
-        error=1
+        error=0
+        
         install = self.getInstallMethod(p).__of__(portal)
 
-        #Some heursitics to figure out if its already been installed
         try:
+            tran=get_transaction()
             res=install()
+            tran.commit()
             status='installed'
-            error=0
-            if swallowExceptions:
-                get_transaction().commit(1)
         except:
+            tran.abort()
             tb=sys.exc_info()
-            if tb[1].endswith('already in use.'):
-                self.error_log.raising(tb)
-                res='this product has already been installed without Quickinstaller!'
-                if not swallowExceptions:
-                    raise AlreadyInstalled
+            res='failed:'+'\n'+'\n'.join(traceback.format_exception(tb[0],tb[1],tb[2]))
             
-            res+='failed:'+'\n'+'\n'.join(traceback.format_exception(tb[0],tb[1],tb[2]))
-            self.error_log.raising(tb)
-            
-            if swallowExceptions:
-                get_transaction().abort()   #this is very naughty
-            else:
-                raise
-                
-
+            status=None
+            error=1
+        
+        
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
         actionsafter=portal_actions.objectIds()
@@ -202,69 +220,13 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
         #add the product
         if p in self.objectIds():
             p=getattr(self,p)
-            p.update(types,skins,actions,portalobjects,workflows,
-                     leftslots,rightslots,res,status,error,locked,
-                     hidden)
+            p.update(types,skins,actions,portalobjects,workflows,leftslots,rightslots,res,status,error)
         else:
-            ip=InstalledProduct(p,types,skins,actions,portalobjects,
-                                workflows,leftslots,rightslots,res,
-                                status,error,locked,hidden)
+            ip=InstalledProduct(p,types,skins,actions,portalobjects,workflows,leftslots,rightslots,res,status,error)
             self._setObject(p,ip)
             
         return res
-        
-    security.declareProtected(ManagePortal, 'installProducts')
-    def installProducts(self,products=[],stoponerror=0,REQUEST=None):
-        ''' '''
-        res='''
-    Installed Products
-    ====================
-    '''
-        ok=1
-        #return products
-        for p in products:
-            res += p +':'
-            try:
-                r=self.installProduct(p,swallowExceptions=1)
-                res +='ok:\n'
-                if r:
-                    r += str(r)+'\n'
-            except Exception,e:
-                ok=0
-                if stoponerror:
-                    raise
-                res += 'failed:'+str(e)+'\n'
-            except :
-                ok=0
-                if stoponerror:
-                    raise
-                res += 'failed\n'
-            
-        if REQUEST :
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-                    
-        return res
 
-    
-    def isProductInstalled(self,productname):
-        ''' checks wether a product is installed (by name) '''
-        o=self._getOb(productname,None)
-        return o and o.isInstalled()
-
-
-    security.declareProtected(ManagePortal, 'notifyInstalled')
-    def notifyInstalled(self,p,locked=1,hidden=0,**kw):
-        ''' marks a product that has been installed without QuickInstaller
-         as installed '''
-
-        if p in self.objectIds():
-            p=getattr(self,p)
-            p.update(locked=locked, hidden=hidden, **kw)
-        else:
-            ip=InstalledProduct(p,locked=locked, hidden=hidden, **kw)
-            self._setObject(p,ip)
-
-            
     security.declareProtected(ManagePortal, 'uninstallProducts')
     def uninstallProducts(self, products, REQUEST=None):
         ''' removes a list of products '''

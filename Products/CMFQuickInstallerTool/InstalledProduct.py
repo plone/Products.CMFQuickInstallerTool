@@ -1,11 +1,11 @@
 #-----------------------------------------------------------------------------
-# Name:        InstalledProduct.py
+# Name:        QuickInstallerTool.py
 # Purpose:     
 #
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.12 2003/07/09 07:25:37 zworkb Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.9 2003/05/26 12:20:00 zworkb Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -29,7 +29,6 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
-from interfaces.portal_quickinstaller import IInstalledProduct
 
 def updatelist(a,b):
     for l in b:
@@ -43,8 +42,6 @@ def delObjects(cont,ids):
 class InstalledProduct(SimpleItem):
     ''' class storing information about an installed product'''
 
-    __implements__ = IInstalledProduct
-    
     meta_type="Installed Product"
     manage_options=(
         {'label':'view','action':'index_html'},
@@ -60,9 +57,7 @@ class InstalledProduct(SimpleItem):
     def manage_beforeDelete(self,object,container):
         self.uninstall()
         
-    def __init__(self,id,types=[],skins=[],actions=[],portalobjects=[],
-        workflows=[],leftslots=[],rightslots=[],logmsg='',status='installed',
-        error=0,locked=0, hidden=0):
+    def __init__(self,id,types,skins,actions,portalobjects,workflows,leftslots,rightslots,logmsg,status='installed',error=0):
         self.id=id
         self.types=types
         self.skins=skins
@@ -72,8 +67,6 @@ class InstalledProduct(SimpleItem):
         self.leftslots=leftslots
         self.rightslots=rightslots
         self.transcript=[{'timestamp':DateTime(),'msg':logmsg}]
-        self.locked=locked
-        self.hidden=hidden
         
         if status:
             self.status=status
@@ -83,8 +76,7 @@ class InstalledProduct(SimpleItem):
         self.error=error
 
     security.declareProtected(ManagePortal, 'update')
-    def update(self,types=[],skins=[],actions=[],portalobjects=[],workflows=[],
-        leftslots=[],rightslots=[],logmsg='',status='installed',error=0,locked=0,hidden=0):
+    def update(self,types,skins,actions,portalobjects,workflows,leftslots,rightslots,logmsg,status='installed',error=0):
         updatelist(self.types,types)
         updatelist(self.skins,skins)
         updatelist(self.actions,actions)
@@ -93,8 +85,6 @@ class InstalledProduct(SimpleItem):
         updatelist(self.leftslots,leftslots)
         updatelist(self.rightslots,rightslots)
         self.transcript.insert(0,{'timestamp':DateTime(),'msg':logmsg})
-        self.locked=locked
-        self.hidden=hidden
         
         if status:
             self.status=status
@@ -108,17 +98,6 @@ class InstalledProduct(SimpleItem):
     def hasError(self):
         ''' returns if the prod is in error state '''
         return getattr(self,'error',0)
-    
-    def isLocked(self):
-        ''' is the product locked for uninstall '''
-        return getattr(self,'locked',0)
-
-    def isHidden(self):
-        ''' is the product hidden'''
-        return getattr(self,'hidden',0)
-    
-    def isVisible(self):
-        return not self.isHidden()
     
     def isInstalled(self):
         return self.status=='installed'
@@ -178,9 +157,6 @@ class InstalledProduct(SimpleItem):
     def uninstall(self,cascade=['types','skins','actions','portalobjects','workflows','slots'],REQUEST=None):
         '''uninstalls the prod and removes its deps'''
 
-        if self.isLocked():
-            raise ValueError, 'The product is locked and cannot be uninstalled!'
-        
         portal=getToolByName(self,'portal_url').getPortalObject()
         res=''
 

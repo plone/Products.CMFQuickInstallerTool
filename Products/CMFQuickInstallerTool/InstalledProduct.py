@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.26 2005/03/10 09:38:32 tiran Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.27 2005/03/14 14:37:24 tiran Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -15,6 +15,7 @@ import Globals
 from DateTime import DateTime
 from App.Common import package_home
 from types import TupleType
+from zExceptions import BadRequest
 
 from Globals import HTMLFile, InitializeClass
 from OFS.SimpleItem import SimpleItem
@@ -53,7 +54,7 @@ def delObjects(cont, ids):
     for delid in delids:
         try:
             cont.manage_delObjects(delid)
-        except:
+        except (AttributeError, KeyError, BadRequest):
             LOG("Quick Installer Tool: ", PROBLEM, "Failed to delete '%s' in '%s'" % (delid, cont.id))
 
 def getAlreadyRegistered(qi):
@@ -358,6 +359,7 @@ class InstalledProduct(SimpleItem):
             delObjects(portal_skins, self.skins)
 
         if 'actions' in cascade:
+            # XXX ugly ugly :(
             portal_actions=getToolByName(self,'portal_actions')
             actids= [o.id.lower() for o in portal_actions._actions]
             delactions=[actids.index(id) for id in self.actions if id in actids]
@@ -379,10 +381,14 @@ class InstalledProduct(SimpleItem):
                                     if s not in self.rightslots]
 
         if 'registrypredicates' in cascade:
-            registry=getToolByName(self,'content_type_registry')
+            ctr = getToolByName(self,'content_type_registry')
+            ids = [id for id, predicate in ctr.listPredicates()]
             predicates=getattr(self,'registrypredicates',[])
             for p in predicates:
-                registry.removePredicate(p)
+                if p in ids:
+                    ctr.removePredicate(p)
+                else:
+                    LOG("Quick Installer Tool: ", PROBLEM, "Failed to delete '%s' from content type registry" % p)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

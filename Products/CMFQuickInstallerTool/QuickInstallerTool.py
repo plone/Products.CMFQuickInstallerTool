@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: QuickInstallerTool.py,v 1.52 2005/03/10 09:38:33 tiran Exp $
+# RCS-ID:      $Id: QuickInstallerTool.py,v 1.53 2005/03/14 14:37:26 tiran Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -281,7 +281,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     raise AlreadyInstalled, p
 
             res+='failed:'+'\n'+'\n'.join(traceback.format_exception(*tb))
-            self.error_log.raising(tb)
+            try:
+                self.error_log.raising(tb)
+            except AttributeError:
+                #import pdb; pdb.set_trace()
+                raise
 
             # Try to avoid reference
             del tb

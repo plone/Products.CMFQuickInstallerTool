@@ -88,6 +88,15 @@ requirements must be met:
 Please note that the customized uninstall method is invoked before
 (and in addition to) the standard removal of objects.
 
+Reinstall
+---------
+
+Reinstalling a product invokes uninstall() and install(). If you have special
+code which should work differently on reinstall than uninstall/install you can
+add a second argument to the install or uninstall method named 'reinstall' which
+is true only for a reinstallation. In most cases you shouldn't react differently
+when reinstalling!=======
+
 Install:
 --------
 

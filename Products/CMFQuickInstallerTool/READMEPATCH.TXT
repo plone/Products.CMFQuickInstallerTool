@@ -1,3 +1,29 @@
+1.5.1
+
+	Oooouuuhhhh so many changes.
+	ok lets begin. 
+
+	-The parser es completly new. The *.conf files
+	are now completely parsed from ZConfig. 
+	For ZConfig parsing i added a schemas Folder were the xml schemas for
+	every type are in.
+
+	-A result of using ZConfig is that we now have a better xml or should
+	 i better say zope xml configuration file syntax.
+	
+	-Configuration files are now not longer without format.
+	 for example: formerly:actions , just actions.conf
+	 
+	-I added a support for adding action icons from xml
+	
+	-Change the documentation for creating *.conf files
+	
+	-Changed Installer. Put every installer and uninstaller method
+	 pair in a own class, put get_tool in a ouwn class.
+	 Changed installer and uninstaller methods to only install and uninstall
+
+1.5.0
+
 How To Use:
 
 Create two files in the Extension Directory of your Product.

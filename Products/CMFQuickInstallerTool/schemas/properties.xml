@@ -1,0 +1,54 @@
+<schema>
+  <sectiontype name="property">
+      <description>
+        A property which schould be installed.
+      </description>
+
+	<key name="tool" datatype="string"
+	     required="yes">
+	  <description>
+	    Name of the tool where the actionicon should be
+	    installed. If you want to install a property to 
+	    PortalObject please choose portal_url. this is because 
+	    portal_url is a tool an it provides a method to get
+	    PortalObject. I think this is more consistent as 
+	    creating a new name for referencing to the Portalobject.
+	  </description>
+	</key>
+
+	<key name="id" datatype="string"
+	     required="yes">
+	  <description>
+	    ID of the property you want to install
+	  </description>
+	</key>
+	
+	<key name="value" datatype="string"
+	     required="yes">
+	  <description>
+	    Value of the property you want to install.
+	    If you want to install for example a lines
+	    type seperate the values with ; so we have here
+	    a csv conform interface.
+	  </description>
+	</key>
+	
+	<key name="type" datatype="string"
+	     required="yes">
+	  <description>
+	    here enter the type as wich the value
+	    shoulb be installed. Choose here the one
+	    of the datatypes zope give you if you want
+	    to install a property in zmi.
+	  </description>
+	</key>
+    </sectiontype>
+
+    <multisection name="*" type="property" attribute="property">
+      <description>
+        Inherit from section type property. "property" have to stand 
+        around every action. this is for knowing start and end
+        of the actionicon.
+      </description>
+    </multisection>
+</schema>

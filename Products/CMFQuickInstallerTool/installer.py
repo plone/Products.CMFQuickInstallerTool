@@ -1,107 +1,19 @@
-from parser import ActionParser,PropertyParser
+#-----------------------------------------------------------------------------
+# Name:        installer.py
+# Purpose:
+#
+# Author:      Kai Hoppert
+# Firm:        tomcom GmbH
+# Created:     2004/06/29
+# Copyright:   (c) 2004 tomcom GmbH
+# Licence:     GPL
+#-----------------------------------------------------------------------------
+
+from parser import ActionParser,PropertyParser,ActionIconParser
 from Products.CMFCore.utils import getToolByName
 from string import join
 
-class Installer:    
-
-    def install_actions(self,product_name,pobj):
-        """Install actions to the specified tool"""
-        res=''
-        aparser=ActionParser()
-        aparser.parse(product_name)
-        actions=aparser.get_data()
-        if actions:
-            for action in actions:
-                action_data=[]
-                tname=action.keys()[0]
-                tool=self.get_tool(pobj,tname)
-                if tool:
-                    existing_actions=[a.id for a in tool._cloneActions()]
-                    for key in action[tname].keys():
-                        action_data.append("%s='%s'" %(key,action[tname][key]))
-                    if action[tname]['id'] not in existing_actions:
-                        eval("tool.addAction(%s)" %join(action_data,','))
-                        res += action[tname]['name']+'was successfully created\n\n'
-                    else:
-                        res += action[tname]['name']+'already exists\n\n'
-                else:
-                    res += tname + ' does not exist\n\n'
-        else:
-            res += 'There are no actions to create\n\n'
-
-        return res                
-
-    def uninstall_actions(self,product_name,pobj):
-        """Install actions to the specified tool"""
-        res=''
-        aparser=ActionParser()
-        aparser.parse(product_name)
-        actions=aparser.get_data()
-        if actions:
-            for action in actions:
-                action_data=[]
-                tname=action.keys()[0]
-                tool=self.get_tool(pobj,tname)
-                if tool:
-                    existing_actions=[a.id for a in tool._cloneActions()]
-                    if action[tname]['id'] in existing_actions:
-                        tool.deleteActions([existing_actions.index(action[tname]['id'])])
-                        res += action[tname]['name']+'was successfully removed\n\n'
-                    else:
-                        res += action[tname]['name']+' does not exists\n\n'
-                else:
-                    res += tname+' does not longer exist removing of '+action[tname]['name']+' is not possible\n\n'
-        else:
-            res += 'There are no actions to create\n\n'
-
-        return res                
-            
-    def install_properties(self,product_name,pobj):
-        """Install properties to the specified tool"""
-        res=''
-        pparser=PropertyParser()
-        pparser.parse(product_name)
-        properties=pparser.get_data()
-        if properties:
-            for property in properties:
-                tname=property.keys()[0]
-                tool=self.get_tool(pobj,tname)
-                if tool:
-                    if not tool.hasProperty(property[tname]['id']):
-                        tool.manage_addProperty(property[tname]['id'],property[tname]['value'],property[tname]['type'])
-                        res += property[tname]['id']+'was successfully created\n\n'
-                    else:
-                        res += property[tname]['id']+'already exists\n\n'
-                else:
-                    res += tname +' does not exist\n\n'
-                    
-        else:
-            res += 'There are no properties to create\n\n'
-            
-        return res
-
-    def uninstall_properties(self,product_name,pobj):
-        """Install properties to the specified tool"""
-        res=''
-        pparser=PropertyParser()
-        pparser.parse(product_name)
-        properties=pparser.get_data()
-        if properties:
-            for property in properties:
-                tname=property.keys()[0]
-                tool=self.get_tool(pobj,tname)
-                if tool:
-                    if tool.hasProperty(property[tname]['id']):
-                        tool.manage_delProperties([property[tname]['id']])
-                        res += property[tname]['id']+'was successfully removed\n\n'
-                    else:
-                        res += property[tname]['id']+'does not exist \n\n'
-                else:
-                    res += tname+' does not longer exist removing of '+action[tname]['name']+' is not possible\n\n'                    
-        else:
-            res += 'There are no properties to create\n\n'
-            
-        return res
+class Installer:
 
     def get_tool(self,pobj,tname):
         if tname=='portal_url':
@@ -112,19 +24,187 @@ class Installer:
             except:
                 return None
 
-def install_from_xml(self,product_name):
+
+class ActionInstaller(Installer):
+
+    def install(self,product_name,pobj):
+        """Install actions to the specified tool"""
+        res=''
+        aparser=ActionParser()
+        aparser.parse(product_name)
+        actions=aparser.get_data()
+        print actions
+        if actions:
+            for action in actions:
+                action_data=[]
+                tname=action.get('tool',None)
+                del action['tool']
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    existing_actions=[a.id for a in tool._cloneActions()]
+                    for key in action.keys():
+                        action_data.append("%s='%s'" %(key,action[key]))
+                    if action['id'] not in existing_actions:
+                        eval("tool.addAction(%s)" %join(action_data,','))
+                        res += action['name']+'was successfully created\n\n'
+                    else:
+                        res += action['name']+'already exists\n\n'
+                else:
+                    res += tname + ' does not exist\n\n'
+        else:
+            res += 'There are no actions to create\n\n'
+
+        return res
+
+    def uninstall(self,product_name,pobj):
+        """Install actions to the specified tool"""
+        res=''
+        aparser=ActionParser()
+        aparser.parse(product_name)
+        actions=aparser.get_data()
+        if actions:
+            for action in actions:
+                action_data=[]
+                tname=action.get('tool',None)
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    existing_actions=[a.id for a in tool._cloneActions()]
+                    if action['id'] in existing_actions:
+                        tool.deleteActions([existing_actions.index(action['id'])])
+                        res += action['name']+'was successfully removed\n\n'
+                    else:
+                        res += action['name']+' does not exists\n\n'
+                else:
+                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n\n'
+        else:
+            res += 'There are no actions to create\n\n'
+
+        return res
+
+class PropertyInstaller(Installer):
+
+    def install(self,product_name,pobj):
+        """Install properties to the specified tool"""
+        res=''
+        pparser=PropertyParser()
+        pparser.parse(product_name)
+        properties=pparser.get_data()
+        if properties:
+            for property in properties:
+                tname=property.get('tool',None)
+                del property['tool']
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    if not tool.hasProperty(property['id']):
+                        tool.manage_addProperty(property['id'],property['value'],property['type'])
+                        res += property['id']+'was successfully created\n\n'
+                    else:
+                        res += property['id']+'already exists\n\n'
+                else:
+                    res += tname +' does not exist\n\n'
+        else:
+            res += 'There are no properties to create\n\n'
+            
+        return res
+
+    def uninstall(self,product_name,pobj):
+        """Install properties to the specified tool"""
+        res=''
+        pparser=PropertyParser()
+        pparser.parse(product_name)
+        properties=pparser.get_data()
+        if properties:
+            for property in properties:
+                tname=property.get('tool',None)
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    if tool.hasProperty(property['id']):
+                        tool.manage_delProperties([property['id']])
+                        res += property['id']+'was successfully removed\n\n'
+                    else:
+                        res += property['id']+'does not exist \n\n'
+                else:
+                    res += tname+' does not longer exist removing of '+action['name']+' is not possible\n\n'                    
+        else:
+            res += 'There are no properties to create\n\n'
+            
+        return res
+
+class ActionIconInstaller(Installer):
+
+    def install(self,product_name,pobj):
+        res=''
+        aiparser=ActionIconParser()
+        aiparser.parse(product_name)
+        action_icons=aiparser.get_data()
+        if action_icons:
+            for action in action_icons:
+                action_data=[]
+                tname=action.get('tool',None)
+                del action['tool']
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    for key in action.keys():
+                        action_data.append("%s='%s'" %(key,action[key]))
+                    if not tool.queryActionIcon(action['category'],action['action_id']):
+                        eval("tool.addActionIcon(%s)" %join(action_data,','))
+                        res += action['action_id']+'was successfully created\n\n'
+                    else:
+                        res += action['action_id']+'already exists\n\n'
+                else:
+                    res += tname + ' does not exist\n\n'
+        else:
+            res += 'There are no actions to create\n\n'
+
+        return res
+
+    def uninstall(self,product_name,pobj):
+        res=''
+        aiparser=ActionIconParser()
+        aiparser.parse(product_name)
+        action_icons=aiparser.get_data()
+        if action_icons:
+            for action in action_icons:
+                tname=action.get('tool',None)
+                tool=self.get_tool(pobj,tname)
+                if tool:
+                    if tool.queryActionIcon(action['category'],action['action_id']):
+                        tool.removeActionIcon(action['category'],action['action_id'])
+                        res += action['action_id']+'was successfully removed\n\n'
+                    else:
+                        res += action['action_id']+'already exists\n\n'
+                else:
+                    res += tname+' does not longer exist removing of '+action['action_id']+' is not possible\n\n'                    
+        else:
+            res += 'There are no action icons to remove\n\n'
+
+        return res
+
+def install_from_xml(self,productName):
     """It would be nice if in future only this method is called from quickinstaller
        and all configuration script will be done in xml and the Quickinstaller install
        the tools"""
     res=''
-    install=Installer()
-    res +=install.install_actions(product_name,self)
-    res +=install.install_properties(product_name,self)
+
+    Action=ActionInstaller()
+    Property=PropertyInstaller()
+    ActionIcon=ActionIconInstaller()
+
+    res +=Action.install(productName,self)
+    res +=Property.install(productName,self)
+    res +=ActionIcon.install(productName,self)
+
     return res
 
-def uninstall_from_xml(self,product_name):
+def uninstall_from_xml(self,productName):
     res=''
-    install=Installer()
-    res +=install.uninstall_actions(product_name,self)
-    res +=install.uninstall_properties(product_name,self)
+
+    Action=ActionInstaller()
+    Property=PropertyInstaller()
+    ActionIcon=ActionIconInstaller()
+
+    res +=Action.uninstall(productName,self)
+    res +=Property.uninstall(productName,self)
+    res +=ActionIcon.uninstall(productName,self)
+
     return res

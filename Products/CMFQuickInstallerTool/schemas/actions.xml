@@ -1,0 +1,99 @@
+<schema>
+  <sectiontype name="action">
+      <description>
+        An action which schould be installed.
+      </description>
+
+	<key name="tool" datatype="string"
+	     required="yes">
+	  <description>
+	    Name of the tool where the actionicon should be
+	    installed. If you want to install a property to 
+	    PortalObject please choose portal_url. this is because 
+	    portal_url is a tool an it provides a method to get
+	    PortalObject. I think this is more consistent as 
+	    creating a new name for referencing to the Portalobject..
+	  </description>
+	</key>
+
+	<key name="name" datatype="string"
+	     required="yes">
+	  <description>
+	    Name of the action wich you see under plone.
+	    When you look at plone Welcome or Log in is
+	    comming from this attribute.
+	  </description>
+	</key>
+
+	<key name="id" datatype="string"
+	     required="yes">
+	  <description>
+	    id is for unique identifying an action.
+	    Tools like portal_action_icons use this id
+	    for assign an icon to an action.
+	  </description>
+	</key>
+	
+	<key name="action" datatype="string"
+	     required="yes">
+	  <description>
+	    Here comes the url in wich is called
+	    after using the action.
+	    
+	    Here you can use string and python expressions
+	    (also called tal expressions look in zpt 
+	     documentation to learn more)
+	    and some build in variables. 
+	  </description>
+	</key>
+	
+	<key name="condition" datatype="string"
+	     required="no">
+	  <description>
+	    Here comes the condition wich is like an add
+	    on to permissions. Both have to passed with
+	    true or the action is not avaliable.
+	
+	    Here you can use string and python expressions
+	    (also called tal expressions look in zpt 
+	     documentation to learn more)
+	    and some build in variables. 
+	  </description>
+	</key>
+	
+	<key name="permission" datatype="string"
+	     required="yes">
+	  <description>
+	    Here you can put one of the legal existing 
+	    permissions in like 'View' or 'Modify portal content'
+	  </description>
+	</key>
+	
+	<key name="category" datatype="string"
+	     required="yes">
+	  <description>
+	    Choose a category for the action.
+	    With category you can control where the
+	    action is visible under plone. Look in 
+	    plone documentation to learn more about
+	    category using for actions. 
+	  </description>
+	</key>
+	
+	<key name="visible" datatype="boolean"
+	     required="yes">
+	  <description>
+	    Should the action displayed under
+	    plone yes or not?
+	  </description>
+	</key>
+    </sectiontype>
+
+    <multisection name="*" type="action" attribute="action">
+      <description>
+        Inherit from section type action. "action" have to stand 
+        around every action. this is for knowing start and end
+        of the actionicon.
+      </description>
+    </multisection>
+</schema>

@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.27 2005/03/14 14:37:24 tiran Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.28 2005/03/15 09:47:10 shh42 Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -15,7 +15,8 @@ import Globals
 from DateTime import DateTime
 from App.Common import package_home
 from types import TupleType
-from zExceptions import BadRequest
+try: from zExceptions import BadRequest
+except ImportError: BadRequest = 'BadRequest'
 
 from Globals import HTMLFile, InitializeClass
 from OFS.SimpleItem import SimpleItem

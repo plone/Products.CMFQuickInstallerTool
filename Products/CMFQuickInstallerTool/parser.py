@@ -173,3 +173,32 @@ class PropertyParser(Parser):
                               'id':property.id,
                               'value':property.value,
                               'type':property.type})
+
+class DependencyParser(Parser):
+    """With this class you can parse dependency informations from xml files
+    The structure for dependency has be the follwing:
+
+        filename:dependencies.conf
+        put the file in your Extension Directory from your Product
+
+        the product Name has be the same as the root directory name from the product.
+        How it is displayed in Quickinstaller.
+        <dependency>
+          product ProductName
+        </dependency>
+
+    Key and value is every time seperated by space. The key name is everytime the same.        
+
+    """
+
+    configName='dependencies.conf'
+    schemaName='dependencies.xml'
+
+    def parse(self,productName):
+        config = self.get_config(productName)
+        if not config:
+            return 'There is no dependencies.conf file'
+
+        for dependency in config.dependency:
+            self.data.append({'product':dependency.product})
+            

@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.20.2.2 2004/07/06 13:36:03 hoka Exp $
+# RCS-ID:      $Id: InstalledProduct.py,v 1.20.2.3 2004/08/06 07:22:13 hoka Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from interfaces.portal_quickinstaller import IInstalledProduct
 
 
-from installer import uninstall_from_xml
+from installer import uninstall_from_xml,uninstall_before
 
 
 def updatelist(a,b):
@@ -205,6 +205,8 @@ class InstalledProduct(SimpleItem):
             raise ValueError, 'The product is locked and cannot be uninstalled!'
 
         res=''
+
+        res += uninstall_before(portal,self.id)
 
         uninstaller=self.getUninstallMethod()
 

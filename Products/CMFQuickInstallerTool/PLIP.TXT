@@ -5,75 +5,113 @@
 
 Definition:
 
-Make installing auf actions and properties easier. Make them installable over xml definition
+Make installing auf actions(normal actions and controlpanel actions), properties, action icons and
+installing of dependend products easier/avaliable. Make them installable over xml definition.
 
 
 Description:
 
-This feature should make actions and proerties installable over xml the feature should be
-integradet in CMFQuickinstaller.
+This modifications are avaliable in collective cvs with branch tag 'plip39-xml-based-config-branch'
 
-Create two files in the Extension Directory of your Product.
-One called actions and the other properties.
+How it works what you have to do to get it running.
+Create a file for that featur you want to use in your extension directory.
 
-The first,actions, fill in this way:
+actions.conf (For installing actions and controlpanel actions)
+actionicons.conf (for installing action icons)
+properties.conf (For installing Prperties)
+dependencies.conf (for installing dependency products)
 
-<portal_actions>
-  name=Testaction
-  id=testaction
-  action=string:test_form
-  condition=member
-  permission=View
-  category=folder
-  visible=1
-</portal_daytatool>
+The parser for xml is ZConfig so the structure of config files is the same as in Zope
 
-<portal_undo> 
-  name=Testaction2
-  id=testaction2
-  action=string:test_form2
-  condition=
-  permission=ModifyPortalContent
-  category=user
-  visible=0
-</portal_undo>
+Some conventions for the new part.
+	- if you want to install something on portal please use portal_url. From portal_url
+	  we are able to get the portalObject. 
+	- If you want to use for Example site_properties do it in this way portal_portperties.site_proeprties
+	  I think using '.' is here the best way because it seems to be common in all zope2/3 xml configuration
+	  files
 
-These two actions are examples. The xml tag provides the name where you
-want to install your action. 
-The rest are the id value pair you normaly fill in in zmi or you give
-to the addAction method from the tool you want to install your action.
-Don't change the varnames bevor the '=' these are the parameter names
-you give to addAction. The Rest edit in the same way as if you put a new
-action to a action provider from zmi.
 
-The second,properties,fill in this way.
+actions.conf and his structure:
 
-<tool_name>
-  propertyname=propertyvalue=type
-  propertyname=propertyvalue1,propertyvalue2,propertyvalue3=list
-  propertyname=1=boolean
-</tool_name>
+Here is an example for two actions you want to install. The first is a normal action the
+second a controlpanel action. Only copy and paste it in your actions.cnf file and it would work.
 
-<tool_name>
-  propertyname=1=boolean
-  propertyname=propertyvalue=type
-  propertyname=propertyvalue1,propertyvalue2,propertyvalue3=list
-  propertyname=1=boolean
-  propertyname=propertyvalue1,propertyvalue2,propertyvalue3=list
-</tool_name>
- 
- Its the same as making actions over xml the diffrent is that you 
- have to think about is what doc you need for properties.
- You need an property id, a property value, and you have to define the type
- and seperate these three parts with a = like above. Don't care about using = in
- the value part i thought on that. The type name has be the same as the tipe name in zmi
- if you add there a property. If you want install a propertie on portalObject use the portal_url tool
- in tag
+<action>
+   tool portal_actions
+   name Testaction
+   id testaction
+   action string:test_form
+   condition member
+   permission View
+   category folder
+   visible true
+</action>
 
+<action>
+  tool portal_controlpanel
+  id testaction2
+  name Testaction2
+  action string:${portal_url}/test_form2
+  condition
+  permission Manage portal
+  category MyProduct
+  visible True
+  appId myid
+</action>
+
+For visible i took the boolean and not the int value because you only have here the posibility to
+check this box or not. Unfortunatly ZConfig only allow here True or falso as boolean value.
+
+actionicons.conf and his structure:
+
+Here an example for an actionicon:
+
+<actionicon>
+  tool portal_actionicons
+  category controlpanel
+  action_id myid
+  icon_expr mail_icon.gif
+  title MyTitle
+  priority 0
+</actionicon>
+
+properties.conf and his structure
+
+Here two examles for property installing
+
+<property>
+  tool portal_url
+  id propertyname
+  value year;month;day;hour;minute
+  type lines
+</property>
+
+<property>
+  tool portal_properties.site_properties
+  id propertyname2
+  value myvalue
+  type string
+</property>
+
+
+properties.conf and his structure:
+
+Here two example for dependency products:
+
+<dependency>
+  product Epoz
+</dependency>
+
+<dependency>
+  product Archetypes
+</dependency>
+
+There is a checking if othere dependencies exists before a dependency tool
+is uninstalled. If there exists anothzer dependency it's not uninstalled.
 
 Motivation:
   -I don't longer want write the same stuff every time again if i want to install an action
-  or a proeprty. 
+   or a proeprty. 
   -Makes Produkt creation easier
 
 Assumptions:

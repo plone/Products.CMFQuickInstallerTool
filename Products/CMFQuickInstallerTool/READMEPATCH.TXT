@@ -1,3 +1,16 @@
+1.5.2
+
+	- added restrictedTraverse support for tool so you can now access site_properties and
+	  the other config sheets in portal_properties.
+	- Nice new feature. Now you can define dependencies of products.
+	- Look in parser.py DependencyParser and dependencies.xml for getting more info.
+	- This new part also checks other product dependencies so if another product
+	  use also the product which is defined has dependency on the product you want to uninstall
+	  it won't be uninstalled.
+	  ATTENTION:I testet this part several times and it works well but please check this part
+	  so that you can be shure it acts in the way you want
+	  we will take no warranty or charge for this part.
+
 1.5.1
 
 	Oooouuuhhhh so many changes.

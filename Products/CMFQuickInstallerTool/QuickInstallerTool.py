@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: QuickInstallerTool.py,v 1.44.2.3 2004/07/07 06:04:54 hoka Exp $
+# RCS-ID:      $Id: QuickInstallerTool.py,v 1.44.2.4 2004/08/06 07:22:14 hoka Exp $
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ from exceptions import RuntimeError
 import zExceptions
 from zLOG import LOG
 
-from installer import install_from_xml
+from installer import install_from_xml, install_before
 
 try:
     from zpi.zope import not_installed, hot_plug
@@ -332,6 +332,7 @@ class QuickInstallerTool( UniqueObject,  ObjectManager, SimpleItem  ):
         ok=1
         #return products
         for p in products:
+            install_before(self,p)
             res += p +':'
             try:
                 r=self.installProduct(p,swallowExceptions=not stoponerror)

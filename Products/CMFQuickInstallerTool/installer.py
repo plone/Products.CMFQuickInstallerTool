@@ -154,7 +154,7 @@ class ActionIconInstaller(Installer):
                 else:
                     res += 'tool: '+ tname + ' does not exist\n'
         else:
-            res += 'There are no actions to create\n'
+            res += 'There are no action icons to create\n'
 
         return res
 

@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: QuickInstallerTool.py,v 1.53 2005/03/14 14:37:26 tiran Exp $
+# RCS-ID:      $Id$
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -84,6 +84,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     def __init__(self):
         self.id = 'portal_quickinstaller'
+
+    def manage_afterAdd(self, container, item):
+        """ Mark ourselves as installed
+        """
+        QuickInstallerTool.inheritedAttribute('manage_afterAdd')(self, container, item)
+        if container is self:
+            if not self.isProductInstalled('CMFQuickInstallerTool'):
+                self.notifyInstalled('CMFQuickInstallerTool', locked=1, hidden=1)
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
     def getInstallMethod(self,productname):
@@ -434,7 +442,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """Check wether a product is installed (by name)
         """
         o = self._getOb(productname, None)
-        return o and o.isInstalled()
+        return o is not None and o.isInstalled()
 
 
     security.declareProtected(ManagePortal, 'notifyInstalled')

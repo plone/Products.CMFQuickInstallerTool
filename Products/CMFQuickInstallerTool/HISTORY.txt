@@ -1,4 +1,7 @@
-unreleased
+1.5.3
+
+ - Added an Extensions.Install module and an initial test suite.
+   [stefan]
 
  - Added optional reinstall argument to install() and uninstall() method
    [tiran]

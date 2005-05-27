@@ -459,7 +459,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             self._setObject(p,ip)
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
-    def uninstallProducts(self, products,
+    def uninstallProducts(self, products=[],
                           cascade=InstalledProduct.default_cascade,
                           reinstall=False,
                           REQUEST=None):

@@ -12,7 +12,7 @@ CMFTestCase.installProduct('CMFQuickInstallerTool')
 CMFTestCase.setupCMFSite()
 
 
-class TestSomeProduct(CMFTestCase.CMFTestCase):
+class TestQuickInstaller(CMFTestCase.CMFTestCase):
 
     def afterSetUp(self):
         self.addProduct('CMFQuickInstallerTool')
@@ -43,11 +43,26 @@ class TestSomeProduct(CMFTestCase.CMFTestCase):
         prods = [x['id'] for x in prods]
         self.failIf('CMFQuickInstallerTool' in prods)
 
+    def testUpgradeQuickInstaller(self):
+        # "Uninstall"
+        self.qi._delObject('CMFQuickInstallerTool')
+        # Should be marked as installed
+        self.qi.installProduct('CMFQuickInstallerTool')
+        self.failUnless(self.qi.isProductInstalled('CMFQuickInstallerTool'))
+        # But neither locked nor hidden
+        for p in self.qi.listInstalledProducts(showHidden=1):
+            if p['id'] == 'CMFQuickInstallerTool':
+                self.failIf(p['isLocked'])
+                self.failIf(p['isHidden'])
+                break
+        else:
+            self.fail('CMFQuickInstallerTool is not installed')
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
-    suite.addTest(makeSuite(TestSomeProduct))
+    suite.addTest(makeSuite(TestQuickInstaller))
     return suite
 
 if __name__ == '__main__':

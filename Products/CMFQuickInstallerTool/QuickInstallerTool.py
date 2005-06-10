@@ -38,6 +38,9 @@ from interfaces.portal_quickinstaller import IQuickInstallerTool
 from exceptions import RuntimeError
 from zLOG import LOG
 
+from ZODB.POSException import ConflictError
+from StringIO import StringIO
+
 try:
     from zExceptions import NotFound
 except ImportError:
@@ -109,23 +112,47 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     if func in modFolder.objectIds():
                         return modFolder[func]
 
+
             try:
                 return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
             except RuntimeError, msg:
                 # external method can throw a bunch of these
                 msg = "RuntimeError: %s" % msg
                 LOG("Quick Installer Tool: ", 100, "%s" % productname, msg)
+            except ConflictError:
+                pass
             except:
                 # catch a string exception
-                err = sys.exc_type
-                #print err, sys.exc_type, sys.exc_value
-                if err not in ("Module Error", NotFound):
-                    msg = "%s: %s" % (err, sys.exc_value)
+                t, v, tb = sys.exc_info()
+
+                if not getattr(self, "errors", {}):
+                    self.errors = {}
+                    
+                if t not in ("Module Error", NotFound):
+                    msg = "%s: %s" % (t, v)
                     LOG("Quick Installer Tool: ", 100, "%s" % productname, msg)
+                    
+                    # write into errors so user can see
+                    strtb = StringIO()
+                    traceback.print_tb(tb, limit=50, file=strtb)
+    
+                    e = {}
+                    e["type"] = str(t)
+                    e["value"] = str(v)
+                    e["traceback"] = strtb.getvalue()
+                    e["productname"] = productname
+            
+                    self.errors[productname] = e
 
         raise AttributeError, ('No Install method found for '
                                'product %s' % productname)
 
+    security.declareProtected(ManagePortal, 'getBrokenInstalls')
+    def getBrokenInstalls(self):
+        """ Return all the broken installs """
+        errs = getattr(self, "errors", {})
+        return errs.values()
+    
     security.declareProtected(ManagePortal, 'isProductInstallable')
     def isProductInstallable(self,productname):
         """Asks wether a product is installable by
@@ -134,6 +161,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         try:
             meth=self.getInstallMethod(productname)
             return 1
+        except ConflictError:
+            raise
         except:
             return 0
 
@@ -145,8 +174,9 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """List candidate CMF products for
         installation -> list of dicts with keys:(id,hasError,status)
         """
+        # reset the list of broken products
+        self.errors = {}
         pids = self.Control_Panel.Products.objectIds() + not_installed(self)
-
         pids = [pid for pid in pids if self.isProductInstallable(pid)]
 
         if skipInstalled:
@@ -170,7 +200,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         dicts with keys:(id, hasError, status, isLocked, isHidden,
         installedVersion)
         """
-
         pids = [o.id for o in self.objectValues()
                 if o.isInstalled() and (o.isVisible() or showHidden)]
 

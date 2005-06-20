@@ -191,6 +191,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                             'hasError':p.hasError()})
             else:
                 res.append({'id':r, 'status':'new', 'hasError':0})
+        res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
 
@@ -212,6 +213,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                         'isLocked':p.isLocked(),
                         'isHidden':p.isHidden(),
                         'installedVersion':p.getInstalledVersion()})
+        res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
     security.declareProtected(ManagePortal, 'getProductFile')

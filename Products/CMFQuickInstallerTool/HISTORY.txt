@@ -1,3 +1,20 @@
+1.5.4
+
+ - listInstalledProducts and listInstallableProducts now return
+   alphabetized lists.
+   [geoffd]
+
+ - Catch errors where the product is there but install cannot by compiled,
+   this picks up syntax errors and adds the them to an errors dict.
+   When listInstallableProducts is called, the errors dict is repoulated.
+   Also added in a few except ConflictErrors.
+   [andym]
+
+ - Fixing plone bug #3113, where the "uninstall" button would raise an exception
+   if no items were selected; this makes the uninstallProducts() method symmetric
+   with the installProducts() method
+   [optilude]
+
 1.5.3
 
  - Added an Extensions.Install module and an initial test suite.

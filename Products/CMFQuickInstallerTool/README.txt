@@ -123,7 +123,7 @@ afterInstall:  Called after a product is installed and the changes are saved
                into the product instance.
                The method is called between install() and recoding the installed
                objects.
-beforeInstall: Called before a product is uninstalled. It may change the
+beforeUninstall: Called before a product is uninstalled. It may change the
                cascade containing which object types should be cleared.
                The method is called after uninstall() but before the cascading
                removing of installed objects.

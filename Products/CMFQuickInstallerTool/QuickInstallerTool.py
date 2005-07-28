@@ -270,6 +270,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if p in not_installed(self):
             hot_plug(self, p)
 
+
         portal_types=getToolByName(self,'portal_types')
         portal_skins=getToolByName(self,'portal_skins')
         portal_actions=getToolByName(self,'portal_actions')
@@ -281,13 +282,16 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         rightslotsbefore=getattr(portal,'right_slots',[])
         registrypredicatesbefore=[pred[0] for pred in type_registry.listPredicates()]
 
-
-        emid='install'+p
         typesbefore=portal_types.objectIds()
         skinsbefore=portal_skins.objectIds()
         actionsbefore=[a.id for a in portal_actions._actions]
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
+
+        if self.isProductInstalled('ResourceRegistries'):
+            resources_js_before=getToolByName(self,'portal_javascripts').getResourceIds()
+            resources_css_before=getToolByName(self,'portal_css').getResourceIds()
+
         res=''
         status=None
         error=1
@@ -344,6 +348,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
 
+        #hardcoded, but i have no more time ;( will go for that when it comes to plone 2.2
+        if self.isProductInstalled('ResourceRegistries'):
+            resources_js_after=getToolByName(self,'portal_javascripts').getResourceIds()
+            resources_css_after=getToolByName(self,'portal_css').getResourceIds()
+            
         if callable(rightslotsafter):
             rightslotsafter = rightslotsafter()
         if callable(leftslotsafter):
@@ -354,54 +363,41 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if callable(leftslotsbefore):
             leftslotsbefore = leftslotsbefore()
 
-        types=[t for t in typesafter if t not in typesbefore]
-        skins=[s for s in skinsafter if s not in skinsbefore]
-        actions=[a.id for a in portal_actions._actions
-                 if a.id not in actionsbefore]
-        workflows=[w for w in workflowsafter if w not in workflowsbefore]
-        portalobjects=[a for a in portalobjectsafter
-                       if a not in portalobjectsbefore]
-        leftslots=[s for s in leftslotsafter if s not in leftslotsbefore]
-        rightslots=[s for s in rightslotsafter if s not in rightslotsbefore]
-        registrypredicates=[s for s in registrypredicatesafter
-                            if s not in registrypredicatesbefore]
+        settings=dict(
+            types=[t for t in typesafter if t not in typesbefore],
+            skins=[s for s in skinsafter if s not in skinsbefore],
+            actions=[a.id for a in portal_actions._actions
+                     if a.id not in actionsbefore],
+            workflows=[w for w in workflowsafter if w not in workflowsbefore],
+            portalobjects=[a for a in portalobjectsafter
+                           if a not in portalobjectsbefore],
+            leftslots=[s for s in leftslotsafter if s not in leftslotsbefore],
+            rightslots=[s for s in rightslotsafter if s not in rightslotsbefore],
+            registrypredicates=[s for s in registrypredicatesafter
+                                if s not in registrypredicatesbefore],
+            )
 
+        if self.isProductInstalled('ResourceRegistries'):
+            settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
+            settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
+        
         msg=str(res)
         version=self.getProductVersion(p)
         # add the product
         try:
-            if p in self.objectIds():
-                ip = getattr(self, p)
-                ip.update(types=types,
-                          skins=skins,
-                          actions=actions,
-                          portalobjects=portalobjects,
-                          workflows=workflows,
-                          leftslots=leftslots,
-                          rightslots=rightslots,
-                          registrypredicates=registrypredicates,
-                          installedversion=version,
-                          logmsg=res,
-                          status=status,
-                          error=error,
-                          locked=locked,
-                          hidden=hidden)
-            else:
-                ip = InstalledProduct(p, self, types=types,
-                                      skins=skins,
-                                      actions=actions,
-                                      portalobjects=portalobjects,
-                                      workflows=workflows,
-                                      leftslots=leftslots,
-                                      rightslots=rightslots,
-                                      registrypredicates=registrypredicates,
-                                      installedversion=version,
-                                      logmsg=res,
-                                      status=status,
-                                      error=error,
-                                      locked=locked,
-                                      hidden=hidden)
+            if p not in self.objectIds():
+                ip = InstalledProduct(p)
                 self._setObject(p,ip)
+                
+            ip = getattr(self, p)
+            ip.update(settings,
+                      installedversion=version,
+                      logmsg=res,
+                      status=status,
+                      error=error,
+                      locked=locked,
+                      hidden=hidden)
+
         except InvalidObjectReference,e:
             raise
         except:
@@ -482,12 +478,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         without QuickInstaller as installed
         """
 
-        if p in self.objectIds():
-            p = getattr(self, p)
-            p.update(locked=locked, hidden=hidden, **kw)
-        else:
-            ip = InstalledProduct(p, self, locked=locked, hidden=hidden, **kw)
+        if not p in self.objectIds():
+            ip = InstalledProduct(p)
             self._setObject(p,ip)
+            
+        p = getattr(self, p)
+        p.update({},locked=locked, hidden=hidden, **kw)
+
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
     def uninstallProducts(self, products=[],
@@ -520,5 +517,27 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+
+    def getQIElements(self):
+        res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 
+                  'leftslots', 'rightslots', 'registrypredicates']
+                  
+        if self.isProductInstalled('ResourceRegistries'):
+            res.extend(['resources_js', 'resources_css'])
+            
+        return res
+
+    def getAlreadyRegistered(self):
+        """Get a list of already registered elements
+        """
+        result = {}
+        products = [p for p in self.objectValues() if p.isInstalled() ]
+        for element in self.getQIElements():
+            v = result.setdefault(element, [])
+            for product in products:
+                pv = getattr(aq_base(product), element, None)
+                if pv:
+                    v.extend(list(pv))
+        return result
 
 InitializeClass(QuickInstallerTool)

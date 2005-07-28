@@ -118,3 +118,6 @@ class IInstalledProduct(Interface):
         '''
     def getInstalledVersion():
         ''' returns the version of the prod in the moment of installation '''
+
+    def getValue(name):
+        ''' returns a value that is tracked by QuickInstaller '''

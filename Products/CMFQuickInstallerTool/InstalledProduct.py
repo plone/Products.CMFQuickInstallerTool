@@ -5,7 +5,7 @@
 # Author:      Philipp Auersperg
 #
 # Created:     2003/10/01
-# RCS-ID:      $Id: InstalledProduct.py,v 1.28 2005/03/15 09:47:10 shh42 Exp $
+# RCS-ID:      $Id$
 # Copyright:   (c) 2003 BlueDynamics
 # Licence:     GPL
 #-----------------------------------------------------------------------------
@@ -37,39 +37,9 @@ from installer import uninstall_from_xml
 from zLOG import LOG, INFO, PROBLEM, ERROR
 
 # the list of elements that watched by the quickinstaller
-QI_ELEMENTS = ('types', 'skins', 'actions', 'portalobjects', 'workflows', 
-              'leftslots', 'rightslots', 'registrypredicates')
 
-def updatelist(a, b, c=None):
-    for l in b:
-        if not l in a:
-            if c is None:
-                a.append(l)
-            else:
-                if not l in c:
-                    a.append(l)
+from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
-def delObjects(cont, ids):
-    """ abbreviation to delete objects """
-    delids=[id for id in ids if hasattr(aq_base(cont),id)]
-    for delid in delids:
-        try:
-            cont.manage_delObjects(delid)
-        except (AttributeError, KeyError, BadRequest):
-            LOG("Quick Installer Tool: ", PROBLEM, "Failed to delete '%s' in '%s'" % (delid, cont.id))
-
-def getAlreadyRegistered(qi):
-    """Get a list of already registered elements
-    """
-    result = {}
-    products = [p for p in qi.objectValues() if p.isInstalled() ]
-    for element in QI_ELEMENTS:
-        v = result.setdefault(element, [])
-        for product in products:
-            pv = getattr(aq_base(product), element, None)
-            if pv:
-                v.extend(list(pv))
-    return result
 
 class InstalledProduct(SimpleItem):
     """ class storing information about an installed product"""
@@ -96,62 +66,32 @@ class InstalledProduct(SimpleItem):
     default_cascade=['types', 'skins', 'actions', 'portalobjects',
                      'workflows', 'slots', 'registrypredicates']
 
-    def __init__(self, id, qi, types=[], skins=[], actions=[],
-                 portalobjects=[], workflows=[], leftslots=[],
-                 rightslots=[], registrypredicates=[],
-                 installedversion='', logmsg='', status='installed',
-                 error=0, locked=0, hidden=0):
-                     
+    def __init__(self, id,):
         self.id=id
-        reg = getAlreadyRegistered(qi)
-
-        # create the attributes
-        for att in QI_ELEMENTS:
-            setattr(self, att, [])
+        self.transcript=[]
+        self.locked=None
+        self.hidden=None
+        self.installedversion=None
+        self.status='new'
+        self.error=None
         
-        updatelist(self.types, types, reg['types'])
-        updatelist(self.skins, skins, reg['skins'])
-        updatelist(self.actions, actions, reg['actions'])
-        updatelist(self.portalobjects, portalobjects, reg['portalobjects'])
-        updatelist(self.workflows, workflows, reg['workflows'])
-        updatelist(self.leftslots, leftslots, reg['leftslots'])
-        updatelist(self.rightslots, rightslots, reg['rightslots'])
-        updatelist(self.registrypredicates, registrypredicates, reg['registrypredicates'])
-        self.transcript=[{'timestamp':DateTime(),'msg':logmsg}]
-        self.locked=locked
-        self.hidden=hidden
-        self.installedversion=installedversion
-
-        if status:
-            self.status=status
-        else:
-            self.status='new'
-
-        self.error=error
 
     security.declareProtected(ManagePortal, 'update')
-    def update(self, types=[], skins=[], actions=[], portalobjects=[],
-               workflows=[], leftslots=[], rightslots=[],
-               registrypredicates=[], installedversion='',
+    def update(self, settings, installedversion='',
                logmsg='', status='installed', error=0,
                locked=0, hidden=0):
 
         #check for the availability of attributes before assiging
-        for att in QI_ELEMENTS:
-            if not hasattr(self, att):
+        for att in settings.keys():
+            if not hasattr(self.aq_base, att):
                 setattr(self, att, [])
                 
         qi = getToolByName(self, 'portal_quickinstaller')
-        reg = getAlreadyRegistered(qi) 
+        reg = qi.getAlreadyRegistered()
 
-        updatelist(self.types, types, reg['types'])
-        updatelist(self.skins, skins, reg['skins'])
-        updatelist(self.actions, actions, reg['actions'])
-        updatelist(self.portalobjects, portalobjects, reg['portalobjects'])
-        updatelist(self.workflows, workflows, reg['workflows'])
-        updatelist(self.leftslots, leftslots, reg['leftslots'])
-        updatelist(self.rightslots, rightslots, reg['rightslots'])
-        updatelist(self.registrypredicates, registrypredicates, reg['registrypredicates'])
+        for k in settings.keys():
+            updatelist(getattr(self,k), settings[k], reg[k])
+
         self.transcript.insert(0, {'timestamp':DateTime(), 'msg':logmsg})
         self.locked=locked
         self.hidden=hidden
@@ -230,6 +170,10 @@ class InstalledProduct(SimpleItem):
     def getSlots(self):
         return self.leftslots+self.rightslots
 
+    security.declareProtected(ManagePortal, 'getValue')
+    def getValue(self,name):
+        return getattr(self,name,[])
+    
     security.declareProtected(ManagePortal, 'getRegistryPredicates')
     def getRegistryPredicates(self):
         """Return the custom entries in the content_type_registry
@@ -390,6 +334,16 @@ class InstalledProduct(SimpleItem):
                     ctr.removePredicate(p)
                 else:
                     LOG("Quick Installer Tool: ", PROBLEM, "Failed to delete '%s' from content type registry" % p)
+
+        if self.getId() != 'ResourceRegistries' and getToolByName(self,'portal_quickinstaller').isProductInstalled('ResourceRegistries'):
+            rr_js=getToolByName(self,'portal_javascripts')
+            for js in getattr(self,'resources_js',[]):
+                rr_js.unregisterResource(js)
+                
+            rr_css=getToolByName(self,'portal_css')
+            for css in getattr(self,'resources_css',[]):
+                rr_css.unregisterResource(css)
+                
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

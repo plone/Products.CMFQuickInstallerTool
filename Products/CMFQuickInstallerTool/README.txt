@@ -5,7 +5,7 @@ Features
 ----------
 
 CMFQuickInstallerTool is a facility for comfortable activation/deactivation
-of CMF compliant products inside a CMF site.
+of CMF compliant products inside a CMF 1.5 site.
 
 Therefore it has to be installed as a tool inside a CMF portal,
 where it stores the information about the installed products.

@@ -1,6 +1,5 @@
 from Acquisition import aq_base, aq_inner, aq_parent
-
-
+from zExceptions import BadRequest
 
 def updatelist(a, b, c=None):
     for l in b:

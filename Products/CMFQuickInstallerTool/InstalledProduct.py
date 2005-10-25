@@ -26,8 +26,7 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent, Implicit, aq_base
 
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.permissions import ManagePortal
 
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile

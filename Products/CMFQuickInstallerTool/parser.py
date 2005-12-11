@@ -2,7 +2,7 @@ import os
 from string import strip,split
 from Products.CMFCore.utils import expandpath
 
-class ActionParser:
+class ActionParser(object):
     """With this object you can parse action informations from xml files
     The structure for actions has be the follwing:
 
@@ -37,14 +37,17 @@ class ActionParser:
 
     def parse(self,product_name):
         """parse the actions to a list consisting dictionaries with the action data"""
+        original_path = os.path.abspath(os.path.curdir)
         try:
             dirpath = expandpath(os.path.join(product_name,'Extensions'))
             os.chdir(dirpath)
         except OSError:
+            os.chdir(original_path)
             return None
         try:
             self.lines=open('actions').readlines()
         except:
+            os.chdir(original_path)
             return None
         for line in self.lines:
             new_line=strip(line)
@@ -61,11 +64,12 @@ class ActionParser:
                         action[item[0]]=item[1]
                 self.data.append({strip(self.lines[self.start])[1:-1]:action})
             self.lineno=self.lineno+1
+        os.chdir(original_path)
 
     def get_data(self):
         return self.data
 
-class PropertyParser:
+class PropertyParser(object):
     """With this object you can parse property informations from xml files
     The structure for properties has be the follwing:
 
@@ -95,6 +99,7 @@ class PropertyParser:
 
     def parse(self,product_name):
         """parse the properties to a list consisting dictionaries with the property data"""
+        original_path = os.path.abspath(os.path.curdir)
         try:
             dirpath = expandpath(os.path.join(product_name,'Extensions'))
             os.chdir(dirpath)
@@ -103,6 +108,7 @@ class PropertyParser:
         try:
             self.lines=open('properties').readlines()
         except:
+            os.chdir(original_path)
             return None
 
         for line in self.lines:
@@ -125,6 +131,7 @@ class PropertyParser:
                     property['type']=item[-1]
                     self.data.append({strip(self.lines[self.start])[1:-1]:property})
             self.lineno=self.lineno+1
-
+        os.chdir(original_path)
+        
     def get_data(self):
         return self.data

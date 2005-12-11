@@ -460,8 +460,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     raise
                 res += 'failed\n'
 
-        # New Part if it is accepted perhaps build it in in the loop above
-        for p in products:
             data = install_from_xml(self, p)
             res += data
 

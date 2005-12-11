@@ -37,18 +37,12 @@ class ActionParser(object):
 
     def parse(self,product_name):
         """parse the actions to a list consisting dictionaries with the action data"""
-        original_path = os.path.abspath(os.path.curdir)
-        try:
-            dirpath = expandpath(os.path.join(product_name,'Extensions'))
-            os.chdir(dirpath)
-        except OSError:
-            os.chdir(original_path)
+        dirpath = expandpath(os.path.join(product_name,'Extensions'))
+        actions_path = os.path.join(dirpath, 'actions')
+        if not os.path.exists(actions_path):
             return None
-        try:
-            self.lines=open('actions').readlines()
-        except:
-            os.chdir(original_path)
-            return None
+        
+        self.lines=open(actions_path).readlines()
         for line in self.lines:
             new_line=strip(line)
             if new_line.startswith('<') and not new_line.startswith('</'):
@@ -64,7 +58,7 @@ class ActionParser(object):
                         action[item[0]]=item[1]
                 self.data.append({strip(self.lines[self.start])[1:-1]:action})
             self.lineno=self.lineno+1
-        os.chdir(original_path)
+
 
     def get_data(self):
         return self.data
@@ -99,18 +93,12 @@ class PropertyParser(object):
 
     def parse(self,product_name):
         """parse the properties to a list consisting dictionaries with the property data"""
-        original_path = os.path.abspath(os.path.curdir)
-        try:
-            dirpath = expandpath(os.path.join(product_name,'Extensions'))
-            os.chdir(dirpath)
-        except OSError:
+        dirpath = expandpath(os.path.join(product_name,'Extensions'))
+        xmlpath = os.path.join(dirpath, 'properties')
+        if not os.path.exists(xmlpath):
             return None
-        try:
-            self.lines=open('properties').readlines()
-        except:
-            os.chdir(original_path)
-            return None
-
+        
+        self.lines=open(xmlpath).readlines()
         for line in self.lines:
             new_line=strip(line)
             if new_line.startswith('<') and not new_line.startswith('</'):
@@ -131,7 +119,6 @@ class PropertyParser(object):
                     property['type']=item[-1]
                     self.data.append({strip(self.lines[self.start])[1:-1]:property})
             self.lineno=self.lineno+1
-        os.chdir(original_path)
         
     def get_data(self):
         return self.data

@@ -2,7 +2,7 @@ from parser import ActionParser,PropertyParser
 from Products.CMFCore.utils import getToolByName
 from string import join
 
-class Installer:
+class Installer(object):
 
     def install_actions(self,product_name,pobj):
         """Install actions to the specified tool"""

@@ -26,8 +26,11 @@ from Acquisition import aq_base, aq_inner, aq_parent
 from App.Common import package_home
 
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+# BBB CMF < 1.5
+try:
+    from Products.CMFCore.permissions import ManagePortal
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile

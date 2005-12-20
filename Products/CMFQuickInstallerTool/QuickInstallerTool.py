@@ -326,7 +326,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             raise
         except:
             tb=sys.exc_info()
-            if str(tb[1]).endswith('already in use.'):
+            if str(tb[1]).endswith('already in use.') and not reinstall:
                 self.error_log.raising(tb)
                 res='this product has already been installed without Quickinstaller!'
                 if not swallowExceptions:

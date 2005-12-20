@@ -1,6 +1,8 @@
 1.5.7 unreleased
 
- -
+ - If we are reinstalling do not say the product is already installed if we
+   see an exception but show the real error message
+   [wichert]
 
 1.5.6 Released December 18, 2005
 

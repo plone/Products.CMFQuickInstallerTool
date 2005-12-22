@@ -389,7 +389,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if self.isProductInstalled('ResourceRegistries'):
             settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
             settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
-        
+            if len(settings['types']) > 0:
+                rr_css=getToolByName(self,'portal_css')
+                rr_css.cookResources()
+
         msg=str(res)
         version=self.getProductVersion(p)
         # add the product

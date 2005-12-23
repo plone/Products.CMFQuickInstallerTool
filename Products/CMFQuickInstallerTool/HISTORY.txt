@@ -1,4 +1,4 @@
-1.5.7 unreleased
+1.5.7 Released December 23, 2005
 
  - Cook resources when new types were added and ResourceRegistries is installed.
    [fschulze]

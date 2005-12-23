@@ -1,5 +1,8 @@
 1.5.7 unreleased
 
+ - Cook resources when new types were added and ResourceRegistries is installed.
+   [fschulze]
+
  - If we are reinstalling do not say the product is already installed if we
    see an exception but show the real error message
    [wichert]

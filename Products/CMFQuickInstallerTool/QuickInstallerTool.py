@@ -44,6 +44,8 @@ from zLOG import LOG
 from ZODB.POSException import ConflictError
 from StringIO import StringIO
 
+from Globals import INSTANCE_HOME, DevelopmentMode
+
 try:
     import transaction
 except ImportError:
@@ -549,5 +551,19 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 if pv:
                     v.extend(list(pv))
         return result
+
+    security.declareProtected(ManagePortal, 'isDevelopmentMode')
+    def isDevelopmentMode(self):
+        """Is the Zope server in debug mode?
+        """
+
+        return not not DevelopmentMode
+
+    security.declareProtected(ManagePortal, 'getInstanceHome')
+    def getInstanceHome(self):
+        """Return location of $INSTANCE_HOME
+        """
+
+        return INSTANCE_HOME
 
 InitializeClass(QuickInstallerTool)

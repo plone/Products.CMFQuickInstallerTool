@@ -1,6 +1,7 @@
 1.5.8 unreleased
 
- -
+ - Added methods to display Products directory and debug mode (if enabled)
+   [joelburton]
 
 1.5.7 Released December 23, 2005
 

@@ -1,5 +1,8 @@
 1.5.8 unreleased
 
+ - Avoid DeprecationWarning for manageAddDelete and product_name.
+   [hannosch]
+
  - Added methods to display Products directory and debug mode (if enabled)
    [joelburton]
 

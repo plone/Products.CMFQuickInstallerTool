@@ -32,7 +32,6 @@ def initialize( context ):
     initializeBasesPhase2( z_tool_bases, context )
     ToolInit( 'CMF QuickInstaller Tool',
                     tools = tools,
-                    product_name = 'QuickInstallerTool',
                     icon='tool.gif'
                     ).initialize( context )
 

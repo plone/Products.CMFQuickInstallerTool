@@ -46,11 +46,6 @@ Installation
 
 - inside the portal instanciate a CMF QuickInstaller Tool
 
-- Happy debian users may apt-get install the Quick Installer by 
-adding the following line to their /etc/apt/sources.list file :
-
-deb ftp://ftp.logilab.org/pub/debian unstable/
-
 Usage:
 --------
 
@@ -59,9 +54,6 @@ the management screen allows you to select products for
 installation and uninstallation.
 you can browse into the installed products and see what
 they created and see the logs of the install process.
-
-for Plone there will be an interface inside the portal so that
-it is not necessary to enter thr ZMI for product management
 
 API
 -------
@@ -95,7 +87,7 @@ Reinstalling a product invokes uninstall() and install(). If you have special
 code which should work differently on reinstall than uninstall/install you can
 add a second argument to the install or uninstall method named 'reinstall' which
 is true only for a reinstallation. In most cases you shouldn't react differently
-when reinstalling!=======
+when reinstalling!
 
 Install:
 --------

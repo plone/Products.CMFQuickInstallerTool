@@ -1,17 +1,3 @@
-#-----------------------------------------------------------------------------
-# Name:        __init__.py
-# Purpose:
-#
-# Author:      Philipp Auersperg
-#
-# Created:     2003/10/01
-# RCS-ID:      $Id$
-# Copyright:   (c) 2003 BlueDynamics
-# Licence:     GPL
-#-----------------------------------------------------------------------------
-# CMF based tool for installing/uninstalling CMF products
-
-
 from Products.CMFCore.utils import initializeBasesPhase1,  \
     initializeBasesPhase2, ToolInit
     
@@ -39,4 +25,4 @@ def initialize( context ):
         QuickInstallerTool.QuickInstallerTool,
         meta_type="CMFQuickInstallerTool",
         constructors=(QuickInstallerTool.addQuickInstallerTool,),
-        icon = 'tool.gif')         #Visibility was added recently, so may be a problem
+        icon = 'tool.gif')

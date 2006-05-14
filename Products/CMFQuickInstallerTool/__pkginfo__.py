@@ -4,7 +4,7 @@ version = open('version.txt').read().strip()
 numversion = version.split('.')
 
 license = 'GPL'
-copyright = '''(c) 2003 BlueDynamics'''
+copyright = '''(c) 2006 BlueDynamics'''
 
 author = "Philipp Auersperg"
 author_email = "phil@bluedynamics.com"
@@ -15,7 +15,7 @@ The main difference to CMFQuickInstaller the tracking of
 what a product creates during install.
 """
 
-web = "http://www.sourceforge.net/projects/collective"
+web = "http://www.plone.org/products/cmfquickinstaller"
 ftp = ""
 mailing_list = "collective@lists.sourceforge.net"
 

@@ -1,5 +1,8 @@
 1.5.8 unreleased
 
+ - Some general spring cleaning.
+   [hannosch]
+
  - Avoid DeprecationWarning for product_name.
    [hannosch]
 

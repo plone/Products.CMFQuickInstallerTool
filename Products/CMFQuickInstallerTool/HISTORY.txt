@@ -1,3 +1,7 @@
+ - Fixed two missing imports in utils.py. This closes
+   http://dev.plone.org/plone/ticket/5529.
+   [hannosch]
+
 1.5.8 Released May 15, 2006
 
  - Some general spring cleaning.

@@ -1,51 +1,26 @@
-#-----------------------------------------------------------------------------
-# Name:        InstalledProduct.py
-# Purpose:
-#
-# Author:      Philipp Auersperg
-#
-# Created:     2003/10/01
-# RCS-ID:      $Id$
-# Copyright:   (c) 2003 BlueDynamics
-# Licence:     GPL
-#-----------------------------------------------------------------------------
-
 import os
 import Globals
-from DateTime import DateTime
-from App.Common import package_home
-from types import TupleType
-try: from zExceptions import BadRequest
-except ImportError: BadRequest = 'BadRequest'
-
-from Globals import HTMLFile, InitializeClass
-from OFS.SimpleItem import SimpleItem
-from OFS.ObjectManager import ObjectManager
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent, Implicit, aq_base
+from App.Common import package_home
+from DateTime import DateTime
+from Globals import HTMLFile, InitializeClass
+from OFS.ObjectManager import ObjectManager
+from OFS.SimpleItem import SimpleItem
+from zExceptions import BadRequest
+from zLOG import LOG, INFO, PROBLEM, ERROR
 
 from Products.CMFCore.utils import UniqueObject, getToolByName
-# BBB CMF < 1.5
-try:
-    from Products.CMFCore.permissions import ManagePortal
-except ImportError:
-    from Products.CMFCore.CMFCorePermissions import ManagePortal
-
+from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from interfaces.portal_quickinstaller import IInstalledProduct
-from installer import uninstall_from_xml
-from zLOG import LOG, INFO, PROBLEM, ERROR
-
-# the list of elements that watched by the quickinstaller
-
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
-
 class InstalledProduct(SimpleItem):
-    """ class storing information about an installed product"""
+    """Class storing information about an installed product"""
 
     __implements__ = IInstalledProduct
 
@@ -77,7 +52,6 @@ class InstalledProduct(SimpleItem):
         self.installedversion=None
         self.status='new'
         self.error=None
-        
 
     security.declareProtected(ManagePortal, 'update')
     def update(self, settings, installedversion='',
@@ -287,9 +261,6 @@ class InstalledProduct(SimpleItem):
         self.status='uninstalled'
         self.log('uninstalled\n'+str(res)+str(afterRes))
 
-        # New part
-        uninstall_from_xml(portal,self.id)
-
         if REQUEST and REQUEST.get('nextUrl',None):
             return REQUEST.RESPONSE.redirect(REQUEST['nextUrl'])
 
@@ -346,7 +317,6 @@ class InstalledProduct(SimpleItem):
             rr_css=getToolByName(self,'portal_css')
             for css in getattr(self,'resources_css',[]):
                 rr_css.unregisterResource(css)
-                
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

@@ -5,7 +5,7 @@ Features
 ----------
 
 CMFQuickInstallerTool is a facility for comfortable activation/deactivation
-of CMF compliant products inside a CMF 1.5 site.
+of CMF compliant products inside a CMF 1.6+ site.
 
 Therefore it has to be installed as a tool inside a CMF portal,
 where it stores the information about the installed products.
@@ -30,7 +30,8 @@ portal skins,
 portal actions,
 portalobjects (objects created in the root of the portal),
 workflows,
-left and right slots (also checks them only for the portal)
+left and right slots (also checks them only for the portal),
+resource registry entries
 
 Attention: QuickInstallerTool just tracks which objects are 
 ADDED, but not what is changed or deleted.

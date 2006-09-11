@@ -1,63 +1,35 @@
-#-----------------------------------------------------------------------------
-# Name:        QuickInstallerTool.py
-# Purpose:
-#
-# Author:      Philipp Auersperg
-#
-# Created:     2003/10/01
-# RCS-ID:      $Id$
-# Copyright:   (c) 2003 BlueDynamics
-# Licence:     GPL
-#-----------------------------------------------------------------------------
-
+import os
 import sys
 import traceback
-import os
-from types import StringTypes, FunctionType, MethodType
-
-import Globals
-from Globals import HTMLFile, InitializeClass
-from OFS.SimpleItem import SimpleItem
-from OFS.ObjectManager import ObjectManager
-from ZODB.POSException import InvalidObjectReference
+import transaction
+from types import FunctionType, MethodType
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 from App.Common import package_home
 
-from Products.CMFCore.utils import UniqueObject, getToolByName
-# BBB CMF < 1.5
-try:
-    from Products.CMFCore.permissions import ManagePortal
-except ImportError:
-    from Products.CMFCore.CMFCorePermissions import ManagePortal
+import Globals
+from Globals import DevelopmentMode
+from Globals import HTMLFile
+from Globals import InitializeClass
+from Globals import INSTANCE_HOME
+from OFS.SimpleItem import SimpleItem
+from OFS.ObjectManager import ObjectManager
+from StringIO import StringIO
+from ZODB.POSException import ConflictError
+from ZODB.POSException import InvalidObjectReference
+from zLOG import LOG
+from zExceptions import NotFound
 
+from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from InstalledProduct import InstalledProduct
-
 from interfaces.portal_quickinstaller import IQuickInstallerTool
 from exceptions import RuntimeError
-from zLOG import LOG
 
-from ZODB.POSException import ConflictError
-from StringIO import StringIO
-
-from Globals import INSTANCE_HOME, DevelopmentMode
-
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
-
-try:
-    from zExceptions import NotFound
-except ImportError:
-    NotFound = 'NotFound'
-
-from installer import install_from_xml
+from InstalledProduct import InstalledProduct
 
 try:
     from zpi.zope import not_installed, hot_plug
@@ -205,7 +177,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
-
     security.declareProtected(ManagePortal, 'listInstalledProducts')
     def listInstalledProducts(self, showHidden=0):
         """Returns a list of products that are installed -> list of
@@ -262,13 +233,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             res = res.strip()
         return res
 
-
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=0, hidden=0, swallowExceptions=0,
                        reinstall=False):
         """Install a product by name
         """
-
         __traceback_info__ = (p,)
 
         if self.isProductInstalled(p):
@@ -280,7 +249,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if p in not_installed(self):
             hot_plug(self, p)
-
 
         portal_types=getToolByName(self,'portal_types')
         portal_skins=getToolByName(self,'portal_skins')
@@ -310,9 +278,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         # Some heursitics to figure out if its already been installed
         if swallowExceptions:
-            transaction.commit(1) # start a subtransaction,
-                                  # commit what has happened so
-                                  # far
+            transaction.savepoint(optimistic=True)
         try:
 
             try:
@@ -348,7 +314,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 transaction.abort(1)   #this is very naughty
             else:
                 raise
-
 
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
@@ -468,9 +433,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     raise
                 res += 'failed\n'
 
-            data = install_from_xml(self, p)
-            res += data
-
         if REQUEST :
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
@@ -482,7 +444,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         o = self._getOb(productname, None)
         return o is not None and o.isInstalled()
-
 
     security.declareProtected(ManagePortal, 'notifyInstalled')
     def notifyInstalled(self,p,locked=1,hidden=0,**kw):
@@ -496,7 +457,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             
         p = getattr(self, p)
         p.update({},locked=locked, hidden=hidden, **kw)
-
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
     def uninstallProducts(self, products=[],
@@ -518,7 +478,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         ininstall/reinstall is that it does not remove portal objects
         created  during install (e.g. tools, etc.)
         """
-        if type(products) in StringTypes:
+        if isinstance(products, basestring):
             products=[products]
 
         # only delete everything EXCEPT portalobjects (tools etc) for reinstall

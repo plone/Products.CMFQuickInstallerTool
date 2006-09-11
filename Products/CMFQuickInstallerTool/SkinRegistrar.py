@@ -1,14 +1,12 @@
 # gracefully donated by Gilles Lenfant from pilotsystems.net
 
+import os
+
+from App.Common import package_home
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.DirectoryView import addDirectoryViews
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
-
-
 from StringIO import StringIO
-
-from App.Common import package_home
-import os
 
 class PloneSkinRegistrar:
     """
@@ -133,4 +131,3 @@ class PloneSkinRegistrar:
             else:
                 rpt += 'Skipping "%s" skin, "%s" is already removed\n' % (skin, layerName)
         return rpt
-# /class PloneSkinRegistrar

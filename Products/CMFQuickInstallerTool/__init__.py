@@ -1,6 +1,7 @@
 from Products.CMFCore.utils import initializeBasesPhase1,  \
     initializeBasesPhase2, ToolInit
-    
+from Products.GenericSetup import EXTENSION, profile_registry
+
 import QuickInstallerTool
 from QuickInstallerTool import AlreadyInstalled
 
@@ -25,3 +26,11 @@ def initialize( context ):
         meta_type="CMFQuickInstallerTool",
         constructors=(QuickInstallerTool.addQuickInstallerTool,),
         icon = 'tool.gif')
+
+    profile_registry.registerProfile('CMFQuickInstallerTool',
+            'CMFQuickInstallerTool',
+            'Extension profile for CMFQuickInstallerTool',
+            'profiles/default',
+            'CMFQuickInstallerTool',
+            EXTENSION,
+            for_=None)

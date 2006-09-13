@@ -8,22 +8,13 @@ from Testing import ZopeTestCase
 from Products.CMFTestCase import CMFTestCase
 
 CMFTestCase.installProduct('CMFQuickInstallerTool')
-CMFTestCase.installProduct('CMFFormController')
-CMFTestCase.installProduct('CMFDynamicViewFTI')
-
 CMFTestCase.setupCMFSite()
-
 
 class TestQuickInstaller(CMFTestCase.CMFTestCase):
 
     def afterSetUp(self):
         self.addProduct('CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
-
-    def testInstallProduct(self):
-        qi = self.app.cmf.portal_quickinstaller
-        qi.installProducts(products=['CMFDynamicViewFTI'])
-        import pdb; pdb.set_trace()
 
     def testTool(self):
         self.failUnless('portal_quickinstaller' in self.portal.objectIds())

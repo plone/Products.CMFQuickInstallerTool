@@ -4,6 +4,8 @@ import traceback
 import transaction
 from types import FunctionType, MethodType
 
+from zope.interface import implements
+
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 from App.Common import package_home
@@ -45,13 +47,20 @@ class AlreadyInstalled(Exception):
 def addQuickInstallerTool(self,REQUEST=None):
     """ """
     qt = QuickInstallerTool()
-    self._setObject('portal_quickinstaller', qt, set_owner=0)
+    self._setObject('portal_quickinstaller', qt, set_owner=False)
     if REQUEST:
         return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
     
 class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
+    """
+      Let's make sure that this implementation actually fulfills the
+      'IQuickInstallerTool' API.
 
-    __implements__ = IQuickInstallerTool
+      >>> from zope.interface.verify import verifyClass
+      >>> verifyClass(IQuickInstallerTool, QuickInstallerTool)
+      True
+    """
+    implements(IQuickInstallerTool)
 
     meta_type = 'CMF QuickInstaller Tool'
     id = 'portal_quickinstaller'
@@ -78,19 +87,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         QuickInstallerTool.inheritedAttribute('manage_afterAdd')(self, container, item)
         if container is self:
             if not self.isProductInstalled('CMFQuickInstallerTool'):
-                self.notifyInstalled('CMFQuickInstallerTool', locked=1, hidden=1)
+                self.notifyInstalled('CMFQuickInstallerTool', locked=True, hidden=True)
 
-    security.declareProtected(ManagePortal, 'getInstallProfile')
-    def getInstallProfile(self, productname):
+    security.declareProtected(ManagePortal, 'getInstallProfiles')
+    def getInstallProfiles(self, productname):
         """ Return the installer profile
         """
         portal_setup = getToolByName(self, 'portal_setup')
         profiles = portal_setup.listProfileInfo()
-        products = [p['product'] for p in profiles]
-        
-        if productname in products:
-            return True
-        return False
+
+        # We are only interested in extension profiles for the product
+        profiles = [prof['id'] for prof in profiles if
+                                   prof['product'] == productname and
+                                   prof['type'] == EXTENSION]
+        return profiles
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
     def getInstallMethod(self,productname):
@@ -159,7 +169,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         except (ConflictError, KeyboardInterrupt):
             raise
         except:
-            if self.getInstallProfile(productname):
+            if self.getInstallProfiles(productname):
                 return True
             return False
 
@@ -187,7 +197,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 res.append({'id':r, 'status':p.getStatus(),
                             'hasError':p.hasError()})
             else:
-                res.append({'id':r, 'status':'new', 'hasError':0})
+                res.append({'id':r, 'status':'new', 'hasError':False})
         res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
@@ -330,23 +340,18 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 del tb
 
                 if swallowExceptions:
-                    transaction.abort(1)   #this is very naughty
+                    transaction.abort(sub=True)
                 else:
                     raise
         else:
-            if self.getInstallProfile(p):
+            profiles = self.getInstallProfiles(p)
+            if profiles:
                 # Install via GenericSetup profile
                 portal_setup = getToolByName(self, 'portal_setup')
                 current_context = portal_setup.getImportContextID()
 
-                profiles = portal_setup.listProfileInfo()
-                # We are only interested in extension profiles for the product
-                profiles = [prof for prof in profiles if
-                                 prof['product'] == p and
-                                 prof['type'] == EXTENSION]
-
                 # XXX Log message for multiple profiles, abort ?
-                profile = profiles[0]['id']
+                profile = profiles[0]
 
                 portal_setup.setImportContext('profile-%s' % profile)
                 portal_setup.runAllImportSteps()
@@ -355,8 +360,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
                 status='installed'
                 error = False
-                if swallowExceptions:
-                    transaction.savepoint(optimistic=True)
+                transaction.savepoint(optimistic=True)
 
             else:
                 # No install method and no profile, log / abort?
@@ -435,7 +439,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             del tb
 
             if swallowExceptions:
-                transaction.abort(1)   #this is very naughty
+                transaction.abort(sub=True)
             else:
                 raise
         
@@ -493,7 +497,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return o is not None and o.isInstalled()
 
     security.declareProtected(ManagePortal, 'notifyInstalled')
-    def notifyInstalled(self,p,locked=1,hidden=0,**kw):
+    def notifyInstalled(self,p,locked=True,hidden=False,**kw):
         """Marks a product that has been installed
         without QuickInstaller as installed
         """
@@ -532,7 +536,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         cascade=[c for c in InstalledProduct.default_cascade
                  if c != 'portalobjects']
         self.uninstallProducts(products, cascade, reinstall=True)
-        self.installProducts(products, stoponerror=1, reinstall=True)
+        self.installProducts(products, stoponerror=True, reinstall=True)
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])

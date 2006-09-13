@@ -1,17 +1,16 @@
-from Interface import Interface, Attribute
+from zope.interface import Interface, Attribute
 
 class IQuickInstallerTool(Interface):
     ''' the QuickInstaller Tool
         contains 'InstalledProduct' instances
     '''
-
     id = Attribute('id', 'Must be set to "portal_quickinstaller"')
 
-    def listInstallableProducts(skipInstalled=1):
+    def listInstallableProducts(skipInstalled=True):
         ''' list candidate CMF products for installation -> list of dicts with
             keys:(id,hasError,status)'''
 
-    def listInstalledProducts(showHidden=0):
+    def listInstalledProducts(showHidden=False):
         ''' returns a list of products that are installed -> list of dicts with
             keys:(id,hasError,status,,isLocked,isHidden)'''
 
@@ -22,7 +21,7 @@ class IQuickInstallerTool(Interface):
         ''' is the product directory present (to check if it has been deleted
             from the Filesystem '''
 
-    def installProduct(p,locked=0,hidden=0,swallowExceptions=0):
+    def installProduct(p,locked=False,hidden=False,swallowExceptions=False):
         ''' installs a product by name
             throws AlreadyInstalled exception, if components of the product are
             already installed
@@ -30,7 +29,7 @@ class IQuickInstallerTool(Interface):
             if swallowExceptions is true, exceptions are caught and logged
         '''
 
-    def installProducts(products=[], stoponerror=0, REQUEST=None):
+    def installProducts(products=[], stoponerror=False, REQUEST=None):
         ''' installs the products specified in the products list'''
 
     def getProductFile(p,fname='readme.txt'):
@@ -46,14 +45,13 @@ class IQuickInstallerTool(Interface):
     def isProductInstalled(productname):
         ''' checks wether a product is installed (by name) '''
 
-    def notifyInstalled(p,locked=1, hidden=0, **kw):
+    def notifyInstalled(p,locked=True, hidden=False, **kw):
         ''' marks a product that has been installed without QuickInstaller
          as installed
          if locked is set -> the prod cannot be uninstalled
          if hidden is set -> the prod is not listed in the UI
          the **kw param is passed to the constructor of InstalledProduct
          '''
-
 
     def uninstallProducts( products, cascade=['types','skins','actions',
         'portalobjects','workflows','slots','registrypredicates'],REQUEST=None):
@@ -79,14 +77,11 @@ class IInstalledProduct(Interface):
     leftslots = Attribute('types','default: []')
     rightslots = Attribute('types','default: []')
 
-    def __init__(id,types=[],skins=[],actions=[],portalobjects=[],
-        workflows=[],leftslots=[],rightslots=[],registrypredicates=[],logmsg='',
-        status='installed', error=0, locked=0, hidden=0):
+    def __init__(id):
         ''' constructor '''
 
-    def update(types=[],skins=[],actions=[],portalobjects=[],workflows=[],
-        leftslots=[],rightslots=[],registrypredicates=[],logmsg='',
-        status='installed',error=0,locked=0,hidden=0):
+    def update(settings, installedversion='', logmsg='', status='installed',
+               error=False, locked=False, hidden=False):
         ''' updates the product attributes '''
 
     def log(logmsg):

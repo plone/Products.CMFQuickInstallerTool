@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import traceback
@@ -16,7 +17,6 @@ from OFS.ObjectManager import ObjectManager
 from StringIO import StringIO
 from ZODB.POSException import ConflictError
 from ZODB.POSException import InvalidObjectReference
-from zLOG import LOG
 from zExceptions import NotFound
 
 from Products.CMFCore.utils import UniqueObject, getToolByName
@@ -25,10 +25,11 @@ from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from interfaces.portal_quickinstaller import IQuickInstallerTool
-from exceptions import RuntimeError
+from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
+    import IQuickInstallerTool
+from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 
-from InstalledProduct import InstalledProduct
+logger = logging.getLogger('CMFQuickInstallerTool')
 
 class AlreadyInstalled(Exception):
     """ Would be nice to say what Product was trying to be installed """
@@ -112,8 +113,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
             except RuntimeError, msg:
                 # external method can throw a bunch of these
-                msg = "RuntimeError: %s" % msg
-                LOG("Quick Installer Tool: ", 100, "%s" % productname, msg)
+                msg = "%s, RuntimeError: %s" % (productname, msg)
+                logger.log(msg, severity=logging.ERROR)
             except (ConflictError, KeyboardInterrupt):
                 pass
             except:
@@ -124,8 +125,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     self.errors = {}
                     
                 if t not in ("Module Error", NotFound):
-                    msg = "%s: %s" % (t, v)
-                    LOG("Quick Installer Tool: ", 100, "%s" % productname, msg)
+                    msg = "%s, %s: %s" % (productname, t, v)
+                    logger.log(msg, severity=logging.ERROR)
                     
                     # write into errors so user can see
                     strtb = StringIO()

@@ -21,7 +21,8 @@ class IQuickInstallerTool(Interface):
         ''' is the product directory present (to check if it has been deleted
             from the Filesystem '''
 
-    def installProduct(p,locked=False,hidden=False,swallowExceptions=False):
+    def installProduct(p, locked=False, hidden=False,
+                       swallowExceptions=False, forceProfile=False):
         ''' installs a product by name
             throws AlreadyInstalled exception, if components of the product are
             already installed
@@ -29,7 +30,8 @@ class IQuickInstallerTool(Interface):
             if swallowExceptions is true, exceptions are caught and logged
         '''
 
-    def installProducts(products=[], stoponerror=False, REQUEST=None):
+    def installProducts(products=[], stoponerror=False, REQUEST=None,
+                        forceProfile=False):
         ''' installs the products specified in the products list'''
 
     def getProductFile(p,fname='readme.txt'):

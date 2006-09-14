@@ -249,7 +249,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
-                       swallowExceptions=False, reinstall=False):
+                       swallowExceptions=False, reinstall=False,
+                       forceProfile=False):
         """Install a product by name
         """
         __traceback_info__ = (p,)
@@ -293,7 +294,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             # No classic install method found
             install = False
 
-        if install:
+        if install and not forceProfile:
             # Some heursitics to figure out if its already been installed
             if swallowExceptions:
                 transaction.savepoint(optimistic=True)
@@ -338,7 +339,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 current_context = portal_setup.getImportContextID()
 
                 profile = profiles[0]
-                if len(profiles > 1):
+                if len(profiles) > 1:
                     logger.log('Multiple extension profiles found for product '
                                '%s. Used profile: %s' % (p, profile),
                                severity=logging.INFO)
@@ -445,7 +446,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'installProducts')
     def installProducts(self, products=[], stoponerror=False, reinstall=False,
-                        REQUEST=None):
+                        REQUEST=None, forceProfile=False):
         """ """
         res = """
     Installed Products
@@ -457,7 +458,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             res += p +':'
             try:
                 r=self.installProduct(p, swallowExceptions=not stoponerror,
-                                      reinstall=reinstall)
+                                      reinstall=reinstall,
+                                      forceProfile=forceProfile)
                 res +='ok:\n'
                 if r:
                     r += str(r)+'\n'
@@ -478,7 +480,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
         return res
-
 
     def isProductInstalled(self, productname):
         """Check wether a product is installed (by name)

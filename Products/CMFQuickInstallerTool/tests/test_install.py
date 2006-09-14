@@ -10,11 +10,21 @@ CMFTestCase.setupCMFSite()
 
 import unittest
 from zope.testing import doctest
+
+from Products.GenericSetup import EXTENSION, profile_registry
 from Testing.ZopeTestCase import FunctionalDocFileSuite as Suite
 
 OPTIONFLAGS = (doctest.REPORT_ONLY_FIRST_FAILURE |
                doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE)
+
+profile_registry.registerProfile('test_product',
+        'CMF QI test profile',
+        'Extension profile including plone.app.i18n configuration.',
+        'profiles/test_product',
+        'Products.CMFQuickInstallerTool',
+        EXTENSION,
+        for_=None)
 
 def test_suite():
     return unittest.TestSuite((

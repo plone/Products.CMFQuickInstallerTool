@@ -80,4 +80,46 @@ is not installed anymore:
 Install a product through an extension profile
 ----------------------------------------------
 
+>>> qi.installProducts(products=['CMFCalendar'], forceProfile=True)
+'...Installed Products...CMFCalendar:ok:...'
 
+Make sure the calendar tool and the Event type are added:
+
+  >>> 'portal_calendar' in portal.objectIds()
+  True
+
+  >>> 'Event' in portal.portal_types.objectIds()
+  True
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is installed again:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+  
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  True
+
+Uninstall the product again
+---------------------------
+
+  >>> qi.uninstallProducts(products=['CMFCalendar'])
+
+Verify that all added entries were removed again:
+
+  >>> 'Event' in types_tool.objectIds()
+  False
+
+  >>> 'portal_calendar' in portal.objectIds()
+  False
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is not installed anymore again:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+  
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  False

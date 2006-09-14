@@ -2,17 +2,13 @@ import os
 import sys
 import traceback
 import transaction
-from types import FunctionType, MethodType
 
 from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base, aq_inner, aq_parent
-from App.Common import package_home
+from Acquisition import aq_base
 
-import Globals
 from Globals import DevelopmentMode
-from Globals import HTMLFile
 from Globals import InitializeClass
 from Globals import INSTANCE_HOME
 from OFS.SimpleItem import SimpleItem
@@ -33,12 +29,6 @@ from interfaces.portal_quickinstaller import IQuickInstallerTool
 from exceptions import RuntimeError
 
 from InstalledProduct import InstalledProduct
-
-try:
-    from zpi.zope import not_installed, hot_plug
-    #print 'Packman support(hotplug) installed'
-except ImportError:
-    def not_installed(s): return []
 
 class AlreadyInstalled(Exception):
     """ Would be nice to say what Product was trying to be installed """
@@ -183,7 +173,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         # reset the list of broken products
         self.errors = {}
-        pids = self.Control_Panel.Products.objectIds() + not_installed(self)
+        pids = self.Control_Panel.Products.objectIds()
         pids = [pid for pid in pids if self.isProductInstallable(pid)]
 
         if skipInstalled:
@@ -270,9 +260,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                    'please uninstall before reinstalling it')
             prod.log(msg)
             return msg
-
-        if p in not_installed(self):
-            hot_plug(self, p)
 
         portal_types=getToolByName(self,'portal_types')
         portal_skins=getToolByName(self,'portal_skins')

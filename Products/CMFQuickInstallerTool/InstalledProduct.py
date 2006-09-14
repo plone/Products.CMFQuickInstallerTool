@@ -1,24 +1,18 @@
 import logging
-import os
-import Globals
-
 from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base, aq_inner, aq_parent, Implicit, aq_base
-from App.Common import package_home
 from DateTime import DateTime
-from Globals import HTMLFile, InitializeClass
-from OFS.ObjectManager import ObjectManager
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
-from zExceptions import BadRequest
 
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from interfaces.portal_quickinstaller import IInstalledProduct
+from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
+    import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
 logger = logging.getLogger('CMFQuickInstallerTool')

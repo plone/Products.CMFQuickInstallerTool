@@ -1,4 +1,4 @@
-from Acquisition import aq_base, aq_inner, aq_parent
+from Acquisition import aq_base
 from zExceptions import BadRequest
 from zLOG import LOG, PROBLEM
 

@@ -94,7 +94,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return profiles
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
-    def getInstallMethod(self,productname):
+    def getInstallMethod(self, productname):
         """ Return the installer method
         """
         for mod, func in (('Install','install'),
@@ -242,7 +242,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getProductVersion(self,p):
         """Return the version string stored in version.txt
         """
-
         res = self.getProductFile(p, 'version.txt')
         if res is not None:
             res = res.strip()
@@ -338,8 +337,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 portal_setup = getToolByName(self, 'portal_setup')
                 current_context = portal_setup.getImportContextID()
 
-                # XXX Log message for multiple profiles, abort ?
                 profile = profiles[0]
+                if len(profiles > 1):
+                    logger.log('Multiple extension profiles found for product '
+                               '%s. Used profile: %s' % (p, profile),
+                               severity=logging.INFO)
 
                 portal_setup.setImportContext('profile-%s' % profile)
                 portal_setup.runAllImportSteps()

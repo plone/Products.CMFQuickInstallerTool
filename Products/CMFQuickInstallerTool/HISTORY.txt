@@ -1,3 +1,11 @@
+2.0.0 Unreleased
+
+ - Removed lots of unused and bbb code. This version requires at least CMF 1.6.
+   [hannosch]
+
+ - Added support for GenericSetup extension profile-based installation.
+   [hannosch]
+
 1.5.9 Released June 1, 2006
 
  - Fixed two missing imports in utils.py. This closes

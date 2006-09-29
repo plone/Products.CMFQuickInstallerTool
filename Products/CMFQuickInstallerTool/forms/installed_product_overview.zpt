@@ -40,9 +40,6 @@
                   </td>
             </tr>
 
-
-            
-
             <tr tal:condition="here/hasError">
               <th> Error </th>
               <td tal:condition="here/hasError">
@@ -87,7 +84,6 @@
         tal:replace="structure here/manage_form_title">
       Form Title
     </h3>
-
 
     <div class="form-mono"
          tal:content="structure python:modules['Products.PythonScripts.standard'].newline_to_br(here.getTranscriptAsText())">

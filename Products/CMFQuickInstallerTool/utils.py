@@ -1,6 +1,9 @@
-from Acquisition import aq_base, aq_inner, aq_parent
+import logging
+
+from Acquisition import aq_base
 from zExceptions import BadRequest
-from zLOG import LOG, PROBLEM
+
+logger = logging.getLogger('CMFQuickInstallerTool')
 
 def updatelist(a, b, c=None):
     for l in b:
@@ -18,4 +21,5 @@ def delObjects(cont, ids):
         try:
             cont.manage_delObjects(delid)
         except (AttributeError, KeyError, BadRequest):
-            LOG("Quick Installer Tool: ", PROBLEM, "Failed to delete '%s' in '%s'" % (delid, cont.id))
+            logger.log("Failed to delete '%s' in '%s'" % (delid, cont.id),
+                        severity=logging.WARNING)

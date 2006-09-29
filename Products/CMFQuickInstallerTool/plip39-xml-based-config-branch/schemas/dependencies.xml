@@ -1,0 +1,27 @@
+<schema>
+  <sectiontype name="dependency">
+      <description>
+        A Dependency Product wich schould be installed.
+        Prease note that that the order is important in wich
+        the products are installed 
+      </description>
+
+	<key name="product" datatype="string"
+	     required="yes">
+	  <description>
+	    Name of the Product wich should be installed.
+	    The tricky thing here is to test if there is a dependency
+	    to another product that i don't uninstall a tool wich is also
+	    need from another.
+	  </description>
+	</key>
+    </sectiontype>
+
+    <multisection name="*" type="dependency" attribute="dependency">
+      <description>
+        Inherit from section type dependency. "dependency" have to stand 
+        around every action. this is for knowing start and end
+        of a dependency product.
+      </description>
+    </multisection>
+</schema>

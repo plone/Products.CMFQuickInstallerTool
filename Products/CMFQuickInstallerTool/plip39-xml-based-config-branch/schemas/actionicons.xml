@@ -1,0 +1,65 @@
+<schema>
+  <sectiontype name="actionicon">
+      <description>
+        An actionicon which schould be installed.
+      </description>
+
+	<key name="tool" datatype="string"
+	     required="yes">
+	  <description>
+	    Name of the tool where the actionicon should be
+	    installed. If you want to install a property to 
+	    PortalObject please choose portal_url. this is because 
+	    portal_url is a tool an it provides a method to get
+	    PortalObject. I think this is more consistent as 
+	    creating a new name for referencing to the Portalobject.
+	  </description>
+	</key>
+      
+	<key name="category" datatype="string"
+	     required="yes">
+	  <description>
+	    It's the same like the category by actions.
+	    Specify where the icon is used.
+	  </description>
+	</key>
+	
+	<key name="action_id" datatype="string"
+	     required="yes">
+	  <description>
+	    Here comes the unique identifier of an action
+	    in. So that the icon is connected with the right id.
+	  </description>
+	</key>
+	
+	<key name="icon_expr" datatype="string"
+	     required="yes">
+	  <description>
+	    ID of the icon so that zope can find it 
+	  </description>
+	</key>
+	
+	<key name="title" datatype="string"
+	     required="no">
+	  <description>
+	    Choose a title for the icon. 
+	  </description>
+	</key>
+	
+	<key name="priority" datatype="string"
+	     required="yes">
+	  <description>
+	    Choos a priority for the icon so that you plone
+	    know wich have to be taken first.
+	  </description>
+	</key>
+    </sectiontype>
+
+    <multisection name="*" type="actionicon" attribute="actionicon">
+      <description>
+        Inherit from section type actionicon. "actionicon" have to stand 
+        around every action. this is for knowing start and end
+        of the actionicon.
+      </description>
+    </multisection>
+</schema>

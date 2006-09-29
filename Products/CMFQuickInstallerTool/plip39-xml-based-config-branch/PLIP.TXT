@@ -1,0 +1,141 @@
+  -- PLIP - number = 1
+  -- Proposer - Kai Hoppert
+  -- Seconder - Jodok Batlok
+  -- Status - Stable
+
+Definition:
+
+Make installing auf actions(normal actions and controlpanel actions), properties, action icons and
+installing of dependend products easier/avaliable. Make them installable over xml definition.
+
+
+Description:
+
+This modifications are avaliable in collective cvs with branch tag 'plip39-xml-based-config-branch'
+
+How it works what you have to do to get it running.
+Create a file for that featur you want to use in your extension directory.
+
+actions.conf (For installing actions and controlpanel actions)
+actionicons.conf (for installing action icons)
+properties.conf (For installing Prperties)
+dependencies.conf (for installing dependency products)
+
+The parser for xml is ZConfig so the structure of config files is the same as in Zope
+
+Some conventions for the new part.
+	- if you want to install something on portal please use portal_url. From portal_url
+	  we are able to get the portalObject. 
+	- If you want to use for Example site_properties do it in this way portal_portperties.site_proeprties
+	  I think using '.' is here the best way because it seems to be common in all zope2/3 xml configuration
+	  files
+
+
+actions.conf and his structure:
+
+Here is an example for two actions you want to install. The first is a normal action the
+second a controlpanel action. Only copy and paste it in your actions.cnf file and it would work.
+
+<action>
+   tool portal_actions
+   name Testaction
+   id testaction
+   action string:test_form
+   condition member
+   permission View
+   category folder
+   visible true
+</action>
+
+<action>
+  tool portal_controlpanel
+  id testaction2
+  name Testaction2
+  action string:${portal_url}/test_form2
+  condition
+  permission Manage portal
+  category MyProduct
+  visible True
+  appId myid
+</action>
+
+For visible i took the boolean and not the int value because you only have here the posibility to
+check this box or not. Unfortunatly ZConfig only allow here True or falso as boolean value.
+
+actionicons.conf and his structure:
+
+Here an example for an actionicon:
+
+<actionicon>
+  tool portal_actionicons
+  category controlpanel
+  action_id myid
+  icon_expr mail_icon.gif
+  title MyTitle
+  priority 0
+</actionicon>
+
+properties.conf and his structure
+
+Here two examles for property installing
+
+<property>
+  tool portal_url
+  id propertyname
+  value year;month;day;hour;minute
+  type lines
+</property>
+
+<property>
+  tool portal_properties.site_properties
+  id propertyname2
+  value myvalue
+  type string
+</property>
+
+
+properties.conf and his structure:
+
+Here two example for dependency products:
+
+<dependency>
+  product Epoz
+</dependency>
+
+<dependency>
+  product Archetypes
+</dependency>
+
+There is a checking if othere dependencies exists before a dependency tool
+is uninstalled. If there exists anothzer dependency it's not uninstalled.
+
+Motivation:
+  -I don't longer want write the same stuff every time again if i want to install an action
+   or a proeprty. 
+  -Makes Produkt creation easier
+
+Assumptions:
+  -Note but the code i wrote
+
+Proposal:
+  -Enlage this code to make the whole product configuration in xml like zope.conf. 
+  -Deprecate install.py in this way
+
+Implementation:
+  -At this time put it only in your Product directory in future it should be a part
+   of quickinstaller
+
+Deliverables:
+  -The code is produced
+  - Make an upgrade for handling action icons
+
+Risks:
+  - No Risk
+
+Timeline:
+  - It's done only perhaps testing from other people as me to get diffrent opinions and 
+    code optimiziatzion
+
+Participants:
+  - Kai Hoppert
+ 

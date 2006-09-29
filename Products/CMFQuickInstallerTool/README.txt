@@ -4,41 +4,43 @@ CMFQuickInstallerTool
 Features
 ----------
 
-CMFQuickInstallerTool is a facility for comfortable activation/deactivation
-of CMF compliant products inside a CMF 1.6+ site.
+CMFQuickInstallerTool is a facility for comfortable activation/deactivation of
+CMF compliant products inside a CMF 1.6+ site.
 
-Therefore it has to be installed as a tool inside a CMF portal,
-where it stores the information about the installed products.
+Therefore it has to be installed as a tool inside a CMF portal, where it stores
+the information about the installed products.
 
-The requirements for a product to be installable with
-QuickInstallerTool are quite simple (almost all existing CMF 
-products fulfill them):
+The requirements for a product to be installable with QuickInstallerTool are
+quite simple (almost all existing CMF  products fulfill them):
 
   External Product:  The product has to implement an external 
                      method 'install' in a python module 'Install.py' 
                      in its Extensions directory.
+                     
+                     OR
+                     
+                     The product ships with a GenericSetup extension profile
+                     and has no install method. It can still use an uninstall
+                     method for custom uninstallation tasks though.
 
-  TTW Product: The product has to have a 'Install' folder
-               and have a python script titled 'install' inside
-               that folder.
+Products can be uninstalled and QuickInstellerTool removes the following items
+a product creates during install:
 
-Products can be uninstalled and QuickInstellerTool removes
-the following items a product creates during install:
-
-portal types,
-portal skins,
 portal actions,
+portal skins,
+portal types,
 portalobjects (objects created in the root of the portal),
 workflows,
 left and right slots (also checks them only for the portal),
 resource registry entries
 
-Attention: QuickInstallerTool just tracks which objects are 
-ADDED, but not what is changed or deleted.
+Attention:
+QuickInstallerTool just tracks which objects are ADDED, but notwhat is changed
+or deleted.
 
-second Attention:
-QuickInstallerTool just can uninstall products that are 
-installed via QuickInstallerTool
+Second Attention:
+QuickInstallerTool can only uninstall products that are installed via
+QuickInstallerTool.
 
 Installation
 ------------
@@ -47,17 +49,15 @@ Installation
 
 - inside the portal instanciate a CMF QuickInstaller Tool
 
-Usage:
---------
+Usage
+-----
 
-in the ZMI click on portal_quickinstaller.
-the management screen allows you to select products for
-installation and uninstallation.
-you can browse into the installed products and see what
-they created and see the logs of the install process.
+In the ZMI click on portal_quickinstaller. The management screen allows you to
+select products for installation and uninstallation. You can browse into the
+installed products and see what was created and the logs of the install process.
 
 API
--------
+---
 
 QuickInstaller is also intended to be called from other modules
 in order to automate installing of application.
@@ -73,13 +73,8 @@ requirements must be met:
                      method 'uninstall in a python module 'Install.py' 
                      in its Extensions directory.
 
-  TTW Product: The product has to have a 'Install' folder
-               and have a python script titled 'uninstall' inside
-               that folder.  This script must also accept a 'portal'
-               parameter.
-
-Please note that the customized uninstall method is invoked before
-(and in addition to) the standard removal of objects.
+Please note that the customized uninstall method is invoked before (and in
+addition to) the standard removal of objects.
 
 Reinstall
 ---------
@@ -108,22 +103,3 @@ code which should work differently on reinstall than uninstall/install you can
 add a second argument to the install or uninstall method named 'reinstall' which
 is true only for a reinstallation. In most cases you shouldn't react differently
 when reinstalling!
-
-Special Hooks
--------------
-
-afterInstall:  Called after a product is installed and the changes are saved
-               into the product instance.
-               The method is called between install() and recoding the installed
-               objects.
-beforeUninstall: Called before a product is uninstalled. It may change the
-               cascade containing which object types should be cleared.
-               The method is called after uninstall() but before the cascading
-               removing of installed objects.
-API:
-  out = afterInstall(portal, reinstall=reinstall, qi_product)
-  out, cascade = beforeUninstall(portal, reinstall, qi_product, cascade)
-
-Flow: 
-  install(), <record installation>, afterInstall()
-  uninstall(), beforeUninstall(), <cascade remove>

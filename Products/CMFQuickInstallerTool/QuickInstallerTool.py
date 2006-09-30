@@ -35,7 +35,7 @@ class AlreadyInstalled(Exception):
     """ Would be nice to say what Product was trying to be installed """
     pass
 
-def addQuickInstallerTool(self,REQUEST=None):
+def addQuickInstallerTool(self, REQUEST=None):
     """ """
     qt = QuickInstallerTool()
     self._setObject('portal_quickinstaller', qt, set_owner=False)
@@ -88,9 +88,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
+        # BBB CMF 1.6: The manual check for Products.* profiles can go away once
+        # we do not support CMF 1.6 anymore.
         profiles = [prof['id'] for prof in profiles if
-                                   prof['product'] == productname and
-                                   prof['type'] == EXTENSION]
+            prof['type'] == EXTENSION and
+            (prof['product'] == productname or
+             prof['product'] == 'Products.%s' % productname)]
         return profiles
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
@@ -114,7 +117,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             except RuntimeError, msg:
                 # external method can throw a bunch of these
                 msg = "%s, RuntimeError: %s" % (productname, msg)
-                logger.log(msg, severity=logging.ERROR)
+                logger.log(logging.ERROR, msg)
             except (ConflictError, KeyboardInterrupt):
                 pass
             except:
@@ -126,7 +129,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     
                 if t not in ("Module Error", NotFound):
                     msg = "%s, %s: %s" % (productname, t, v)
-                    logger.log(msg, severity=logging.ERROR)
+                    logger.log(logging.ERROR, msg)
                     
                     # write into errors so user can see
                     strtb = StringIO()
@@ -257,8 +260,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if self.isProductInstalled(p):
             prod = self._getOb(p)
-            msg = ('this product is already installed, '
-                   'please uninstall before reinstalling it')
+            msg = ('This product is already installed, '
+                   'please uninstall before reinstalling it.')
             prod.log(msg)
             return msg
 
@@ -314,7 +317,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 tb=sys.exc_info()
                 if str(tb[1]).endswith('already in use.') and not reinstall:
                     self.error_log.raising(tb)
-                    res='this product has already been installed without Quickinstaller!'
+                    res='This product has already been installed without Quickinstaller!'
                     if not swallowExceptions:
                         raise AlreadyInstalled, p
 
@@ -340,9 +343,9 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
                 profile = profiles[0]
                 if len(profiles) > 1:
-                    logger.log('Multiple extension profiles found for product '
-                               '%s. Used profile: %s' % (p, profile),
-                               severity=logging.INFO)
+                    logger.log(logging.INFO,
+                               'Multiple extension profiles found for product '
+                               '%s. Used profile: %s' % (p, profile))
 
                 portal_setup.setImportContext('profile-%s' % profile)
                 portal_setup.runAllImportSteps()

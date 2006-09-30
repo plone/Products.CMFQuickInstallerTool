@@ -1,5 +1,14 @@
 2.0.0 Unreleased
 
+ - Made profile based installation work with CMF 2.1+. The profile id may use
+   the full package name now, instead of only the product name (for example:
+   Products.CMFCalendar instead of CMFCalendar).
+   [hannosch]
+
+ - Changed GS profile registration to be zcml based. Fixed some problems with
+   the logging calls. Removed some stale code from the tests.
+   [hannosch]
+
  - Removed lots of unused and bbb code. This version requires at least CMF 1.6.
    [hannosch]
 

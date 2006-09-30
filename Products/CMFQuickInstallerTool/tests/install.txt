@@ -36,7 +36,7 @@ And we have no InstalledProduct instance in the QI tool:
   >>> 'CMFCalendar' in qi.objectIds()
   False
 
-After checking that the product is not installed yet we do install it:
+After checking that the product is not installed yet, we do install it:
 
   >>> qi.installProducts(products=['CMFCalendar'])
   '...Installed Products...CMFCalendar:ok:...'

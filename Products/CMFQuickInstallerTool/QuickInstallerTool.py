@@ -19,8 +19,8 @@ from ZODB.POSException import ConflictError
 from ZODB.POSException import InvalidObjectReference
 from zExceptions import NotFound
 
-from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.permissions import ManagePortal
+from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -28,6 +28,12 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+
+CMF21 = True
+try:
+    from Products.CMFCore.ActionInformation import ActionCategory
+except ImportError:
+    CMF21 = False
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -278,7 +284,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         typesbefore=portal_types.objectIds()
         skinsbefore=portal_skins.objectIds()
-        actionsbefore=[a.id for a in portal_actions._actions]
+        if CMF21:
+            actionsbefore = set()
+            for category in portal_actions.objectIds():
+                for action in portal_actions[category].objectIds():
+                    actionsbefore.add((category, action))
+        else:
+            actionsbefore=[a.id for a in portal_actions._actions]
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
 
@@ -362,14 +374,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
-        actionsafter=portal_actions.objectIds()
+        if CMF21:
+            actionsafter = set()
+            for category in portal_actions.objectIds():
+                for action in portal_actions[category].objectIds():
+                    actionsafter.add((category, action))
+        else:
+            actionsafter=portal_actions.objectIds()
         workflowsafter=portal_workflow.objectIds()
         portalobjectsafter=portal.objectIds()
         leftslotsafter=getattr(portal,'left_slots',[])
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
 
-        #hardcoded, but i have no more time ;( will go for that when it comes to plone 2.2
+        # TODO hardcoded, but i have no more time ;(
         if self.isProductInstalled('ResourceRegistries'):
             resources_js_after=getToolByName(self,'portal_javascripts').getResourceIds()
             resources_css_after=getToolByName(self,'portal_css').getResourceIds()
@@ -384,11 +402,16 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if callable(leftslotsbefore):
             leftslotsbefore = leftslotsbefore()
 
+        if CMF21:
+            actions = [a for a in (actionsafter - actionsbefore)]
+        else:
+            actions = [a.id for a in portal_actions._actions
+                       if a.id not in actionsbefore],
+
         settings=dict(
             types=[t for t in typesafter if t not in typesbefore],
             skins=[s for s in skinsafter if s not in skinsbefore],
-            actions=[a.id for a in portal_actions._actions
-                     if a.id not in actionsbefore],
+            actions=actions,
             workflows=[w for w in workflowsafter if w not in workflowsbefore],
             portalobjects=[a for a in portalobjectsafter
                            if a not in portalobjectsbefore],
@@ -561,14 +584,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def isDevelopmentMode(self):
         """Is the Zope server in debug mode?
         """
-
         return not not DevelopmentMode
 
     security.declareProtected(ManagePortal, 'getInstanceHome')
     def getInstanceHome(self):
         """Return location of $INSTANCE_HOME
         """
-
         return INSTANCE_HOME
 
 InitializeClass(QuickInstallerTool)

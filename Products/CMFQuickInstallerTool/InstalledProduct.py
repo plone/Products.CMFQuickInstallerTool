@@ -15,6 +15,12 @@ from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
+CMF21 = True
+try:
+    from Products.CMFCore.ActionInformation import ActionCategory
+except ImportError:
+    CMF21 = False
+
 logger = logging.getLogger('CMFQuickInstallerTool')
 
 class InstalledProduct(SimpleItem):
@@ -282,12 +288,17 @@ class InstalledProduct(SimpleItem):
             delObjects(portal_skins, self.skins)
 
         if 'actions' in cascade:
-            # XXX ugly ugly :(
             portal_actions=getToolByName(self,'portal_actions')
-            actids= [o.id.lower() for o in portal_actions._actions]
-            delactions=[actids.index(id) for id in self.actions if id in actids]
-            if delactions:
-                portal_actions.deleteActions(delactions)
+            if CMF21:
+                for category, action in self.actions:
+                    # XXX
+                    pass
+            else:
+                actids= [o.id.lower() for o in portal_actions._actions]
+                delactions=[actids.index(id) for id in
+                            self.actions if id in actids]
+                if delactions:
+                    portal_actions.deleteActions(delactions)
 
         if 'portalobjects' in cascade:
             delObjects(portal, self.portalobjects)

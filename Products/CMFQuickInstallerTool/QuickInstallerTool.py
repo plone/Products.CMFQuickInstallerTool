@@ -380,7 +380,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 for action in portal_actions[category].objectIds():
                     actionsafter.add((category, action))
         else:
-            actionsafter=portal_actions.objectIds()
+            actionsafter=[a.id for a in portal_actions._actions]
         workflowsafter=portal_workflow.objectIds()
         portalobjectsafter=portal.objectIds()
         leftslotsafter=getattr(portal,'left_slots',[])
@@ -405,8 +405,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if CMF21:
             actions = [a for a in (actionsafter - actionsbefore)]
         else:
-            actions = [a.id for a in portal_actions._actions
-                       if a.id not in actionsbefore],
+            actions = [a for a in actionsafter if a not in actionsbefore]
 
         settings=dict(
             types=[t for t in typesafter if t not in typesbefore],

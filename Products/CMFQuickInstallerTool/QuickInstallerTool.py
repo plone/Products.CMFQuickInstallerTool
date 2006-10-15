@@ -302,12 +302,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         status=None
         error=True
 
-        try:
-            # Install via external method
-            install = self.getInstallMethod(p).__of__(portal)
-        except AttributeError:
-            # No classic install method found
-            install = False
+        install = False
+        if not forceProfile:
+            try:
+                # Install via external method
+                install = self.getInstallMethod(p).__of__(portal)
+            except AttributeError:
+                # No classic install method found
+                pass
 
         if install and not forceProfile:
             # Some heursitics to figure out if its already been installed

@@ -1,5 +1,8 @@
 2.0.0 Unreleased
 
+ - Slightly optimize for GenericSetup profile based installations.
+   [hannosch]
+
  - Adjusted actions installation tracking to work with CMF 2.1+.
    [hannosch]
 

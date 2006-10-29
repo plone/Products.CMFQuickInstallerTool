@@ -54,6 +54,8 @@ class InstalledProduct(SimpleItem):
     error=False #error flag
     default_cascade=['types', 'skins', 'actions', 'portalobjects',
                      'workflows', 'slots', 'registrypredicates']
+    afterid = None
+    beforeid = None
 
     def __init__(self, id):
         self.id=id
@@ -63,17 +65,19 @@ class InstalledProduct(SimpleItem):
         self.installedversion=None
         self.status='new'
         self.error=None
+        self.afterid = None
+        self.beforeid = None
 
     security.declareProtected(ManagePortal, 'update')
-    def update(self, settings, installedversion='',
-               logmsg='', status='installed', error=False,
-               locked=False, hidden=False):
+    def update(self, settings, installedversion='', logmsg='',
+               status='installed', error=False, locked=False, hidden=False,
+               afterid=None, beforeid=None):
 
         #check for the availability of attributes before assiging
         for att in settings.keys():
             if not hasattr(self.aq_base, att):
                 setattr(self, att, [])
-                
+
         qi = getToolByName(self, 'portal_quickinstaller')
         reg = qi.getAlreadyRegistered()
 
@@ -84,6 +88,8 @@ class InstalledProduct(SimpleItem):
         self.locked=locked
         self.hidden=hidden
         self.installedversion=installedversion
+        self.afterid = afterid
+        self.beforeid = beforeid
 
         if status:
             self.status=status
@@ -167,6 +173,14 @@ class InstalledProduct(SimpleItem):
         """Return the custom entries in the content_type_registry
         """
         return getattr(self, 'registrypredicates', [])
+
+    security.declareProtected(ManagePortal, 'getAfterId')
+    def getAfterId(self):
+        return self.afterid
+
+    security.declareProtected(ManagePortal, 'getBeforeId')
+    def getBeforeId(self):
+        return self.beforeid
 
     security.declareProtected(ManagePortal, 'getTranscriptAsText')
     def getTranscriptAsText(self):

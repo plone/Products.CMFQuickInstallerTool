@@ -1,3 +1,10 @@
+2.0.1 Unreleased
+
+ - We automatically create a GenericSetup snapshot before and after installation
+   now, so you can at least compare the changes a product did during
+   installation. We have no better uninstall yet, though.
+   [hannosch]
+
 2.0.0 Released October 25, 2006
 
  - Slightly optimize for GenericSetup profile based installations.

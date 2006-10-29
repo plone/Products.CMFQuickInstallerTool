@@ -3,6 +3,7 @@ Tests for QuickInstaller Actions installation
 
 First we need to install quickinstaller itself:
 
+  >>> self.setRoles(['Manager'])
   >>> self.addProduct('CMFQuickInstallerTool')
 
 Now set three convenience variables for later use:

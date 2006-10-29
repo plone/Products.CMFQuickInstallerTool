@@ -298,9 +298,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             resources_js_before=getToolByName(self,'portal_javascripts').getResourceIds()
             resources_css_before=getToolByName(self,'portal_css').getResourceIds()
 
-        res=''
+        portal_setup = getToolByName(self, 'portal_setup')
         status=None
         error=True
+        res=''
+
+        # Create a snapshot before installation
+        before_id = portal_setup._mangleTimestampName('qi-before-%s' % p)
+        portal_setup.createSnapshot(before_id)
 
         install = False
         if not forceProfile:
@@ -352,7 +357,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             profiles = self.getInstallProfiles(p)
             if profiles:
                 # Install via GenericSetup profile
-                portal_setup = getToolByName(self, 'portal_setup')
                 current_context = portal_setup.getImportContextID()
 
                 profile = profiles[0]
@@ -373,6 +377,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             else:
                 # No install method and no profile, log / abort?
                 pass
+
+        # Create a snapshot after installation
+        after_id = portal_setup._mangleTimestampName('qi-after-%s' % p)
+        portal_setup.createSnapshot(after_id)
 
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
@@ -444,7 +452,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                       status=status,
                       error=error,
                       locked=locked,
-                      hidden=hidden)
+                      hidden=hidden,
+                      afterid = after_id,
+                      beforeid = before_id
+                      )
 
         except InvalidObjectReference,e:
             raise

@@ -13,6 +13,7 @@ CMFTestCase.setupCMFSite()
 class TestQuickInstaller(CMFTestCase.CMFTestCase):
 
     def afterSetUp(self):
+        self.setRoles(['Manager'])
         self.addProduct('CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 

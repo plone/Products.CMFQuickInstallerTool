@@ -41,7 +41,7 @@ is installed:
 
 After checking that the product is not installed yet, we do install it:
 
-  >>> qi.installProducts(products=['CMFCalendar'])
+  >>> qi.installProducts(products=['CMFCalendar'], omitSnapshots=False)
   '...Installed Products...CMFCalendar:ok:...'
 
 Make sure the calendar tool and the Event type are added:
@@ -97,7 +97,7 @@ is not installed anymore:
 Install a product through an extension profile
 ----------------------------------------------
 
->>> qi.installProducts(products=['CMFCalendar'], forceProfile=True)
+>>> qi.installProducts(products=['CMFCalendar'], forceProfile=True, omitSnapshots=False)
 '...Installed Products...CMFCalendar:ok:...'
 
 Make sure the calendar tool and the Event type are added:

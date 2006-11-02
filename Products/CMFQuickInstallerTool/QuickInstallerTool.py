@@ -259,7 +259,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
-                       forceProfile=False, omitSnapshots=False):
+                       forceProfile=False, omitSnapshots=True):
         """Install a product by name
         """
         __traceback_info__ = (p,)
@@ -486,7 +486,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'installProducts')
     def installProducts(self, products=[], stoponerror=False, reinstall=False,
-                        REQUEST=None, forceProfile=False, omitSnapshots=False):
+                        REQUEST=None, forceProfile=False, omitSnapshots=True):
         """ """
         res = """
     Installed Products
@@ -556,7 +556,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
     security.declareProtected(ManagePortal, 'reinstallProducts')
-    def reinstallProducts(self, products, REQUEST=None, omitSnapshots=False):
+    def reinstallProducts(self, products, REQUEST=None, omitSnapshots=True):
         """Reinstalls a list of products, the main difference to
         uninstall/install is that it does not remove portal objects
         created during install (e.g. tools, etc.)

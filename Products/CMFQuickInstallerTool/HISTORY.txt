@@ -1,6 +1,6 @@
 2.0.1 Unreleased
 
- - Added an option to omit snapshot creation to make it possible to speed up
+ - Added an option to omit snapshot creation which defaults to True to speed up
    test runs and migrations.
    [hannosch]
 

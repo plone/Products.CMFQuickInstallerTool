@@ -1,5 +1,9 @@
 2.0.1 Unreleased
 
+ - Added an option to omit snapshot creation to make it possible to speed up
+   test runs and migrations.
+   [hannosch]
+
  - We automatically create a GenericSetup snapshot before and after installation
    now, so you can at least compare the changes a product did during
    installation. We have no better uninstall yet, though.

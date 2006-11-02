@@ -259,7 +259,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
-                       forceProfile=False):
+                       forceProfile=False, omitSnapshots=False):
         """Install a product by name
         """
         __traceback_info__ = (p,)
@@ -305,7 +305,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         # Create a snapshot before installation
         before_id = portal_setup._mangleTimestampName('qi-before-%s' % p)
-        portal_setup.createSnapshot(before_id)
+        if not omitSnapshots:
+            portal_setup.createSnapshot(before_id)
 
         install = False
         if not forceProfile:
@@ -380,7 +381,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         # Create a snapshot after installation
         after_id = portal_setup._mangleTimestampName('qi-after-%s' % p)
-        portal_setup.createSnapshot(after_id)
+        if not omitSnapshots:
+            portal_setup.createSnapshot(after_id)
 
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
@@ -484,7 +486,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'installProducts')
     def installProducts(self, products=[], stoponerror=False, reinstall=False,
-                        REQUEST=None, forceProfile=False):
+                        REQUEST=None, forceProfile=False, omitSnapshots=False):
         """ """
         res = """
     Installed Products
@@ -497,7 +499,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             try:
                 r=self.installProduct(p, swallowExceptions=not stoponerror,
                                       reinstall=reinstall,
-                                      forceProfile=forceProfile)
+                                      forceProfile=forceProfile,
+                                      omitSnapshots=omitSnapshots)
                 res +='ok:\n'
                 if r:
                     r += str(r)+'\n'
@@ -553,10 +556,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 
     security.declareProtected(ManagePortal, 'reinstallProducts')
-    def reinstallProducts(self, products, REQUEST=None):
+    def reinstallProducts(self, products, REQUEST=None, omitSnapshots=False):
         """Reinstalls a list of products, the main difference to
-        ininstall/reinstall is that it does not remove portal objects
-        created  during install (e.g. tools, etc.)
+        uninstall/install is that it does not remove portal objects
+        created during install (e.g. tools, etc.)
         """
         if isinstance(products, basestring):
             products=[products]
@@ -565,7 +568,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         cascade=[c for c in InstalledProduct.default_cascade
                  if c != 'portalobjects']
         self.uninstallProducts(products, cascade, reinstall=True)
-        self.installProducts(products, stoponerror=True, reinstall=True)
+        self.installProducts(products,
+                             stoponerror=True,
+                             reinstall=True,
+                             omitSnapshots=omitSnapshots)
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])

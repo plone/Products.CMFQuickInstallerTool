@@ -4,6 +4,7 @@ import sys
 import traceback
 import transaction
 
+from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo
@@ -25,6 +26,7 @@ from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
@@ -47,7 +49,15 @@ def addQuickInstallerTool(self, REQUEST=None):
     self._setObject('portal_quickinstaller', qt, set_owner=False)
     if REQUEST:
         return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-    
+
+
+class HiddenProducts(object):
+    implements(INonInstallable)
+
+    def getNonInstallableProducts(self):
+        return ['CMFQuickInstallerTool']
+
+
 class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     """
       Let's make sure that this implementation actually fulfills the
@@ -77,14 +87,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     def __init__(self):
         self.id = 'portal_quickinstaller'
-
-    def manage_afterAdd(self, container, item):
-        """ Mark ourselves as installed
-        """
-        QuickInstallerTool.inheritedAttribute('manage_afterAdd')(self, container, item)
-        if container is self:
-            if not self.isProductInstalled('CMFQuickInstallerTool'):
-                self.notifyInstalled('CMFQuickInstallerTool', locked=True, hidden=True)
 
     security.declareProtected(ManagePortal, 'getInstallProfiles')
     def getInstallProfiles(self, productname):
@@ -160,9 +162,15 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     
     security.declareProtected(ManagePortal, 'isProductInstallable')
     def isProductInstallable(self, productname):
-        """Asks wether a product is installable by
-        trying to get its install method
+        """Asks wether a product is installable by trying to get its install
+           method or an installation profile.
         """
+        not_installable = []
+        utils = getAllUtilitiesRegisteredFor(INonInstallable)
+        for util in utils:
+            not_installable.extend(util.getNonInstallableProducts())
+        if productname in not_installable:
+            return False
         try:
             meth=self.getInstallMethod(productname)
             return True
@@ -178,8 +186,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'listInstallableProducts')
     def listInstallableProducts(self, skipInstalled=True):
-        """List candidate CMF products for
-        installation -> list of dicts with keys:(id,hasError,status)
+        """List candidate CMF products for installation -> list of dicts
+           with keys:(id,hasError,status)
         """
         # reset the list of broken products
         self.errors = {}

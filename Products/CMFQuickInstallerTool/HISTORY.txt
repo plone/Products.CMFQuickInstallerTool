@@ -1,5 +1,10 @@
 2.0.1 Unreleased
 
+ - Added the INonInstallable interface that is used to look up utilities
+   which provide a list of non-installable products. This allows applications
+   to exclude certain products from the list of installable products.
+   [hannosch]
+
  - Added an option to omit snapshot creation which defaults to True to speed up
    test runs and migrations.
    [hannosch]

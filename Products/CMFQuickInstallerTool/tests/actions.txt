@@ -20,10 +20,6 @@ Now set three convenience variables for later use:
   >>> actions_tool
   <ActionsTool at /cmf/portal_actions>
 
-Mark CMFQI as not installed, so we can install our test profile:
-
-  >>> qi['CMFQuickInstallerTool'].status = 'uninstalled'
-
 Install a product through an extension profile
 ----------------------------------------------
 

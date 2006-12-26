@@ -1,1 +1,1 @@
-#
+from installable import INonInstallable

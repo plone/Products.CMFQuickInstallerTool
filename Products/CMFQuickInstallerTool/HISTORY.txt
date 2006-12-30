@@ -1,5 +1,9 @@
 2.0.1 Unreleased
 
+ - Refactored ResourceRegistries support not to require the product itself to
+   be installed in QI.
+   [hannosch]
+
  - Added the INonInstallable interface that is used to look up utilities
    which provide a list of non-installable products. This allows applications
    to exclude certain products from the list of installable products.

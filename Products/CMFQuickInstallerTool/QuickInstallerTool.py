@@ -302,9 +302,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
 
-        if self.isProductInstalled('ResourceRegistries'):
-            resources_js_before=getToolByName(self,'portal_javascripts').getResourceIds()
-            resources_css_before=getToolByName(self,'portal_css').getResourceIds()
+        jstool = getToolByName(self,'portal_javascripts', None)
+        if jstool is not None:
+            resources_js_before = jstool.getResourceIds()
+        csstool = getToolByName(self,'portal_css', None)
+        if jstool is not None:
+            resources_css_before = csstool.getResourceIds()
 
         portal_setup = getToolByName(self, 'portal_setup')
         status=None
@@ -407,11 +410,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
 
-        # TODO hardcoded, but i have no more time ;(
-        if self.isProductInstalled('ResourceRegistries'):
-            resources_js_after=getToolByName(self,'portal_javascripts').getResourceIds()
-            resources_css_after=getToolByName(self,'portal_css').getResourceIds()
-            
+        jstool = getToolByName(self,'portal_javascripts', None)
+        if jstool is not None:
+            resources_js_after = jstool.getResourceIds()
+        csstool = getToolByName(self,'portal_css', None)
+        if jstool is not None:
+            resources_css_after = csstool.getResourceIds()
+
         if callable(rightslotsafter):
             rightslotsafter = rightslotsafter()
         if callable(leftslotsafter):
@@ -440,7 +445,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                 if s not in registrypredicatesbefore],
             )
 
-        if self.isProductInstalled('ResourceRegistries'):
+        jstool = getToolByName(self,'portal_javascripts', None)
+        if jstool is not None:
             settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
             settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
             if len(settings['types']) > 0:
@@ -586,11 +592,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     def getQIElements(self):
         res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 
-                  'leftslots', 'rightslots', 'registrypredicates']
-                  
-        if self.isProductInstalled('ResourceRegistries'):
-            res.extend(['resources_js', 'resources_css'])
-            
+                  'leftslots', 'rightslots', 'registrypredicates',
+                  'resources_js', 'resources_css']
         return res
 
     def getAlreadyRegistered(self):

@@ -345,13 +345,13 @@ class InstalledProduct(SimpleItem):
                     logger.log("Failed to delete '%s' from content type " \
                                "registry" % p, severity=logging.WARNING)
 
-        if self.getId() != 'ResourceRegistries' and \
-           getToolByName(self,'portal_quickinstaller').isProductInstalled('ResourceRegistries'):
-            rr_js=getToolByName(self,'portal_javascripts')
+        rr_js = getToolByName(self, 'portal_javascripts', None)
+        rr_css = getToolByName(self, 'portal_css', None)
+
+        if rr_js is not None:
             for js in getattr(self,'resources_js',[]):
                 rr_js.unregisterResource(js)
-                
-            rr_css=getToolByName(self,'portal_css')
+        if rr_css is not None:
             for css in getattr(self,'resources_css',[]):
                 rr_css.unregisterResource(css)
 

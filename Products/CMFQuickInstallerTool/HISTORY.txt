@@ -1,5 +1,9 @@
 2.0.1 Unreleased
 
+ - Adjusted installProduct method to be compatible with CMF 2.1 (including the
+   conversion of tools as utilities).
+   [hannosch]
+
  - Refactored ResourceRegistries support not to require the product itself to
    be installed in QI.
    [hannosch]

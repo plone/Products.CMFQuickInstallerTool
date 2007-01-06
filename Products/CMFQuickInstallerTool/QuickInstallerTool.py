@@ -8,7 +8,7 @@ from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_parent
 
 from Globals import DevelopmentMode
 from Globals import InitializeClass
@@ -279,12 +279,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             prod.log(msg)
             return msg
 
-        portal_types=getToolByName(self,'portal_types')
-        portal_skins=getToolByName(self,'portal_skins')
-        portal_actions=getToolByName(self,'portal_actions')
-        portal_workflow=getToolByName(self,'portal_workflow')
-        portal=getToolByName(self,'portal_url').getPortalObject()
-        type_registry=getToolByName(self,'content_type_registry')
+        portal=aq_parent(self)
+        portal_types=getToolByName(portal,'portal_types')
+        portal_skins=getToolByName(portal,'portal_skins')
+        portal_actions=getToolByName(portal,'portal_actions')
+        portal_workflow=getToolByName(portal,'portal_workflow')
+        type_registry=getToolByName(portal,'content_type_registry')
 
         leftslotsbefore=getattr(portal,'left_slots',[])
         rightslotsbefore=getattr(portal,'right_slots',[])
@@ -302,14 +302,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
 
-        jstool = getToolByName(self,'portal_javascripts', None)
+        jstool = getToolByName(portal,'portal_javascripts', None)
         if jstool is not None:
             resources_js_before = jstool.getResourceIds()
-        csstool = getToolByName(self,'portal_css', None)
+        csstool = getToolByName(portal,'portal_css', None)
         if jstool is not None:
             resources_css_before = csstool.getResourceIds()
 
-        portal_setup = getToolByName(self, 'portal_setup')
+        portal_setup = getToolByName(portal, 'portal_setup')
         status=None
         error=True
         res=''
@@ -410,10 +410,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
 
-        jstool = getToolByName(self,'portal_javascripts', None)
+        jstool = getToolByName(portal,'portal_javascripts', None)
         if jstool is not None:
             resources_js_after = jstool.getResourceIds()
-        csstool = getToolByName(self,'portal_css', None)
+        csstool = getToolByName(portal,'portal_css', None)
         if jstool is not None:
             resources_css_after = csstool.getResourceIds()
 
@@ -450,7 +450,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
             settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
             if len(settings['types']) > 0:
-                rr_css=getToolByName(self,'portal_css')
+                rr_css=getToolByName(portal,'portal_css')
                 rr_css.cookResources()
 
         msg=str(res)

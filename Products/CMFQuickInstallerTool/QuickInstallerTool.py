@@ -90,7 +90,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'getInstallProfiles')
     def getInstallProfiles(self, productname):
-        """ Return the installer profile
+        """ Return the installer profile id
         """
         portal_setup = getToolByName(self, 'portal_setup')
         profiles = portal_setup.listProfileInfo()
@@ -103,6 +103,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             (prof['product'] == productname or
              prof['product'] == 'Products.%s' % productname)]
         return profiles
+
+    security.declareProtected(ManagePortal, 'getInstallProfile')
+    def getInstallProfile(self, productname):
+        """ Return the installer profile
+        """
+        portal_setup = getToolByName(self, 'portal_setup')
+        profiles = portal_setup.listProfileInfo()
+
+        profiles = [prof for prof in profiles if
+            prof['type'] == EXTENSION and
+            prof['product'] == productname]
+        if profiles:
+            return profiles[0]
+        return None
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
     def getInstallMethod(self, productname):
@@ -201,11 +215,15 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         res=[]
         for r in pids:
             p=self._getOb(r,None)
+            name = r
+            profile = self.getInstallProfile(r)
+            if profile:
+                name = profile['title']
             if p:
-                res.append({'id':r, 'status':p.getStatus(),
+                res.append({'id':name, 'status':p.getStatus(),
                             'hasError':p.hasError()})
             else:
-                res.append({'id':r, 'status':'new', 'hasError':False})
+                res.append({'id':name, 'status':'new', 'hasError':False})
         res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
@@ -222,7 +240,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         for r in pids:
             p = self._getOb(r,None)
-            res.append({'id':r, 'status':p.getStatus(),
+            name = r
+            profile = self.getInstallProfile(r)
+            if profile:
+                name = profile['title']
+            
+            res.append({'id':name,
+                        'status':p.getStatus(),
                         'hasError':p.hasError(),
                         'isLocked':p.isLocked(),
                         'isHidden':p.isHidden(),

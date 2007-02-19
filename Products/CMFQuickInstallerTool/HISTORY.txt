@@ -1,3 +1,11 @@
+2.0.2 Unreleased
+
+ - Adjusted listInstallable and listInstalled methods to return the title of
+   the GenericSetup profile instead of the package name, for extension profile
+   based installation. These look a lot nicer ;) This fixes
+   http://dev.plone.org/plone/ticket/6129.
+   [hannosch]
+
 2.0.1 Released February 10, 2007
 
  - Adjusted installProduct method to be compatible with CMF 2.1 (including the

@@ -235,6 +235,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         pids = [o.id for o in self.objectValues()
                 if o.isInstalled() and (o.isVisible() or showHidden)]
+        pids = [pid for pid in pids if self.isProductInstallable(pid)]
 
         res=[]
 

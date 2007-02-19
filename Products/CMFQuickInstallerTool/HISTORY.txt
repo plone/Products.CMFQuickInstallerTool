@@ -1,5 +1,8 @@
 2.0.2 Unreleased
 
+ - Don't show removed products in the standard listings.
+   [hannosch]
+
  - Adjusted listInstallable and listInstalled methods to return the title of
    the GenericSetup profile instead of the package name, for extension profile
    based installation. These look a lot nicer ;) This fixes

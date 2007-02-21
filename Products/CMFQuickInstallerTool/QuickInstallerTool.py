@@ -201,7 +201,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'listInstallableProducts')
     def listInstallableProducts(self, skipInstalled=True):
         """List candidate CMF products for installation -> list of dicts
-           with keys:(id,hasError,status)
+           with keys:(id,title,hasError,status)
         """
         # reset the list of broken products
         self.errors = {}
@@ -220,17 +220,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             if profile:
                 name = profile['title']
             if p:
-                res.append({'id':name, 'status':p.getStatus(),
+                res.append({'id':r, 'title':name, 'status':p.getStatus(),
                             'hasError':p.hasError()})
             else:
-                res.append({'id':name, 'status':'new', 'hasError':False})
+                res.append({'id':r, 'title':name,'status':'new', 'hasError':False})
         res.sort(lambda x,y: cmp(x.get('id',None),y.get('id',None)))
         return res
 
     security.declareProtected(ManagePortal, 'listInstalledProducts')
     def listInstalledProducts(self, showHidden=False):
         """Returns a list of products that are installed -> list of
-        dicts with keys:(id, hasError, status, isLocked, isHidden,
+        dicts with keys:(id, title, hasError, status, isLocked, isHidden,
         installedVersion)
         """
         pids = [o.id for o in self.objectValues()
@@ -246,7 +246,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             if profile:
                 name = profile['title']
             
-            res.append({'id':name,
+            res.append({'id':r,
+                        'title':name,
                         'status':p.getStatus(),
                         'hasError':p.hasError(),
                         'isLocked':p.isLocked(),

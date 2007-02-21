@@ -36,7 +36,7 @@
                    tal:attributes="value product/id"
                    />
           </td>
-          <td tal:content="product/id"
+          <td tal:content="product/title"
               class="form-label">
             product name
           </td>
@@ -95,7 +95,7 @@
             </td>
             <td class="form-label">
               <a tal:attributes="href string:${context/absolute_url}/${product/id}/manage_workspace"
-                 tal:content="product/id">
+                 tal:content="product/title">
                 product name
               </a>
             </td>

@@ -1,0 +1,150 @@
+Tests for QuickInstaller installation
+=====================================
+
+First we need to install quickinstaller itself:
+
+  >>> self.setRoles(['Manager'])
+  >>> self.addProduct('CMFQuickInstallerTool')
+
+Now set three convenience variables for later use:
+
+  >>> portal = self.app.cmf
+  >>> portal
+  <CMFSite at /cmf>
+
+  >>> qi = getattr(portal, 'portal_quickinstaller', None)
+  >>> qi
+  <QuickInstallerTool at /cmf/portal_quickinstaller>
+
+  >>> types_tool = portal.portal_types
+  >>> types_tool
+  <TypesTool at /cmf/portal_types>
+
+
+Install a product through an external method
+--------------------------------------------
+
+Before installing CMFCalendar as an example lets make sure none of the
+installed objects are already present:
+
+  >>> 'Event' in types_tool.objectIds()
+  False
+
+  >>> 'portal_calendar' in portal.objectIds()
+  False
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is installed:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  False
+
+After checking that the product is not installed yet, we do install it:
+
+  >>> qi.installProducts(products=['CMFCalendar'], omitSnapshots=False)
+  '...Installed Products...CMFCalendar:ok:...'
+
+Make sure the calendar tool and the Event type are added:
+
+  >>> 'portal_calendar' in portal.objectIds()
+  True
+
+  >>> 'Event' in portal.portal_types.objectIds()
+  True
+
+And we have an InstalledProduct instance in the QI tool:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  True
+
+And test if we have a GenericSetup snapshot before and after the installation:
+
+  >>> cal.beforeid
+  'qi-before-CMFCalendar-...'
+
+  >>> cal.afterid
+  'qi-after-CMFCalendar-...'
+
+
+Uninstall the product again
+---------------------------
+
+  >>> qi.uninstallProducts(products=['CMFCalendar'])
+
+Verify that all added entries were removed again:
+
+  >>> 'Event' in types_tool.objectIds()
+  False
+
+  >>> 'portal_calendar' in portal.objectIds()
+  False
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is not installed anymore:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+  
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  False
+
+
+Install a product through an extension profile
+----------------------------------------------
+
+>>> qi.installProducts(products=['CMFCalendar'], forceProfile=True, omitSnapshots=False)
+'...Installed Products...CMFCalendar:ok:...'
+
+Make sure the calendar tool and the Event type are added:
+
+  >>> 'portal_calendar' in portal.objectIds()
+  True
+
+  >>> 'Event' in portal.portal_types.objectIds()
+  True
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is installed again:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+  
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  True
+
+And test if we have a GenericSetup snapshot before and after the installation:
+
+  >>> cal.beforeid
+  'qi-before-CMFCalendar-...'
+
+  >>> cal.afterid
+  'qi-after-CMFCalendar-...'
+
+Uninstall the product again
+---------------------------
+
+  >>> qi.uninstallProducts(products=['CMFCalendar'])
+
+Verify that all added entries were removed again:
+
+  >>> 'Event' in types_tool.objectIds()
+  False
+
+  >>> 'portal_calendar' in portal.objectIds()
+  False
+
+And we have an InstalledProduct instance in the QI tool which says the product
+is not installed anymore again:
+
+  >>> 'CMFCalendar' in qi.objectIds()
+  True
+  
+  >>> cal = qi['CMFCalendar']
+  >>> cal.isInstalled()
+  False

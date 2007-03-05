@@ -2,7 +2,7 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool 2.0.2 - Unreleased
+CMFQuickInstallerTool 2.0.2b1 - Released March 5, 2007
 
    - Don't show removed products in the standard listings.
      [hannosch]

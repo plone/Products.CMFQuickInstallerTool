@@ -1,11 +1,11 @@
 CMFQuickInstallerTool
-==================
+=====================
 
 Features
 ----------
 
 CMFQuickInstallerTool is a facility for comfortable activation/deactivation of
-CMF compliant products inside a CMF 1.6+ site.
+CMF compliant products inside a CMF 2.1+ site.
 
 Therefore it has to be installed as a tool inside a CMF portal, where it stores
 the information about the installed products.
@@ -41,13 +41,6 @@ or deleted.
 Second Attention:
 QuickInstallerTool can only uninstall products that are installed via
 QuickInstallerTool.
-
-Installation
-------------
-
-- Drop the CMFQuickInstallerTool into the Products directory.
-
-- inside the portal instanciate a CMF QuickInstaller Tool
 
 Usage
 -----

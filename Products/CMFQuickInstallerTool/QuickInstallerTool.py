@@ -34,8 +34,7 @@ from Products.GenericSetup import EXTENSION
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
-from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
-    import IQuickInstallerTool
+from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 
 CMF21 = True

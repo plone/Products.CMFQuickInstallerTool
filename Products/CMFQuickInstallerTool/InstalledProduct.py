@@ -1,10 +1,18 @@
 import logging
 from zope.interface import implements
+from zope.component import getUtility
 
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.interfaces import IActionsTool
+from Products.CMFCore.interfaces import IConfigurableWorkflowTool
+from Products.CMFCore.interfaces import IContentTypeRegistry
+from Products.CMFCore.interfaces import ISkinsTool
+from Products.CMFCore.interfaces import ITypesTool
+from Products.CMFCore.interfaces import IURLTool
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
@@ -15,11 +23,7 @@ from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
-CMF21 = True
-try:
-    from Products.CMFCore.ActionInformation import ActionCategory
-except ImportError:
-    CMF21 = False
+from Products.CMFCore.ActionInformation import ActionCategory
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -254,7 +258,7 @@ class InstalledProduct(SimpleItem):
         """Uninstalls the product and removes its dependencies
         """
 
-        portal=getToolByName(self,'portal_url').getPortalObject()
+        portal=getUtility(IURLTool).getPortalObject()
 
         # XXX eventually we will land Event system and could remove
         # this 'removal_inprogress' hack
@@ -291,39 +295,32 @@ class InstalledProduct(SimpleItem):
     def _cascadeRemove(self, cascade):
         """Cascaded removal of objects
         """
-        portal=getToolByName(self,'portal_url').getPortalObject()
+        portal=getUtility(IURLTool).getPortalObject()
         
         if 'types' in cascade:
-            portal_types=getToolByName(self,'portal_types')
+            portal_types=getUtility(ITypesTool)
             delObjects(portal_types, self.types)
 
         if 'skins' in cascade:
-            portal_skins=getToolByName(self,'portal_skins')
+            portal_skins=getUtility(ISkinsTool)
             delObjects(portal_skins, self.skins)
 
         if 'actions' in cascade:
-            portal_actions=getToolByName(self,'portal_actions')
-            if CMF21:
-                for category, action in self.actions:
-                    if category in portal_actions.objectIds():
-                        cat = portal_actions[category]
-                        if action in cat.objectIds():
-                            cat._delObject(action)
-                        if len(cat.objectIds()) == 0:
-                            del cat
-                            portal_actions._delObject(category)
-            else:
-                actids= [o.id.lower() for o in portal_actions._actions]
-                delactions=[actids.index(id) for id in
-                            self.actions if id in actids]
-                if delactions:
-                    portal_actions.deleteActions(delactions)
+            portal_actions=getUtility(IActionsTool)
+            for category, action in self.actions:
+                if category in portal_actions.objectIds():
+                    cat = portal_actions[category]
+                    if action in cat.objectIds():
+                        cat._delObject(action)
+                    if len(cat.objectIds()) == 0:
+                        del cat
+                        portal_actions._delObject(category)
 
         if 'portalobjects' in cascade:
             delObjects(portal, self.portalobjects)
 
         if 'workflows' in cascade:
-            portal_workflow=getToolByName(self, 'portal_workflow')
+            portal_workflow=getUtility(IConfigurableWorkflowTool)
             delObjects(portal_workflow, self.workflows)
 
         if 'slots' in cascade:
@@ -335,7 +332,7 @@ class InstalledProduct(SimpleItem):
                                     if s not in self.rightslots]
 
         if 'registrypredicates' in cascade:
-            ctr = getToolByName(self,'content_type_registry')
+            ctr = getUtility(IContentTypeRegistry)
             ids = [id for id, predicate in ctr.listPredicates()]
             predicates=getattr(self,'registrypredicates',[])
             for p in predicates:

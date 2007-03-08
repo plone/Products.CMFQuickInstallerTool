@@ -4,8 +4,15 @@ import sys
 import traceback
 import transaction
 
-from zope.component import getAllUtilitiesRegisteredFor
+from zope.component import getUtility, getAllUtilitiesRegisteredFor
 from zope.interface import implements
+
+from Products.GenericSetup.interfaces import ISetupTool
+from Products.CMFCore.interfaces import IActionsTool
+from Products.CMFCore.interfaces import IConfigurableWorkflowTool
+from Products.CMFCore.interfaces import IContentTypeRegistry
+from Products.CMFCore.interfaces import ISkinsTool
+from Products.CMFCore.interfaces import ITypesTool
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_parent
@@ -92,7 +99,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallProfiles(self, productname):
         """ Return the installer profile id
         """
-        portal_setup = getToolByName(self, 'portal_setup')
+        portal_setup = getUtility(ISetupTool)
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
@@ -108,7 +115,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallProfile(self, productname):
         """ Return the installer profile
         """
-        portal_setup = getToolByName(self, 'portal_setup')
+        portal_setup = getUtility(ISetupTool)
         profiles = portal_setup.listProfileInfo()
 
         profiles = [prof for prof in profiles if
@@ -306,11 +313,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             return msg
 
         portal=aq_parent(self)
-        portal_types=getToolByName(portal,'portal_types')
-        portal_skins=getToolByName(portal,'portal_skins')
-        portal_actions=getToolByName(portal,'portal_actions')
-        portal_workflow=getToolByName(portal,'portal_workflow')
-        type_registry=getToolByName(portal,'content_type_registry')
+        portal_types=getUtility(ITypesTool)
+        portal_skins=getUtility(ISkinsTool)
+        portal_actions=getUtility(IActionsTool)
+        portal_workflow=getUtility(IConfigurableWorkflowTool)
+        type_registry=getUtility(IContentTypeRegistry)
 
         leftslotsbefore=getattr(portal,'left_slots',[])
         rightslotsbefore=getattr(portal,'right_slots',[])
@@ -335,7 +342,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if jstool is not None:
             resources_css_before = csstool.getResourceIds()
 
-        portal_setup = getToolByName(portal, 'portal_setup')
+        portal_setup = getUtility(ISetupTool)
         status=None
         error=True
         res=''

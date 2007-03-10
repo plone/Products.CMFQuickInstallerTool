@@ -1,6 +1,7 @@
 import logging
 from zope.interface import implements
 from zope.component import getUtility
+from zope.component import queryUtility
 
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
@@ -14,16 +15,24 @@ from Products.CMFCore.interfaces import ISkinsTool
 from Products.CMFCore.interfaces import ITypesTool
 from Products.CMFCore.interfaces import IURLTool
 
-from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
 from Products.CMFCore.ActionInformation import ActionCategory
+
+HAS_RR = True
+try:
+    from Products.ResourceRegistries.interfaces import ICSSRegistry
+    from Products.ResourceRegistries.interfaces import IJSRegistry
+except ImportError:
+    HAS_RR = False
+
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -82,7 +91,7 @@ class InstalledProduct(SimpleItem):
             if not hasattr(self.aq_base, att):
                 setattr(self, att, [])
 
-        qi = getToolByName(self, 'portal_quickinstaller')
+        qi = getUtility(IQuickInstallerTool)
         reg = qi.getAlreadyRegistered()
 
         for k in settings.keys():
@@ -342,15 +351,16 @@ class InstalledProduct(SimpleItem):
                     logger.log("Failed to delete '%s' from content type " \
                                "registry" % p, severity=logging.WARNING)
 
-        rr_js = getToolByName(self, 'portal_javascripts', None)
-        rr_css = getToolByName(self, 'portal_css', None)
+        if HAS_RR:
+            rr_js = queryUtility(IJSRegistry)
+            rr_css = queryUtility(ICSSRegistry)
 
-        if rr_js is not None:
-            for js in getattr(self,'resources_js',[]):
-                rr_js.unregisterResource(js)
-        if rr_css is not None:
-            for css in getattr(self,'resources_css',[]):
-                rr_css.unregisterResource(css)
+            if rr_js is not None:
+                for js in getattr(self,'resources_js',[]):
+                    rr_js.unregisterResource(js)
+            if rr_css is not None:
+                for css in getattr(self,'resources_css',[]):
+                    rr_css.unregisterResource(css)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

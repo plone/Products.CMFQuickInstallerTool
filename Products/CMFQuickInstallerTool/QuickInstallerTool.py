@@ -4,7 +4,9 @@ import sys
 import traceback
 import transaction
 
-from zope.component import getUtility, getAllUtilitiesRegisteredFor
+from zope.component import getUtility
+from zope.component import getAllUtilitiesRegisteredFor
+from zope.component import queryUtility
 from zope.interface import implements
 
 from Products.GenericSetup.interfaces import ISetupTool
@@ -28,7 +30,7 @@ from ZODB.POSException import InvalidObjectReference
 from zExceptions import NotFound
 
 from Products.CMFCore.permissions import ManagePortal
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.utils import UniqueObject
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -37,11 +39,14 @@ from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 
-CMF21 = True
+from Products.CMFCore.ActionInformation import ActionCategory
+
+HAS_RR = True
 try:
-    from Products.CMFCore.ActionInformation import ActionCategory
+    from Products.ResourceRegistries.interfaces import ICSSRegistry
+    from Products.ResourceRegistries.interfaces import IJSRegistry
 except ImportError:
-    CMF21 = False
+    HAS_RR = False
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -324,22 +329,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         typesbefore=portal_types.objectIds()
         skinsbefore=portal_skins.objectIds()
-        if CMF21:
-            actionsbefore = set()
-            for category in portal_actions.objectIds():
-                for action in portal_actions[category].objectIds():
-                    actionsbefore.add((category, action))
-        else:
-            actionsbefore=[a.id for a in portal_actions._actions]
+        actionsbefore = set()
+        for category in portal_actions.objectIds():
+            for action in portal_actions[category].objectIds():
+                actionsbefore.add((category, action))
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
 
-        jstool = getToolByName(portal,'portal_javascripts', None)
-        if jstool is not None:
-            resources_js_before = jstool.getResourceIds()
-        csstool = getToolByName(portal,'portal_css', None)
-        if jstool is not None:
-            resources_css_before = csstool.getResourceIds()
+        if HAS_RR:
+            jstool = queryUtility(IJSRegistry)
+            if jstool is not None:
+                resources_js_before = jstool.getResourceIds()
+            csstool = queryUtility(ICSSRegistry)
+            if jstool is not None:
+                resources_css_before = csstool.getResourceIds()
 
         portal_setup = getUtility(ISetupTool)
         status=None
@@ -429,25 +432,23 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         typesafter=portal_types.objectIds()
         skinsafter=portal_skins.objectIds()
-        if CMF21:
-            actionsafter = set()
-            for category in portal_actions.objectIds():
-                for action in portal_actions[category].objectIds():
-                    actionsafter.add((category, action))
-        else:
-            actionsafter=[a.id for a in portal_actions._actions]
+        actionsafter = set()
+        for category in portal_actions.objectIds():
+            for action in portal_actions[category].objectIds():
+                actionsafter.add((category, action))
         workflowsafter=portal_workflow.objectIds()
         portalobjectsafter=portal.objectIds()
         leftslotsafter=getattr(portal,'left_slots',[])
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
 
-        jstool = getToolByName(portal,'portal_javascripts', None)
-        if jstool is not None:
-            resources_js_after = jstool.getResourceIds()
-        csstool = getToolByName(portal,'portal_css', None)
-        if jstool is not None:
-            resources_css_after = csstool.getResourceIds()
+        if HAS_RR:
+            jstool = queryUtility(IJSRegistry)
+            if jstool is not None:
+                resources_js_after = jstool.getResourceIds()
+            csstool = queryUtility(ICSSRegistry)
+            if csstool is not None:
+                resources_css_after = csstool.getResourceIds()
 
         if callable(rightslotsafter):
             rightslotsafter = rightslotsafter()
@@ -459,10 +460,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if callable(leftslotsbefore):
             leftslotsbefore = leftslotsbefore()
 
-        if CMF21:
-            actions = [a for a in (actionsafter - actionsbefore)]
-        else:
-            actions = [a for a in actionsafter if a not in actionsbefore]
+        actions = [a for a in (actionsafter - actionsbefore)]
 
         settings=dict(
             types=[t for t in typesafter if t not in typesbefore],
@@ -477,13 +475,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                 if s not in registrypredicatesbefore],
             )
 
-        jstool = getToolByName(self,'portal_javascripts', None)
-        if jstool is not None:
-            settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
-            settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
-            if len(settings['types']) > 0:
-                rr_css=getToolByName(portal,'portal_css')
-                rr_css.cookResources()
+        if HAS_RR:
+            jstool = queryUtility(IJSRegistry)
+            if jstool is not None:
+                settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
+                settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
+                if len(settings['types']) > 0:
+                    rr_css=getUtility(ICSSRegistry)
+                    rr_css.cookResources()
 
         msg=str(res)
         version=self.getProductVersion(p)

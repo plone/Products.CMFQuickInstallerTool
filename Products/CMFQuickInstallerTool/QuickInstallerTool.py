@@ -66,7 +66,7 @@ class HiddenProducts(object):
     implements(INonInstallable)
 
     def getNonInstallableProducts(self):
-        return ['CMFQuickInstallerTool']
+        return ['CMFQuickInstallerTool', 'Products.CMFQuickInstallerTool']
 
 
 class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):

@@ -6,6 +6,9 @@ First we need to install quickinstaller itself:
   >>> self.setRoles(['Manager'])
   >>> self.addProduct('CMFQuickInstallerTool')
 
+  >>> from zope.component import getSiteManager
+  >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
+
 Now set three convenience variables for later use:
 
   >>> portal = self.app.cmf
@@ -20,6 +23,10 @@ Now set three convenience variables for later use:
   >>> types_tool
   <TypesTool at /cmf/portal_types>
 
+And register the QI tool as a utility:
+
+  >>> sm = getSiteManager()
+  >>> sm.registerUtility(qi, IQuickInstallerTool)
 
 Install a product through an external method
 --------------------------------------------

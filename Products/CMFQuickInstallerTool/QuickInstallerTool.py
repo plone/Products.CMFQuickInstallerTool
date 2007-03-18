@@ -304,10 +304,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
-                       forceProfile=False, omitSnapshots=True):
+                       forceProfile=False, omitSnapshots=True,
+                       profile=None):
         """Install a product by name
         """
         __traceback_info__ = (p,)
+
+        if profile is not None:
+            forceProfile = True
 
         if self.isProductInstalled(p):
             prod = self._getOb(p)
@@ -406,11 +410,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 # Install via GenericSetup profile
                 current_context = portal_setup.getImportContextID()
 
-                profile = profiles[0]
-                if len(profiles) > 1:
-                    logger.log(logging.INFO,
-                               'Multiple extension profiles found for product '
-                               '%s. Used profile: %s' % (p, profile))
+                if profile is None:
+                    profile = profiles[0]
+                    if len(profiles) > 1:
+                        logger.log(logging.INFO,
+                                   'Multiple extension profiles found for product '
+                                   '%s. Used profile: %s' % (p, profile))
 
                 portal_setup.setImportContext('profile-%s' % profile)
                 portal_setup.runAllImportSteps()

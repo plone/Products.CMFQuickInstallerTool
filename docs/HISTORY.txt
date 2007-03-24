@@ -2,6 +2,12 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
+CMFQuickInstallerTool - Unreleased
+
+    - Added uninstall support for utilities. All additional utilities installed
+      by a product are now recorded and uninstalled properly.
+      [hannosch]
+
 CMFQuickInstallerTool 2.0.2b2 - Released March 23, 2007
 
     - Added new profile argument to the installProduct method to explicitly set

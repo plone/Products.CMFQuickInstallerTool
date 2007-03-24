@@ -1,5 +1,6 @@
 import logging
 from zope.interface import implements
+from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
 
@@ -17,6 +18,7 @@ from Products.CMFCore.interfaces import IURLTool
 
 from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
+from Products.GenericSetup.utils import _resolveDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
@@ -66,7 +68,8 @@ class InstalledProduct(SimpleItem):
     transcript=[]
     error=False #error flag
     default_cascade=['types', 'skins', 'actions', 'portalobjects',
-                     'workflows', 'slots', 'registrypredicates']
+                     'workflows', 'slots', 'registrypredicates',
+                     'adapters', 'utilities']
     afterid = None
     beforeid = None
 
@@ -86,7 +89,7 @@ class InstalledProduct(SimpleItem):
                status='installed', error=False, locked=False, hidden=False,
                afterid=None, beforeid=None):
 
-        #check for the availability of attributes before assiging
+        # check for the availability of attributes before assigning
         for att in settings.keys():
             if not hasattr(self.aq_base, att):
                 setattr(self, att, [])
@@ -95,7 +98,8 @@ class InstalledProduct(SimpleItem):
         reg = qi.getAlreadyRegistered()
 
         for k in settings.keys():
-            updatelist(getattr(self,k), settings[k], reg[k])
+            old = k in reg.keys() and reg[k] or []
+            updatelist(getattr(self,k), settings[k], old)
 
         self.transcript.insert(0, {'timestamp':DateTime(), 'msg':logmsg})
         self.locked=locked
@@ -350,6 +354,22 @@ class InstalledProduct(SimpleItem):
                 else:
                     logger.log("Failed to delete '%s' from content type " \
                                "registry" % p, severity=logging.WARNING)
+
+        if 'adapters' in cascade:
+            adapters = getattr(self, 'adapters', [])
+            if adapters:
+                sm = getSiteManager()
+                # TODO: expand this to actually cover adapter registrations
+
+        if 'utilities' in cascade:
+            utilities = getattr(self, 'utilities', [])
+            if utilities:
+                sm = getSiteManager()
+                for registration in utilities:
+                    provided = _resolveDottedName(registration[0])
+                    name = registration[1]
+                    if queryUtility(provided, name=name) is not None:
+                        sm.unregisterUtility(provided=provided, name=name)
 
         if HAS_RR:
             rr_js = queryUtility(IJSRegistry)

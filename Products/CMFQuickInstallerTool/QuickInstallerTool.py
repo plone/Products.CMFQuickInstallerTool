@@ -4,12 +4,14 @@ import sys
 import traceback
 import transaction
 
+from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import getAllUtilitiesRegisteredFor
 from zope.component import queryUtility
 from zope.interface import implements
 
 from Products.GenericSetup.interfaces import ISetupTool
+
 from Products.CMFCore.interfaces import IActionsTool
 from Products.CMFCore.interfaces import IConfigurableWorkflowTool
 from Products.CMFCore.interfaces import IContentTypeRegistry
@@ -33,6 +35,7 @@ from Products.CMFCore.permissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
+from Products.GenericSetup.utils import _getDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
@@ -339,6 +342,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 actionsbefore.add((category, action))
         workflowsbefore=portal_workflow.objectIds()
         portalobjectsbefore=portal.objectIds()
+        adaptersbefore = tuple(getSiteManager().registeredAdapters())
+        utilitiesbefore = tuple(getSiteManager().registeredUtilities())
 
         if HAS_RR:
             jstool = queryUtility(IJSRegistry)
@@ -446,6 +451,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         leftslotsafter=getattr(portal,'left_slots',[])
         rightslotsafter=getattr(portal,'right_slots',[])
         registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
+        adaptersafter = tuple(getSiteManager().registeredAdapters())
+        utilitiesafter = tuple(getSiteManager().registeredUtilities())
 
         if HAS_RR:
             jstool = queryUtility(IJSRegistry)
@@ -467,6 +474,21 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         actions = [a for a in (actionsafter - actionsbefore)]
 
+        adapters = []
+        if len(adaptersafter) > len(adaptersbefore):
+            registrations = [reg for reg in adaptersafter
+                                  if reg not in adaptersbefore]
+            # TODO: expand this to actually cover adapter registrations
+
+        utilities = []
+        if len(utilitiesafter) > len(utilitiesbefore):
+            registrations = [reg for reg in utilitiesafter
+                                  if reg not in utilitiesbefore]
+
+            for registration in registrations:
+                reg = (_getDottedName(registration.provided), registration.name)
+                utilities.append(reg)
+
         settings=dict(
             types=[t for t in typesafter if t not in typesbefore],
             skins=[s for s in skinsafter if s not in skinsbefore],
@@ -476,6 +498,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                            if a not in portalobjectsbefore],
             leftslots=[s for s in leftslotsafter if s not in leftslotsbefore],
             rightslots=[s for s in rightslotsafter if s not in rightslotsbefore],
+            adapters=adapters,
+            utilities=utilities,
             registrypredicates=[s for s in registrypredicatesafter
                                 if s not in registrypredicatesbefore],
             )

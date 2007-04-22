@@ -78,6 +78,11 @@ CMFQuickInstallerTool 2.0.0 - Released October 25, 2006
     - Added support for GenericSetup extension profile-based installation.
       [hannosch]
 
+CMFQuickInstallerTool 1.6.0 - Released April 22, 2007
+
+    - Applied postonly protection to product uninstall and reinstall.
+      [alecm]
+
 CMFQuickInstallerTool 1.5.9 - Released June 1, 2006
 
     - Fixed two missing imports in utils.py. This closes

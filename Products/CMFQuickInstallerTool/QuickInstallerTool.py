@@ -19,6 +19,7 @@ from Products.CMFCore.interfaces import ISkinsTool
 from Products.CMFCore.interfaces import ITypesTool
 
 from AccessControl import ClassSecurityInfo
+from AccessControl.requestmethod import postonly
 from Acquisition import aq_base, aq_parent
 
 from Globals import DevelopmentMode
@@ -52,6 +53,7 @@ except ImportError:
     HAS_RR = False
 
 logger = logging.getLogger('CMFQuickInstallerTool')
+
 
 class AlreadyInstalled(Exception):
     """ Would be nice to say what Product was trying to be installed """
@@ -628,6 +630,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+    uninstallProducts = postonly(uninstallProducts)
 
     security.declareProtected(ManagePortal, 'reinstallProducts')
     def reinstallProducts(self, products, REQUEST=None, omitSnapshots=True):
@@ -649,6 +652,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
+    reinstallProducts = postonly(reinstallProducts)
 
     def getQIElements(self):
         res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 

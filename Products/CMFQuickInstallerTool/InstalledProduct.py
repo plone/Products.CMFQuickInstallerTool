@@ -9,31 +9,17 @@ from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
-from Products.CMFCore.interfaces import IActionsTool
-from Products.CMFCore.interfaces import IConfigurableWorkflowTool
-from Products.CMFCore.interfaces import IContentTypeRegistry
-from Products.CMFCore.interfaces import ISkinsTool
-from Products.CMFCore.interfaces import ITypesTool
-from Products.CMFCore.interfaces import IURLTool
+from Products.CMFCore.interfaces import ISiteRoot
 
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup.utils import _resolveDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
-
-from Products.CMFCore.ActionInformation import ActionCategory
-
-HAS_RR = True
-try:
-    from Products.ResourceRegistries.interfaces import ICSSRegistry
-    from Products.ResourceRegistries.interfaces import IJSRegistry
-except ImportError:
-    HAS_RR = False
 
 
 logger = logging.getLogger('CMFQuickInstallerTool')
@@ -94,7 +80,7 @@ class InstalledProduct(SimpleItem):
             if not hasattr(self.aq_base, att):
                 setattr(self, att, [])
 
-        qi = getUtility(IQuickInstallerTool)
+        qi = getToolByName(self, 'portal_quickinstaller')
         reg = qi.getAlreadyRegistered()
 
         for k in settings.keys():
@@ -271,7 +257,7 @@ class InstalledProduct(SimpleItem):
         """Uninstalls the product and removes its dependencies
         """
 
-        portal=getUtility(IURLTool).getPortalObject()
+        portal=getUtility(ISiteRoot)
 
         # XXX eventually we will land Event system and could remove
         # this 'removal_inprogress' hack
@@ -308,18 +294,18 @@ class InstalledProduct(SimpleItem):
     def _cascadeRemove(self, cascade):
         """Cascaded removal of objects
         """
-        portal=getUtility(IURLTool).getPortalObject()
+        portal=getUtility(ISiteRoot)
         
         if 'types' in cascade:
-            portal_types=getUtility(ITypesTool)
+            portal_types=getToolByName(self,'portal_types')
             delObjects(portal_types, self.types)
 
         if 'skins' in cascade:
-            portal_skins=getUtility(ISkinsTool)
+            portal_skins=getToolByName(self,'portal_skins')
             delObjects(portal_skins, self.skins)
 
         if 'actions' in cascade:
-            portal_actions=getUtility(IActionsTool)
+            portal_actions=getToolByName(self,'portal_actions')
             for category, action in self.actions:
                 if category in portal_actions.objectIds():
                     cat = portal_actions[category]
@@ -333,7 +319,7 @@ class InstalledProduct(SimpleItem):
             delObjects(portal, self.portalobjects)
 
         if 'workflows' in cascade:
-            portal_workflow=getUtility(IConfigurableWorkflowTool)
+            portal_workflow=getToolByName(self, 'portal_workflow')
             delObjects(portal_workflow, self.workflows)
 
         if 'slots' in cascade:
@@ -345,7 +331,7 @@ class InstalledProduct(SimpleItem):
                                     if s not in self.rightslots]
 
         if 'registrypredicates' in cascade:
-            ctr = getUtility(IContentTypeRegistry)
+            ctr = getToolByName(self,'content_type_registry')
             ids = [id for id, predicate in ctr.listPredicates()]
             predicates=getattr(self,'registrypredicates',[])
             for p in predicates:
@@ -371,16 +357,15 @@ class InstalledProduct(SimpleItem):
                     if queryUtility(provided, name=name) is not None:
                         sm.unregisterUtility(provided=provided, name=name)
 
-        if HAS_RR:
-            rr_js = queryUtility(IJSRegistry)
-            rr_css = queryUtility(ICSSRegistry)
+        rr_js = getToolByName(self, 'portal_javascripts', None)
+        rr_css = getToolByName(self, 'portal_css', None)
 
-            if rr_js is not None:
-                for js in getattr(self,'resources_js',[]):
-                    rr_js.unregisterResource(js)
-            if rr_css is not None:
-                for css in getattr(self,'resources_css',[]):
-                    rr_css.unregisterResource(css)
+        if rr_js is not None:
+            for js in getattr(self,'resources_js',[]):
+                rr_js.unregisterResource(js)
+        if rr_css is not None:
+            for css in getattr(self,'resources_css',[]):
+                rr_css.unregisterResource(css)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

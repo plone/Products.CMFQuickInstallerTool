@@ -1,3 +1,10 @@
+1.6.1 Released April 28, 2007
+
+ - Disabled postonly protection for product reinstall. This broke the reinstall
+   functionality on the Plone control panel. The postonly protection can be
+   enabled once the control panel is changed.
+   [hannosch]
+
 1.6.0 Released April 22, 2007
 
  - Applied postonly protection to product uninstall and reinstall.

@@ -631,7 +631,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-    reinstallProducts = postonly(reinstallProducts)
+    # XXX: Should be enabled once the Plone control panel supports this.
+    # reinstallProducts = postonly(reinstallProducts)
 
     def getQIElements(self):
         res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 

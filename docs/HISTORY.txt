@@ -2,7 +2,10 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool - Unreleased
+CMFQuickInstallerTool 2.0.2b3 - Released May 1, 2007
+
+    - Back to getToolByName.
+      [wichert]
 
     - Added uninstall support for utilities. All additional utilities installed
       by a product are now recorded and uninstalled properly.

@@ -2,6 +2,12 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
+CMFQuickInstallerTool 2.0.3 - Unreleased
+
+    - Use new GenericSetup features, so we don't have to change the current
+      setup tool context anymore.
+      [hannosch]
+
 CMFQuickInstallerTool 2.0.2b3 - Released May 1, 2007
 
     - Back to getToolByName.

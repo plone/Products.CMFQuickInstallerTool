@@ -6,9 +6,10 @@ First we need to install quickinstaller itself:
   >>> self.setRoles(['Manager'])
   >>> self.addProduct('CMFQuickInstallerTool')
 
-  >>> from zope.component import getSiteManager, queryUtility
+  >>> from zope.component import getSiteManager
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
   >>> from Products.CMFCalendar.interfaces import ICalendarTool
+  >>> from Products.CMFCore.utils import getToolByName
 
 Now set three convenience variables for later use:
 
@@ -41,9 +42,6 @@ installed objects are already present:
   >>> 'portal_calendar' in portal.objectIds()
   False
 
-  >>> queryUtility(ICalendarTool) is None
-  True
-
 And we have no InstalledProduct instance in the QI tool:
 
   >>> 'CMFCalendar' in qi.objectIds()
@@ -51,7 +49,7 @@ And we have no InstalledProduct instance in the QI tool:
 
 After checking that the product is not installed yet, we do install it:
 
-  >>> qi.installProducts(products=['CMFCalendar'], omitSnapshots=False)
+  >>> qi.installProducts(products=['CMFCalendar'])
   '...Installed Products...CMFCalendar:ok:...'
 
 Make sure the calendar tool and the Event type are added:
@@ -62,7 +60,7 @@ Make sure the calendar tool and the Event type are added:
   >>> 'Event' in portal.portal_types.objectIds()
   True
 
-  >>> queryUtility(ICalendarTool)
+  >>> getToolByName(portal, 'portal_calendar')
   <CalendarTool at .../portal_calendar>
 
 And we have an InstalledProduct instance in the QI tool:
@@ -73,14 +71,6 @@ And we have an InstalledProduct instance in the QI tool:
   >>> cal = qi['CMFCalendar']
   >>> cal.isInstalled()
   True
-
-And test if we have a GenericSetup snapshot before and after the installation:
-
-  >>> cal.beforeid
-  'qi-before-CMFCalendar-...'
-
-  >>> cal.afterid
-  'qi-after-CMFCalendar-...'
 
 
 Uninstall the product again
@@ -96,9 +86,6 @@ Verify that all added entries were removed again:
   >>> 'portal_calendar' in portal.objectIds()
   False
 
-  >>> queryUtility(ICalendarTool) is None
-  True
-
 And we have an InstalledProduct instance in the QI tool which says the product
 is not installed anymore:
 
@@ -109,6 +96,10 @@ is not installed anymore:
   >>> cal.isInstalled()
   False
 
+  >>> setup = getToolByName(portal, 'portal_setup')
+  >>> logs = [i for i in setup.objectIds() if 'CMFCalendar' in i]
+  >>> for i in logs:
+  ...     setup._delObject(i)
 
 Install a product through an extension profile
 ----------------------------------------------
@@ -121,7 +112,7 @@ Make sure the calendar tool and the Event type are added:
   >>> 'portal_calendar' in portal.objectIds()
   True
 
-  >>> queryUtility(ICalendarTool)
+  >>> getToolByName(portal, 'portal_calendar')
   <CalendarTool at .../portal_calendar>
 
   >>> 'Event' in portal.portal_types.objectIds()
@@ -157,9 +148,6 @@ Verify that all added entries were removed again:
 
   >>> 'portal_calendar' in portal.objectIds()
   False
-
-  >>> queryUtility(ICalendarTool) is None
-  True
 
 And we have an InstalledProduct instance in the QI tool which says the product
 is not installed anymore again:

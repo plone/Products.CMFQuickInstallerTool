@@ -395,9 +395,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         else:
             profiles = self.getInstallProfiles(p)
             if profiles:
-                # Install via GenericSetup profile
-                current_context = portal_setup.getImportContextID()
-
                 if profile is None:
                     profile = profiles[0]
                     if len(profiles) > 1:
@@ -405,10 +402,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                    'Multiple extension profiles found for product '
                                    '%s. Used profile: %s' % (p, profile))
 
-                portal_setup.setImportContext('profile-%s' % profile)
-                portal_setup.runAllImportSteps()
-                # Restore import context again
-                portal_setup.setImportContext(current_context)
+                portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
 
                 status='installed'
                 error = False

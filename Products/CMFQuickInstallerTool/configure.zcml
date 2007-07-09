@@ -3,10 +3,6 @@
 
   <include file="profiles.zcml"/>
 
-  <five:registerPackage
-      package="."
-      initialize=".initialize" />
-
   <utility factory=".QuickInstallerTool.HiddenProducts"
            name="Products.CMFQuickInstallerTool"
     />

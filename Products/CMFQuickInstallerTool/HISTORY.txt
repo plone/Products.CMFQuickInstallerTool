@@ -2,6 +2,11 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
+CMFQuickInstallerTool 2.0.4 - Unreleased
+
+    - Avoid an unneeded transaction savepoint.
+      [hannosch]
+
 CMFQuickInstallerTool 2.0.3 - Released July 9, 2007
 
     - Use new GenericSetup features, so we don't have to change the current

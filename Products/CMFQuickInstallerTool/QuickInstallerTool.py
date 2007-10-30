@@ -406,8 +406,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
                 status='installed'
                 error = False
-                transaction.savepoint(optimistic=True)
-
             else:
                 # No install method and no profile, log / abort?
                 pass

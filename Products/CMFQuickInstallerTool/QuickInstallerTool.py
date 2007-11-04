@@ -7,6 +7,7 @@ import transaction
 from zope.component import getSiteManager
 from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
+from zope.annotation.interfaces import IAnnotatable
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
@@ -398,6 +399,15 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         before=self.snapshotPortal(portal)
 
+        reqstorage=IAnnotatable(self.REQUEST, None)
+        if reqstorage is not None:
+            key="Products.CMFQUickInstaller.Installing"
+            if reqstorage.has_key(key):
+                installing=reqstorage[key]
+            else:
+                installing=reqstorage[key]=set()
+            installing.add(p)
+
         portal_setup = getToolByName(portal, 'portal_setup')
         status=None
         error=True
@@ -471,6 +481,9 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             else:
                 # No install method and no profile, log / abort?
                 pass
+
+        if reqstorage is not None:
+            installing.remove(p)
 
         # Create a snapshot after installation
         after_id = portal_setup._mangleTimestampName('qi-after-%s' % p)

@@ -37,9 +37,23 @@ def handleBeforeProfileImportEvent(event):
     if product is None:
         return
 
-    storage=IAnnotatable(request)
-    storage["Products.CMFQuickInstallerTool.GenericSetupEvents"]=dict(product=product)
+    qi=getToolByName(context, "portal_quickinstaller", None)
+    snapshot=qi.snapshotPortal(context.aq_parent)
 
+    storage=IAnnotatable(request, None)
+    if storage is None:
+        return
+
+    
+    installing=storage.get("Products.CMFQuickInstaller.Installing", [])
+    if product in installing:
+        return
+
+    if storage.has_key("Products.CMFQuickInstallerTool.Events"):
+        data=storage["Products.CMFQuickInstallerTool.Events"]
+    else:
+        data=storage["Products.CMFQuickInstallerTool.Events"]={}
+    data[event.profile_id]=dict(product=product, snapshot=snapshot)
 
 
 @adapter(IProfileImportedEvent)
@@ -50,6 +64,32 @@ def handleProfileImportedEvent(event):
     context=event.tool
 
     # We need a request to scribble some data in
-    if not hasattr(context, "REQUEST"):
+    request=getattr(context, "REQUEST", None)
+    if request is None:
         return
+
+    storage=IAnnotatable(request, None)
+    if storage is None:
+        return
+
+    data=storage.get("Products.CMFQuickInstallerTool.Events", [])
+    if event.profile_id not in data:
+        return
+    info=data[event.profile_id]
+
+    qi=getToolByName(context, "portal_quickinstaller", None)
+    after=qi.snapshotPortal(context.aq_parent)
+
+
+    settings=qi.deriveSettingsFromSnapshots(info["snapshot"], after)
+    version=qi.getProductVersion(info["product"])
+    qi.notifyInstalled(
+            info["product"],
+            logmsg="Installed via setup tool",
+            settings=settings,
+            installedversion=version,
+            status='installed',
+            error=False)
+
+
 

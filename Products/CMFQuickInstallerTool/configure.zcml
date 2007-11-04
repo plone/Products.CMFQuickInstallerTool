@@ -3,6 +3,8 @@
 
   <include file="profiles.zcml"/>
 
+  <subscriber handler=".events.handleBeforeProfileImportEvent" />
+
   <utility factory=".QuickInstallerTool.HiddenProducts"
            name="Products.CMFQuickInstallerTool"
     />

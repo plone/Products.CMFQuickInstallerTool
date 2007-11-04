@@ -373,6 +373,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return settings
 
 
+    security.declareProtected(ManagePortal, '')
+
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
@@ -487,24 +489,18 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         msg=str(res)
         version=self.getProductVersion(p)
+
         # add the product
         try:
-            if p not in self.objectIds():
-                ip = InstalledProduct(p)
-                self._setObject(p,ip)
-                
-            ip = getattr(self, p)
-            ip.update(settings,
-                      installedversion=version,
-                      logmsg=res,
-                      status=status,
-                      error=error,
-                      locked=locked,
-                      hidden=hidden,
-                      afterid = after_id,
-                      beforeid = before_id
-                      )
-
+            self.notifyInstalled(settings,
+                          installedversion=version,
+                          logmsg=res,
+                          status=status,
+                          error=error,
+                          locked=locked,
+                          hidden=hidden,
+                          afterid=after_id,
+                          beforeid=before_id)
         except InvalidObjectReference,e:
             raise
         except:
@@ -575,7 +571,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return o is not None and o.isInstalled()
 
     security.declareProtected(ManagePortal, 'notifyInstalled')
-    def notifyInstalled(self,p,locked=True,hidden=False,**kw):
+    def notifyInstalled(self,p,locked=True,hidden=False,settings={},**kw):
         """Marks a product that has been installed
         without QuickInstaller as installed
         """
@@ -585,7 +581,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             self._setObject(p,ip)
             
         p = getattr(self, p)
-        p.update({},locked=locked, hidden=hidden, **kw)
+        p.update(settings,locked=locked, hidden=hidden, **kw)
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
     def uninstallProducts(self, products=[],

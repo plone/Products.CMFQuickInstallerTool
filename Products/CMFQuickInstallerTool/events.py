@@ -23,7 +23,7 @@ def findProductForProfile(context, profile_id):
 
 @adapter(IBeforeProfileImportEvent)
 def handleBeforeProfileImportEvent(event):
-    if event.profile_id is None:
+    if event.profile_id is None or not event.full_import:
         return
 
     context=event.tool
@@ -58,7 +58,7 @@ def handleBeforeProfileImportEvent(event):
 
 @adapter(IProfileImportedEvent)
 def handleProfileImportedEvent(event):
-    if event.profile_id is None:
+    if event.profile_id is None or not event.full_import:
         return
 
     context=event.tool

@@ -49,24 +49,20 @@ class InstalledProduct(SimpleItem):
         'forms/installed_product_overview', globals(),
         __name__='manage_installationInfo')
 
-    leftslots=[]
-    rightslots=[]
-    transcript=[]
-    error=False #error flag
     default_cascade=['types', 'skins', 'actions', 'portalobjects',
                      'workflows', 'slots', 'registrypredicates',
                      'adapters', 'utilities']
-    afterid = None
-    beforeid = None
 
     def __init__(self, id):
         self.id=id
         self.transcript=[]
+        self.leftslots=[]
+        self.rightslots=[]
         self.locked=None
         self.hidden=None
         self.installedversion=None
         self.status='new'
-        self.error=None
+        self.error=False
         self.afterid = None
         self.beforeid = None
 

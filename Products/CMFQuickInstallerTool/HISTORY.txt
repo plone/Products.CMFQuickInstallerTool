@@ -4,6 +4,11 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.4 - Unreleased
 
+    - Fixed class variables in InstalledProduct. All products would share the
+      same left slots and right slots properties. Thx to Saverio Mucci for
+      noting this.
+      [hannosch]
+
     - Avoid an unneeded transaction savepoint.
       [hannosch]
 

@@ -21,5 +21,4 @@ def delObjects(cont, ids):
         try:
             cont.manage_delObjects(delid)
         except (AttributeError, KeyError, BadRequest):
-            logger.log("Failed to delete '%s' in '%s'" % (delid, cont.id),
-                        severity=logging.WARNING)
+            logger.warning("Failed to delete '%s' in '%s'" % (delid, cont.id))

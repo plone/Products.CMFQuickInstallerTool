@@ -4,6 +4,10 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.4 - Unreleased
 
+    - Fixed logging code in utils. This closes
+      http://dev.plone.org/plone/ticket/7093.
+      [bliles, hannosch]
+
     - Reverted getUtility usage. Closes http://dev.plone.org/plone/ticket/7314.
       [hannosch]
 

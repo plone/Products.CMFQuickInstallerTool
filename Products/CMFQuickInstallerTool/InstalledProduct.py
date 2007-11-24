@@ -1,15 +1,12 @@
 import logging
 from zope.interface import implements
 from zope.component import getSiteManager
-from zope.component import getUtility
 from zope.component import queryUtility
 
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
-
-from Products.CMFCore.interfaces import ISiteRoot
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
@@ -252,10 +249,9 @@ class InstalledProduct(SimpleItem):
     def uninstall(self, cascade=default_cascade, reinstall=False, REQUEST=None):
         """Uninstalls the product and removes its dependencies
         """
+        portal = getToolByName(self, 'portal_url').getPortalObject() 
 
-        portal=getUtility(ISiteRoot)
-
-        # XXX eventually we will land Event system and could remove
+        # TODO eventually we will land Event system and could remove
         # this 'removal_inprogress' hack
         if self.isLocked() and getattr(portal, 'removal_inprogress', False):
             raise ValueError, 'The product is locked and cannot be uninstalled!'
@@ -290,7 +286,7 @@ class InstalledProduct(SimpleItem):
     def _cascadeRemove(self, cascade):
         """Cascaded removal of objects
         """
-        portal=getUtility(ISiteRoot)
+        portal = getToolByName(self, 'portal_url').getPortalObject() 
         
         if 'types' in cascade:
             portal_types=getToolByName(self,'portal_types')

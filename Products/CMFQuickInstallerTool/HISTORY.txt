@@ -4,6 +4,9 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.4 - Unreleased
 
+    - Reverted getUtility usage. Closes http://dev.plone.org/plone/ticket/7314.
+      [hannosch]
+
     - Fixed class variables in InstalledProduct. All products would share the
       same left slots and right slots properties. Thx to Saverio Mucci for
       noting this.

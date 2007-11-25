@@ -4,6 +4,9 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.4 - Unreleased
 
+    - Added metadata.xml to GenericSetup profile.
+      [hannosch]
+
     - Avoid breakage for InstalledProduct instances without the left or
       rightslots properties. Thx to Roberto Fontanarosa from the OpenCpi
       division of Cpi Progetti Spa.

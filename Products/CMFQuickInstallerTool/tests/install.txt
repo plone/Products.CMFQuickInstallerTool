@@ -104,7 +104,7 @@ is not installed anymore:
 Install a product through an extension profile
 ----------------------------------------------
 
->>> qi.installProducts(products=['CMFCalendar'], forceProfile=True, omitSnapshots=False)
+>>> qi.installProducts(products=['CMFCalendar'], forceProfile=True, omitSnapshots=True)
 '...Installed Products...CMFCalendar:ok:...'
 
 Make sure the calendar tool and the Event type are added:
@@ -127,14 +127,6 @@ is installed again:
   >>> cal = qi['CMFCalendar']
   >>> cal.isInstalled()
   True
-
-And test if we have a GenericSetup snapshot before and after the installation:
-
-  >>> cal.beforeid
-  'qi-before-CMFCalendar-...'
-
-  >>> cal.afterid
-  'qi-after-CMFCalendar-...'
 
 Uninstall the product again
 ---------------------------

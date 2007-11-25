@@ -150,15 +150,19 @@ class InstalledProduct(SimpleItem):
 
     security.declareProtected(ManagePortal, 'getLeftSlots')
     def getLeftSlots(self):
+        if getattr(self, 'leftslots', None) is None:
+            self.leftslots = []
         return self.leftslots
 
     security.declareProtected(ManagePortal, 'getRightSlots')
     def getRightSlots(self):
+        if getattr(self, 'rightslots', None) is None:
+            self.rightslots = []
         return self.rightslots
 
     security.declareProtected(ManagePortal, 'getSlots')
     def getSlots(self):
-        return self.leftslots+self.rightslots
+        return self.getLeftSlots()+self.getRightSlots()
 
     security.declareProtected(ManagePortal, 'getValue')
     def getValue(self,name):
@@ -315,12 +319,12 @@ class InstalledProduct(SimpleItem):
             delObjects(portal_workflow, self.workflows)
 
         if 'slots' in cascade:
-            if self.leftslots:
+            if self.getLeftSlots():
                 portal.left_slots=[s for s in portal.left_slots
-                                   if s not in self.leftslots]
-            if self.rightslots:
+                                   if s not in self.getLeftSlots()]
+            if self.getRightSlots():
                 portal.right_slots=[s for s in portal.right_slots
-                                    if s not in self.rightslots]
+                                    if s not in self.getRightSlots()]
 
         if 'registrypredicates' in cascade:
             ctr = getToolByName(self,'content_type_registry')

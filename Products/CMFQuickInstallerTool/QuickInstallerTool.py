@@ -11,7 +11,7 @@ from zope.annotation.interfaces import IAnnotatable
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base, aq_parent, aq_get
 
 from Globals import DevelopmentMode
 from Globals import InitializeClass
@@ -399,16 +399,22 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         before=self.snapshotPortal(portal)
 
-        reqstorage=IAnnotatable(self.REQUEST, None)
-        if reqstorage is not None:
-            key="Products.CMFQUickInstaller.Installing"
-            if reqstorage.has_key(key):
-                installing=reqstorage[key]
-            else:
-                installing=reqstorage[key]=set()
-            installing.add(p)
+        if hasattr(self, "REQUEST"):
+            reqstorage=IAnnotatable(self.REQUEST, None)
+            if reqstorage is not None:
+                key="Products.CMFQUickInstaller.Installing"
+                if reqstorage.has_key(key):
+                    installing=reqstorage[key]
+                else:
+                    installing=reqstorage[key]=set()
+                installing.add(p)
+        else:
+            reqstorage=None
 
-        portal_setup = getToolByName(portal, 'portal_setup')
+        # XXX We can not use getToolByName since that returns a utility
+        # without a RequestContainer. This breaks import steps that need
+        # to run tools which request self.REQUEST.
+        portal_setup =  aq_get(portal, 'portal_setup', None, 1)
         status=None
         error=True
         res=''
@@ -505,7 +511,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         # add the product
         try:
-            self.notifyInstalled(settings,
+            self.notifyInstalled(p,
+                          settings=settings,
                           installedversion=version,
                           logmsg=res,
                           status=status,

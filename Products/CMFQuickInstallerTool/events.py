@@ -85,6 +85,7 @@ def handleProfileImportedEvent(event):
     version=qi.getProductVersion(info["product"])
     qi.notifyInstalled(
             info["product"],
+            locked=False,
             logmsg="Installed via setup tool",
             settings=settings,
             installedversion=version,

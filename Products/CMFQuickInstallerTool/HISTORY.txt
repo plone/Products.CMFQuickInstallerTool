@@ -2,7 +2,7 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool 2.0.4 - Unreleased
+CMFQuickInstallerTool 2.0.4 - Released December 2, 2007
 
     - Added metadata.xml to GenericSetup profile.
       [hannosch]

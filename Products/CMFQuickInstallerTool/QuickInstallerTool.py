@@ -402,10 +402,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                    'Multiple extension profiles found for product '
                                    '%s. Used profile: %s' % (p, profile))
 
-                portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
+                try:
+                    portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
+                    status='installed'
+                    error = False
+                except:
+                    tb=sys.exc_info()
 
-                status='installed'
-                error = False
+                    res+='failed:'+'\n'+'\n'.join(traceback.format_exception(*tb))
+                    error=True
+                    try:
+                        self.error_log.raising(tb)
+                    except AttributeError:
+                        raise
+
             else:
                 # No install method and no profile, log / abort?
                 pass

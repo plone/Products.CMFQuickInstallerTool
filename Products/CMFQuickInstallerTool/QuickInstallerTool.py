@@ -361,8 +361,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 transaction.savepoint(optimistic=True)
             try:
                 try:
-                   res=install(portal, reinstall=reinstall)
-                   # XXX log it
+                    res=install(portal, reinstall=reinstall)
+                    # XXX log it
                 except TypeError:
                     res=install(portal)
                 status='installed'

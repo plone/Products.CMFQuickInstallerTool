@@ -190,9 +190,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         except (ConflictError, KeyboardInterrupt):
             raise
         except:
-            if self.getInstallProfiles(productname):
-                return True
-            return False
+            profiles=self.getInstallProfiles(productname)
+            if not profiles:
+                return False
+            setup_tool = getToolByName(self, 'portal_setup')
+            try:
+                # XXX Currently QI always uses the first profile
+                setup_tool.getProfileDependencyChain( profiles[0] )
+            except KeyError:
+                return False
+
+            return True
 
     security.declareProtected(ManagePortal, 'isProductAvailable')
     isProductAvailable = isProductInstallable

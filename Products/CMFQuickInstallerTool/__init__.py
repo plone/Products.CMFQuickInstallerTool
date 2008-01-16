@@ -1,5 +1,7 @@
 from Products.CMFCore.utils import ToolInit
 from Products.CMFQuickInstallerTool.QuickInstallerTool import AlreadyInstalled
+from zope.i18nmessageid import MessageFactory
+MessageFactory = MessageFactory("plone")
 
 def initialize( context ):
     import Products.CMFQuickInstallerTool.QuickInstallerTool

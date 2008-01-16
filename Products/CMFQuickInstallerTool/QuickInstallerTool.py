@@ -8,6 +8,7 @@ from zope.component import getSiteManager
 from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
 from zope.annotation.interfaces import IAnnotatable
+from zope.i18nmessageid import MessageFactory
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
@@ -33,6 +34,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+_ = MessageFactory("plone")
 
 
 logger = logging.getLogger('CMFQuickInstallerTool')
@@ -197,7 +199,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             try:
                 # XXX Currently QI always uses the first profile
                 setup_tool.getProfileDependencyChain( profiles[0] )
-            except KeyError:
+            except KeyError, e:
+                if not getattr(self, "errors", {}):
+                    self.errors = {}
+                self.errors[productname] = dict(
+                        type= _(u"dependency_missing", default=u"Missing dependency"),
+                        value = e.args[0],
+                        productname = productname)
+
                 return False
 
             return True

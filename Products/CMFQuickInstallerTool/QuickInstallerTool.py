@@ -7,10 +7,12 @@ import transaction
 from zope.component import getSiteManager
 from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
+from zope.annotation.interfaces import IAnnotatable
+from zope.i18nmessageid import MessageFactory
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
-from Acquisition import aq_base, aq_parent
+from Acquisition import aq_base, aq_parent, aq_get
 
 from Globals import DevelopmentMode
 from Globals import InitializeClass
@@ -32,6 +34,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+_ = MessageFactory("plone")
 
 
 logger = logging.getLogger('CMFQuickInstallerTool')
@@ -189,9 +192,24 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         except (ConflictError, KeyboardInterrupt):
             raise
         except:
-            if self.getInstallProfiles(productname):
-                return True
-            return False
+            profiles=self.getInstallProfiles(productname)
+            if not profiles:
+                return False
+            setup_tool = getToolByName(self, 'portal_setup')
+            try:
+                # XXX Currently QI always uses the first profile
+                setup_tool.getProfileDependencyChain( profiles[0] )
+            except KeyError, e:
+                if not getattr(self, "errors", {}):
+                    self.errors = {}
+                self.errors[productname] = dict(
+                        type= _(u"dependency_missing", default=u"Missing dependency"),
+                        value = e.args[0],
+                        productname = productname)
+
+                return False
+
+            return True
 
     security.declareProtected(ManagePortal, 'isProductAvailable')
     isProductAvailable = isProductInstallable
@@ -288,6 +306,93 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             res = res.strip()
         return res
 
+
+    security.declareProtected(ManagePortal, 'snapshotPortal')
+    def snapshotPortal(self, portal):
+        portal_types=getToolByName(portal,'portal_types')
+        portal_skins=getToolByName(portal,'portal_skins')
+        portal_actions=getToolByName(portal,'portal_actions')
+        portal_workflow=getToolByName(portal,'portal_workflow')
+        type_registry=getToolByName(portal,'content_type_registry')
+
+        state={}
+        state['leftslots']=getattr(portal,'left_slots',[])
+        if callable(state['leftslots']):
+            state['leftslots']=state['leftslots']()
+        state['rightslots']=getattr(portal,'right_slots',[])
+        if callable(state['rightslots']):
+            state['rightslots']=state['rightslots']()
+        state['registrypredicates']=[pred[0] for pred in type_registry.listPredicates()]
+
+        state['types']=portal_types.objectIds()
+        state['skins']=portal_skins.objectIds()
+        actions= set()
+        for category in portal_actions.objectIds():
+            for action in portal_actions[category].objectIds():
+                actions.add((category, action))
+        state['actions']=actions
+        state['workflows']=portal_workflow.objectIds()
+        state['portalobjects']=portal.objectIds()
+        state['adapters']= tuple(getSiteManager().registeredAdapters())
+        state['utilities']= tuple(getSiteManager().registeredUtilities())
+
+        jstool = getToolByName(portal,'portal_javascripts', None)
+        if jstool is not None:
+            state['resources_js']= jstool.getResourceIds()
+        else:
+            state['resources_js']= []
+        csstool = getToolByName(portal,'portal_css', None)
+        if jstool is not None:
+            state['resources_css']= csstool.getResourceIds()
+        else:
+            state['resources_css']= []
+
+        return state
+
+
+    def deriveSettingsFromSnapshots(self, before, after):
+        actions = [a for a in (after['actions'] - before['actions'])]
+
+        adapters = []
+        if len(after['adapters']) > len(before['adapters']):
+            registrations = [reg for reg in after['adapters']
+                                  if reg not in before['adapters']]
+            # TODO: expand this to actually cover adapter registrations
+
+        utilities = []
+        if len(after['utilities']) > len(before['utilities']):
+            registrations = [reg for reg in after['utilities']
+                                  if reg not in before['utilities']]
+
+            for registration in registrations:
+                reg = (_getDottedName(registration.provided), registration.name)
+                utilities.append(reg)
+
+        settings=dict(
+            types=[t for t in after['types'] if t not in before['types']],
+            skins=[s for s in after['skins'] if s not in before['skins']],
+            actions=actions,
+            workflows=[w for w in after['workflows'] if w not in before['workflows']],
+            portalobjects=[a for a in after['portalobjects']
+                           if a not in before['portalobjects']],
+            leftslots=[s for s in after['leftslots'] if s not in before['leftslots']],
+            rightslots=[s for s in after['rightslots'] if s not in before['rightslots']],
+            adapters=adapters,
+            utilities=utilities,
+            registrypredicates=[s for s in after['registrypredicates']
+                                if s not in before['registrypredicates']],
+            )
+
+        jstool = getToolByName(self,'portal_javascripts', None)
+        if jstool is not None:
+            settings['resources_js']=[r for r in after['resources_js'] if r not in before['resources_js']]
+            settings['resources_css']=[r for r in after['resources_css'] if r not in before['resources_css']]
+
+        return settings
+
+
+    security.declareProtected(ManagePortal, '')
+
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
@@ -308,35 +413,25 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             return msg
 
         portal=aq_parent(self)
-        portal_types=getToolByName(portal,'portal_types')
-        portal_skins=getToolByName(portal,'portal_skins')
-        portal_actions=getToolByName(portal,'portal_actions')
-        portal_workflow=getToolByName(portal,'portal_workflow')
-        type_registry=getToolByName(portal,'content_type_registry')
 
-        leftslotsbefore=getattr(portal,'left_slots',[])
-        rightslotsbefore=getattr(portal,'right_slots',[])
-        registrypredicatesbefore=[pred[0] for pred in type_registry.listPredicates()]
+        before=self.snapshotPortal(portal)
 
-        typesbefore=portal_types.objectIds()
-        skinsbefore=portal_skins.objectIds()
-        actionsbefore = set()
-        for category in portal_actions.objectIds():
-            for action in portal_actions[category].objectIds():
-                actionsbefore.add((category, action))
-        workflowsbefore=portal_workflow.objectIds()
-        portalobjectsbefore=portal.objectIds()
-        adaptersbefore = tuple(getSiteManager().registeredAdapters())
-        utilitiesbefore = tuple(getSiteManager().registeredUtilities())
+        if hasattr(self, "REQUEST"):
+            reqstorage=IAnnotatable(self.REQUEST, None)
+            if reqstorage is not None:
+                key="Products.CMFQUickInstaller.Installing"
+                if reqstorage.has_key(key):
+                    installing=reqstorage[key]
+                else:
+                    installing=reqstorage[key]=set()
+                installing.add(p)
+        else:
+            reqstorage=None
 
-        jstool = getToolByName(portal,'portal_javascripts', None)
-        if jstool is not None:
-            resources_js_before = jstool.getResourceIds()
-        csstool = getToolByName(portal,'portal_css', None)
-        if jstool is not None:
-            resources_css_before = csstool.getResourceIds()
-
-        portal_setup = getToolByName(portal, 'portal_setup')
+        # XXX We can not use getToolByName since that returns a utility
+        # without a RequestContainer. This breaks import steps that need
+        # to run tools which request self.REQUEST.
+        portal_setup =  aq_get(portal, 'portal_setup', None, 1)
         status=None
         error=True
         res=''
@@ -420,102 +515,39 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 # No install method and no profile, log / abort?
                 pass
 
+        if reqstorage is not None:
+            installing.remove(p)
+
         # Create a snapshot after installation
         after_id = portal_setup._mangleTimestampName('qi-after-%s' % p)
         if not omitSnapshots:
             portal_setup.createSnapshot(after_id)
 
-        typesafter=portal_types.objectIds()
-        skinsafter=portal_skins.objectIds()
-        actionsafter = set()
-        for category in portal_actions.objectIds():
-            for action in portal_actions[category].objectIds():
-                actionsafter.add((category, action))
-        workflowsafter=portal_workflow.objectIds()
-        portalobjectsafter=portal.objectIds()
-        leftslotsafter=getattr(portal,'left_slots',[])
-        rightslotsafter=getattr(portal,'right_slots',[])
-        registrypredicatesafter=[pred[0] for pred in type_registry.listPredicates()]
-        adaptersafter = tuple(getSiteManager().registeredAdapters())
-        utilitiesafter = tuple(getSiteManager().registeredUtilities())
+        after=self.snapshotPortal(portal)
 
-        jstool = getToolByName(portal,'portal_javascripts', None)
-        if jstool is not None:
-            resources_js_after = jstool.getResourceIds()
-        csstool = getToolByName(portal,'portal_css', None)
-        if jstool is not None:
-            resources_css_after = csstool.getResourceIds()
-
-        if callable(rightslotsafter):
-            rightslotsafter = rightslotsafter()
-        if callable(leftslotsafter):
-            leftslotsafter = leftslotsafter()
-
-        if callable(rightslotsbefore):
-            rightslotsbefore = rightslotsbefore()
-        if callable(leftslotsbefore):
-            leftslotsbefore = leftslotsbefore()
-
-        actions = [a for a in (actionsafter - actionsbefore)]
-
-        adapters = []
-        if len(adaptersafter) > len(adaptersbefore):
-            registrations = [reg for reg in adaptersafter
-                                  if reg not in adaptersbefore]
-            # TODO: expand this to actually cover adapter registrations
-
-        utilities = []
-        if len(utilitiesafter) > len(utilitiesbefore):
-            registrations = [reg for reg in utilitiesafter
-                                  if reg not in utilitiesbefore]
-
-            for registration in registrations:
-                reg = (_getDottedName(registration.provided), registration.name)
-                utilities.append(reg)
-
-        settings=dict(
-            types=[t for t in typesafter if t not in typesbefore],
-            skins=[s for s in skinsafter if s not in skinsbefore],
-            actions=actions,
-            workflows=[w for w in workflowsafter if w not in workflowsbefore],
-            portalobjects=[a for a in portalobjectsafter
-                           if a not in portalobjectsbefore],
-            leftslots=[s for s in leftslotsafter if s not in leftslotsbefore],
-            rightslots=[s for s in rightslotsafter if s not in rightslotsbefore],
-            adapters=adapters,
-            utilities=utilities,
-            registrypredicates=[s for s in registrypredicatesafter
-                                if s not in registrypredicatesbefore],
-            )
+        settings=self.deriveSettingsFromSnapshots(before, after)
 
         jstool = getToolByName(self,'portal_javascripts', None)
         if jstool is not None:
-            settings['resources_js']=[r for r in resources_js_after if r not in resources_js_before]
-            settings['resources_css']=[r for r in resources_css_after if r not in resources_css_before]
             if len(settings['types']) > 0:
                 rr_css=getToolByName(portal,'portal_css')
                 rr_css.cookResources()
 
         msg=str(res)
         version=self.getProductVersion(p)
+
         # add the product
         try:
-            if p not in self.objectIds():
-                ip = InstalledProduct(p)
-                self._setObject(p,ip)
-                
-            ip = getattr(self, p)
-            ip.update(settings,
-                      installedversion=version,
-                      logmsg=res,
-                      status=status,
-                      error=error,
-                      locked=locked,
-                      hidden=hidden,
-                      afterid = after_id,
-                      beforeid = before_id
-                      )
-
+            self.notifyInstalled(p,
+                          settings=settings,
+                          installedversion=version,
+                          logmsg=res,
+                          status=status,
+                          error=error,
+                          locked=locked,
+                          hidden=hidden,
+                          afterid=after_id,
+                          beforeid=before_id)
         except InvalidObjectReference,e:
             raise
         except:
@@ -586,7 +618,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return o is not None and o.isInstalled()
 
     security.declareProtected(ManagePortal, 'notifyInstalled')
-    def notifyInstalled(self,p,locked=True,hidden=False,**kw):
+    def notifyInstalled(self,p,locked=True,hidden=False,settings={},**kw):
         """Marks a product that has been installed
         without QuickInstaller as installed
         """
@@ -596,7 +628,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             self._setObject(p,ip)
             
         p = getattr(self, p)
-        p.update({},locked=locked, hidden=hidden, **kw)
+        p.update(settings,locked=locked, hidden=hidden, **kw)
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
     def uninstallProducts(self, products=[],

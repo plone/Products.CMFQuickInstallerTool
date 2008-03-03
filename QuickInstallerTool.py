@@ -321,7 +321,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         # Some heursitics to figure out if its already been installed
         if swallowExceptions:
-            transaction.commit(1) # start a subtransaction,
+            transaction.savepoint(optimistic=True) # start a subtransaction,
                                   # commit what has happened so
                                   # far
         try:
@@ -334,7 +334,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             status='installed'
             error=0
             if swallowExceptions:
-                transaction.commit(1)
+                transaction.savepoint(optimistic=True)
         except InvalidObjectReference,e:
             raise
         except:
@@ -356,7 +356,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             del tb
 
             if swallowExceptions:
-                transaction.abort(1)   #this is very naughty
+                transaction.abort(sub=True)   #this is very naughty
             else:
                 raise
 
@@ -434,7 +434,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             del tb
 
             if swallowExceptions:
-                transaction.abort(1)   #this is very naughty
+                transaction.abort(sub=True)   #this is very naughty
             else:
                 raise
         

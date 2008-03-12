@@ -306,17 +306,26 @@ class InstalledProduct(SimpleItem):
             portal_skins=getToolByName(self,'portal_skins')
             delObjects(portal_skins, self.skins)
 
-        if 'actions' in cascade:
+        if 'actions' in cascade and len(self.actions) > 0:
             portal_actions=getToolByName(self,'portal_actions')
             if CMF21:
-                for category, action in self.actions:
-                    if category in portal_actions.objectIds():
-                        cat = portal_actions[category]
-                        if action in cat.objectIds():
-                            cat._delObject(action)
-                        if len(cat.objectIds()) == 0:
-                            del cat
-                            portal_actions._delObject(category)
+                if len(self.actions) == 2:
+                    for category, action in self.actions:
+                        if category in portal_actions.objectIds():
+                            cat = portal_actions[category]
+                            if action in cat.objectIds():
+                                cat._delObject(action)
+                            if len(cat.objectIds()) == 0:
+                                del cat
+                                portal_actions._delObject(category)
+                else:
+                    # Product was installed before CMF 2.1
+                    # Try to remove the action from all categories
+                    for action in self.actions:
+                        for category in portal_actions.objectIds():
+                            cat = portal_actions[category]
+                            if action in cat.objectIds():
+                                cat._delObject(action)
             else:
                 actids= [o.id.lower() for o in portal_actions._actions]
                 delactions=[actids.index(id) for id in

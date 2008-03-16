@@ -4,6 +4,12 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.1.1 - Unreleased
 
+    - Fixed actions re/uninstall for products installed prior to CMF 2.1.
+      This closes https://dev.plone.org/plone/ticket/6974.
+      [hannosch]
+
+    - Restored code which got accidentally removed in c38815.
+      [hannosch]
 
 CMFQuickInstallerTool 2.1 - Released March 9, 2008
 

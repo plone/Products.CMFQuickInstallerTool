@@ -4,6 +4,10 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.1.1 - Unreleased
 
+    - Added new listInstallableProfiles method, to include products without a
+      Zope2 control panel entry in the listings.
+      [hannosch]
+
     - Tighten some security settings.
       [hannosch]
 

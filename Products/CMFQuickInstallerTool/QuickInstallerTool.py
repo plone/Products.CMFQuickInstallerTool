@@ -106,7 +106,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallProfile(self, productname):
         """ Return the installer profile
         """
-        profiles = self.getInstallProfiles(productname)
+        portal_setup = getToolByName(self, 'portal_setup')
+        profiles = portal_setup.listProfileInfo()
+
+        # We are only interested in extension profiles for the product
+        profiles = [prof for prof in profiles if
+            prof['type'] == EXTENSION and
+            prof['product'] == productname]
+
         # XXX Currently QI always uses the first profile
         if profiles:
             return profiles[0]
@@ -185,12 +192,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         except (ConflictError, KeyboardInterrupt):
             raise
         except:
-            profile=self.getInstallProfile(productname)
-            if profile is None:
+            profiles = self.getInstallProfiles(productname)
+            if not profiles:
                 return False
             setup_tool = getToolByName(self, 'portal_setup')
             try:
-                setup_tool.getProfileDependencyChain(profile)
+                # XXX Currently QI always uses the first profile 
+                setup_tool.getProfileDependencyChain(profiles[0])
             except KeyError, e:
                 if not getattr(self, "errors", {}):
                     self.errors = {}
@@ -206,6 +214,18 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'isProductAvailable')
     isProductAvailable = isProductInstallable
 
+    security.declareProtected(ManagePortal, 'listInstallableProfiles')
+    def listInstallableProfiles(self):
+        """List candidate products which have a GS profiles.
+        """
+        portal_setup = getToolByName(self, 'portal_setup')
+        profiles = portal_setup.listProfileInfo()
+
+        # We are only interested in extension profiles
+        profiles = [prof['product'] for prof in profiles if
+            prof['type'] == EXTENSION]
+        return set(profiles)
+
     security.declareProtected(ManagePortal, 'listInstallableProducts')
     def listInstallableProducts(self, skipInstalled=True):
         """List candidate CMF products for installation -> list of dicts
@@ -213,8 +233,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         # reset the list of broken products
         self.errors = {}
+
+        # Get product list from control panel
         pids = self.Control_Panel.Products.objectIds()
-        pids = [pid for pid in pids if self.isProductInstallable(pid)]
+        pids = [p for p in pids if self.isProductInstallable(p)]
+
+        # Get product list from the extension profiles
+        profile_pids = self.listInstallableProfiles()
+        profile_pids = [p for p in profile_pids if self.isProductInstallable(p)]
+        for p in profile_pids:
+            if p not in pids:
+                pids.append(p)
 
         if skipInstalled:
             installed=[p['id'] for p in self.listInstalledProducts(showHidden=True)]

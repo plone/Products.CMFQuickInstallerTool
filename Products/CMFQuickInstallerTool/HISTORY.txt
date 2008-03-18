@@ -4,6 +4,9 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.1.1 - Unreleased
 
+    - Tighten some security settings.
+      [hannosch]
+
     - Fixed actions re/uninstall for products installed prior to CMF 2.1.
       This closes https://dev.plone.org/plone/ticket/6974.
       [hannosch]

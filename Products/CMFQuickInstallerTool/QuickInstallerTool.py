@@ -97,24 +97,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
-        # BBB CMF 1.6: The manual check for Products.* profiles can go away once
-        # we do not support CMF 1.6 anymore.
         profiles = [prof['id'] for prof in profiles if
             prof['type'] == EXTENSION and
-            (prof['product'] == productname or
-             prof['product'] == 'Products.%s' % productname)]
+            prof['product'] == productname]
         return profiles
 
     security.declareProtected(ManagePortal, 'getInstallProfile')
     def getInstallProfile(self, productname):
         """ Return the installer profile
         """
-        portal_setup = getToolByName(self, 'portal_setup')
-        profiles = portal_setup.listProfileInfo()
-
-        profiles = [prof for prof in profiles if
-            prof['type'] == EXTENSION and
-            prof['product'] == productname]
+        profiles = self.getInstallProfiles(productname)
+        # XXX Currently QI always uses the first profile
         if profiles:
             return profiles[0]
         return None
@@ -192,13 +185,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         except (ConflictError, KeyboardInterrupt):
             raise
         except:
-            profiles=self.getInstallProfiles(productname)
-            if not profiles:
+            profile=self.getInstallProfile(productname)
+            if profile is None:
                 return False
             setup_tool = getToolByName(self, 'portal_setup')
             try:
-                # XXX Currently QI always uses the first profile
-                setup_tool.getProfileDependencyChain( profiles[0] )
+                setup_tool.getProfileDependencyChain(profile)
             except KeyError, e:
                 if not getattr(self, "errors", {}):
                     self.errors = {}
@@ -350,6 +342,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return state
 
 
+    security.declareProtected(ManagePortal, 'deriveSettingsFromSnapshots')
     def deriveSettingsFromSnapshots(self, before, after):
         actions = [a for a in (after['actions'] - before['actions'])]
 
@@ -391,8 +384,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return settings
 
 
-    security.declareProtected(ManagePortal, '')
-
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=False, reinstall=False,
@@ -431,7 +422,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # XXX We can not use getToolByName since that returns a utility
         # without a RequestContainer. This breaks import steps that need
         # to run tools which request self.REQUEST.
-        portal_setup =  aq_get(portal, 'portal_setup', None, 1)
+        portal_setup = aq_get(portal, 'portal_setup', None, 1)
         status=None
         error=True
         res=''
@@ -665,8 +656,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-    # XXX: Should be enabled once the Plone control panel supports this.
-    # reinstallProducts = postonly(reinstallProducts)
+
+    reinstallProducts = postonly(reinstallProducts)
 
     def getQIElements(self):
         res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 

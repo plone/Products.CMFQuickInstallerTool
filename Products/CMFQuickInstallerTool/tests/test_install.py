@@ -18,11 +18,11 @@ OPTIONFLAGS = (doctest.REPORT_ONLY_FIRST_FAILURE |
                doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE)
 
-profile_registry.registerProfile('CMFQuickInstallerTool',
-           'CMFQuickInstallerTool',
+profile_registry.registerProfile('test',
+           'CMFQI test profile',
            'Test profile for CMFQuickInstallerTool',
            'profiles/test',
-           'CMFQuickInstallerTool',
+           'Products.CMFQuickInstallerTool',
            EXTENSION,
            for_=None)
 

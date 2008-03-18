@@ -97,9 +97,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
+        # TODO Remove the manual Products.* check here. It is still needed.
         profiles = [prof['id'] for prof in profiles if
             prof['type'] == EXTENSION and
-            prof['product'] == productname]
+            (prof['product'] == productname or 
+             prof['product'] == 'Products.%s' % productname)]
+
         return profiles
 
     security.declareProtected(ManagePortal, 'getInstallProfile')

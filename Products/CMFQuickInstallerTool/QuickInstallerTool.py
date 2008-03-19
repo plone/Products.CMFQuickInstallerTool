@@ -321,13 +321,32 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'getProductReadme')
     getProductReadme=getProductFile
 
+    security.declareProtected(ManagePortal, 'getProductDescription')
+    def getProductDescription(self, p):
+        """Returns the profile description for a given product.
+        """
+        profile = self.getInstallProfile(p)
+        if profile is None:
+            return None
+        return profile.get('description', None)
+
     security.declareProtected(ManagePortal, 'getProductVersion')
     def getProductVersion(self,p):
-        """Return the version string stored in version.txt
+        """Return the version string stored in version.txt or the one found
+        in the GS profile.
         """
         res = self.getProductFile(p, 'version.txt')
         if res is not None:
             res = res.strip()
+        else:
+            # Try to look up the version from the GS profile
+            profiles = self.getInstallProfiles(p)
+            if profiles:
+                profile = profiles[0]
+                portal_setup = getToolByName(self, 'portal_setup')
+                version = portal_setup.getVersionForProfile(profile)
+                if isinstance(version, basestring):
+                    res = str(version.strip())
         return res
 
 

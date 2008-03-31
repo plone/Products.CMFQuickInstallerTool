@@ -16,6 +16,7 @@ from Globals import InitializeClass
 from Globals import INSTANCE_HOME
 from OFS.SimpleItem import SimpleItem
 from OFS.ObjectManager import ObjectManager
+from zExceptions import NotFound
 
 from Products.CMFCore.permissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject, getToolByName
@@ -131,12 +132,18 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     if func in modFolder.objectIds():
                         return modFolder[func]
 
-            try:
-                return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
-            except RuntimeError, msg:
-                # external method can throw a bunch of these
-                msg = "%s, RuntimeError: %s" % (productname, msg)
-                logger.log(logging.ERROR, msg)
+                try:
+                    try:
+                        return ExternalMethod('temp',
+                                              'temp',
+                                              productname+'.'+mod,
+                                              func)
+                    except NotFound, e:
+                        continue
+                except RuntimeError, msg:
+                    # external method can throw a bunch of these
+                    msg = "%s, RuntimeError: %s" % (productname, msg)
+                    logger.log(logging.ERROR, msg)
 
         raise AttributeError, ('No Install method found for '
                                'product %s' % productname)

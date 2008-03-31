@@ -1,8 +1,5 @@
 import logging
 import os
-import sys
-import traceback
-import transaction
 
 from zope.component import getSiteManager
 from zope.component import getAllUtilitiesRegisteredFor
@@ -19,10 +16,6 @@ from Globals import InitializeClass
 from Globals import INSTANCE_HOME
 from OFS.SimpleItem import SimpleItem
 from OFS.ObjectManager import ObjectManager
-from StringIO import StringIO
-from ZODB.POSException import ConflictError
-from ZODB.POSException import InvalidObjectReference
-from zExceptions import NotFound
 
 from Products.CMFCore.permissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject, getToolByName
@@ -144,30 +137,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 # external method can throw a bunch of these
                 msg = "%s, RuntimeError: %s" % (productname, msg)
                 logger.log(logging.ERROR, msg)
-            except (ConflictError, KeyboardInterrupt):
-                pass
-            except:
-                # catch a string exception
-                t, v, tb = sys.exc_info()
-
-                if not getattr(self, "errors", {}):
-                    self.errors = {}
-                    
-                if t not in ("Module Error", NotFound):
-                    msg = "%s, %s: %s" % (productname, t, v)
-                    logger.log(logging.ERROR, msg)
-                    
-                    # write into errors so user can see
-                    strtb = StringIO()
-                    traceback.print_tb(tb, limit=50, file=strtb)
-    
-                    e = {}
-                    e["type"] = str(t)
-                    e["value"] = str(v)
-                    e["traceback"] = strtb.getvalue()
-                    e["productname"] = productname
-            
-                    self.errors[productname] = e
 
         raise AttributeError, ('No Install method found for '
                                'product %s' % productname)
@@ -192,9 +161,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         try:
             meth=self.getInstallMethod(productname)
             return True
-        except (ConflictError, KeyboardInterrupt):
-            raise
-        except:
+        except AttributeError:
             profiles = self.getInstallProfiles(productname)
             if not profiles:
                 return False
@@ -437,7 +404,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     security.declareProtected(ManagePortal, 'installProduct')
     def installProduct(self, p, locked=False, hidden=False,
-                       swallowExceptions=False, reinstall=False,
+                       swallowExceptions=None, reinstall=False,
                        forceProfile=False, omitSnapshots=True,
                        profile=None):
         """Install a product by name
@@ -475,7 +442,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # to run tools which request self.REQUEST.
         portal_setup = aq_get(portal, 'portal_setup', None, 1)
         status=None
-        error=True
         res=''
 
         # Create a snapshot before installation
@@ -493,42 +459,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 pass
 
         if install and not forceProfile:
-            # Some heursitics to figure out if its already been installed
-            if swallowExceptions:
-                transaction.savepoint(optimistic=True)
             try:
-                try:
-                    res=install(portal, reinstall=reinstall)
-                    # XXX log it
-                except TypeError:
-                    res=install(portal)
-                status='installed'
-                error = False
-                if swallowExceptions:
-                    transaction.savepoint(optimistic=True)
-            except InvalidObjectReference, e:
-                raise
-            except:
-                tb=sys.exc_info()
-                if str(tb[1]).endswith('already in use.') and not reinstall:
-                    self.error_log.raising(tb)
-                    res='This product has already been installed without Quickinstaller!'
-                    if not swallowExceptions:
-                        raise AlreadyInstalled, p
-
-                res+='failed:'+'\n'+'\n'.join(traceback.format_exception(*tb))
-                try:
-                    self.error_log.raising(tb)
-                except AttributeError:
-                    raise
-
-                # Try to avoid reference
-                del tb
-
-                if swallowExceptions:
-                    transaction.abort(sub=True)
-                else:
-                    raise
+                res=install(portal, reinstall=reinstall)
+            except TypeError:
+                res=install(portal)
+            status='installed'
         else:
             profiles = self.getInstallProfiles(p)
             if profiles:
@@ -539,20 +474,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                    'Multiple extension profiles found for product '
                                    '%s. Used profile: %s' % (p, profile))
 
-                try:
-                    portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
-                    status='installed'
-                    error = False
-                except:
-                    tb=sys.exc_info()
-
-                    res+='failed:'+'\n'+'\n'.join(traceback.format_exception(*tb))
-                    error=True
-                    try:
-                        self.error_log.raising(tb)
-                    except AttributeError:
-                        raise
-
+                portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
+                status='installed'
             else:
                 # No install method and no profile, log / abort?
                 pass
@@ -579,32 +502,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         version=self.getProductVersion(p)
 
         # add the product
-        try:
-            self.notifyInstalled(p,
-                          settings=settings,
-                          installedversion=version,
-                          logmsg=res,
-                          status=status,
-                          error=error,
-                          locked=locked,
-                          hidden=hidden,
-                          afterid=after_id,
-                          beforeid=before_id)
-        except InvalidObjectReference,e:
-            raise
-        except:
-            tb=sys.exc_info()
-            res+='failed:'+'\n'+'\n'.join(traceback.format_exception(*tb))
-            self.error_log.raising(tb)
+        self.notifyInstalled(p,
+                      settings=settings,
+                      installedversion=version,
+                      logmsg=res,
+                      status=status,
+                      error=False,
+                      locked=locked,
+                      hidden=hidden,
+                      afterid=after_id,
+                      beforeid=before_id)
 
-            # Try to avoid reference
-            del tb
-
-            if swallowExceptions:
-                transaction.abort(sub=True)
-            else:
-                raise
-        
         prod = getattr(self, p)
         afterInstall = prod.getAfterInstallMethod()
         if afterInstall is not None:
@@ -612,11 +520,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             afterRes=afterInstall(portal, reinstall=reinstall, product=prod)
             if afterRes:
                 res = res + '\n' + str(afterRes)
-        
         return res
 
     security.declareProtected(ManagePortal, 'installProducts')
-    def installProducts(self, products=[], stoponerror=False, reinstall=False,
+    def installProducts(self, products=[], stoponerror=True, reinstall=False,
                         REQUEST=None, forceProfile=False, omitSnapshots=True):
         """ """
         res = """
@@ -627,27 +534,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # return products
         for p in products:
             res += p +':'
-            try:
-                r=self.installProduct(p, swallowExceptions=not stoponerror,
-                                      reinstall=reinstall,
-                                      forceProfile=forceProfile,
-                                      omitSnapshots=omitSnapshots)
-                res +='ok:\n'
-                if r:
-                    r += str(r)+'\n'
-            except InvalidObjectReference, e:
-                raise
-            except Exception, e:
-                ok = False
-                if stoponerror:
-                    raise
-                res += 'failed:'+str(e)+'\n'
-            except:
-                ok = False
-                if stoponerror:
-                    raise
-                res += 'failed\n'
-
+            r=self.installProduct(p, swallowExceptions=not stoponerror,
+                                  reinstall=reinstall,
+                                  forceProfile=forceProfile,
+                                  omitSnapshots=omitSnapshots)
+            res +='ok:\n'
+            if r:
+                r += str(r)+'\n'
         if REQUEST :
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 

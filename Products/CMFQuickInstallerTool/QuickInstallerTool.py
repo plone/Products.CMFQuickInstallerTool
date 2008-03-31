@@ -288,8 +288,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         for f in files:
             if f.lower()==fname:
-                return open(os.path.join(prodpath,f)).read()
-
+                text = open(os.path.join(prodpath,f)).read()
+                try:
+                    return unicode(text)
+                except UnicodeDecodeError:
+                    try:
+                        return unicode(text, 'utf-8')
+                    except UnicodeDecodeError:
+                        return unicode(text, 'utf-8', 'replace')
         return None
 
     security.declareProtected(ManagePortal, 'getProductReadme')

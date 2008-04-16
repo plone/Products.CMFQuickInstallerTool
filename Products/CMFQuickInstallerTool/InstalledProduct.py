@@ -27,6 +27,13 @@ except ImportError:
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
+DEFAULT_CASCADE = (
+    'types', 'skins', 'actions', 'portalobjects', 'workflows', 'slots',
+    'registrypredicates', 'adapters', 'utilities',
+)
+
+
+
 class InstalledProduct(SimpleItem):
     """Class storing information about an installed product
 
@@ -68,6 +75,8 @@ class InstalledProduct(SimpleItem):
         self.error=False
         self.afterid = None
         self.beforeid = None
+        for key in DEFAULT_CASCADE:
+            setattr(self, key, [])
 
     security.declareProtected(ManagePortal, 'update')
     def update(self, settings, installedversion='', logmsg='',

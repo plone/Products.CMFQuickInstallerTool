@@ -4,6 +4,11 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.5 - Unreleased
 
+    - Added initialize code for all values in DEFAULT_CASCADE. Otherwise you
+      could get errors during uninstall of products which where installed
+      via notifyInstalled.
+      [hannosch, wichert]
+
     - Fixed actions re/uninstall for products installed prior to CMF 2.1.
       This closes https://dev.plone.org/plone/ticket/6974.
       [hannosch]

@@ -219,6 +219,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profile_pids = self.listInstallableProfiles()
         profile_pids = [p for p in profile_pids if self.isProductInstallable(p)]
         for p in profile_pids:
+            if p.startswith('Products.'):
+                logger.warning("%s extension use the old Products directory "
+                               "instead of an egg" % p)
+                p = p[9:]
             if p not in pids:
                 pids.append(p)
 

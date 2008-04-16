@@ -309,16 +309,16 @@ class InstalledProduct(SimpleItem):
         
         if 'types' in cascade:
             portal_types=getToolByName(self,'portal_types')
-            delObjects(portal_types, self.types)
+            delObjects(portal_types, getattr(self, 'types', []))
 
         if 'skins' in cascade:
             portal_skins=getToolByName(self,'portal_skins')
-            delObjects(portal_skins, self.skins)
+            delObjects(portal_skins, getattr(self, 'skins', []))
 
         if 'actions' in cascade and len(self.actions) > 0:
             portal_actions=getToolByName(self,'portal_actions')
             if CMF21:
-                if len(self.actions) == 2:
+                if len(getattr(self, 'actions', ())) == 2:
                     for category, action in self.actions:
                         if category in portal_actions.objectIds():
                             cat = portal_actions[category]
@@ -330,24 +330,24 @@ class InstalledProduct(SimpleItem):
                 else:
                     # Product was installed before CMF 2.1
                     # Try to remove the action from all categories
-                    for action in self.actions:
+                    for action in getattr(self, 'actions', ()):
                         for category in portal_actions.objectIds():
                             cat = portal_actions[category]
                             if action in cat.objectIds():
                                 cat._delObject(action)
             else:
-                actids= [o.id.lower() for o in portal_actions._actions]
-                delactions=[actids.index(id) for id in
-                            self.actions if id in actids]
+                actids = [o.id.lower() for o in portal_actions._actions]
+                delactions = [actids.index(id) for id in
+                              getattr(self, 'actions', ()) if id in actids]
                 if delactions:
                     portal_actions.deleteActions(delactions)
 
         if 'portalobjects' in cascade:
-            delObjects(portal, self.portalobjects)
+            delObjects(portal, getattr(self, 'portalobjects', []))
 
         if 'workflows' in cascade:
             portal_workflow=getToolByName(self, 'portal_workflow')
-            delObjects(portal_workflow, self.workflows)
+            delObjects(portal_workflow, getattr(self, 'workflows', []))
 
         if 'slots' in cascade:
             if self.getLeftSlots():

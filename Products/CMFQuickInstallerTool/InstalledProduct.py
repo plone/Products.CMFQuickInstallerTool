@@ -315,7 +315,7 @@ class InstalledProduct(SimpleItem):
             portal_skins=getToolByName(self,'portal_skins')
             delObjects(portal_skins, getattr(self, 'skins', []))
 
-        if 'actions' in cascade and len(self.actions) > 0:
+        if 'actions' in cascade and len(getattr(self, 'actions', [])) > 0:
             portal_actions=getToolByName(self,'portal_actions')
             if CMF21:
                 if len(getattr(self, 'actions', ())) == 2:

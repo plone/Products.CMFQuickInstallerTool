@@ -10,7 +10,7 @@ CMFQuickInstallerTool 2.1.2 - Unreleased
 
     - Added getattr code to make sure uninstall for products which have not
       been installed properly doesn't fail that easily.
-      [hannosch]
+      [hannosch, wichert]
 
     - Added initialize code for all values in DEFAULT_CASCADE. Otherwise you
       could get errors during uninstall of products which where installed

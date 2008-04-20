@@ -2,7 +2,7 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool 2.1.2 - Unreleased
+CMFQuickInstallerTool 2.1.2 - Released April 20, 2008
 
     - Fix when a product comes from the 'Products' namespace and has both
       installation profile and an entry in the control panel.

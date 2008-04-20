@@ -109,7 +109,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # We are only interested in extension profiles for the product
         profiles = [prof for prof in profiles if
             prof['type'] == EXTENSION and
-            prof['product'] == productname]
+            (prof['product'] == productname or 
+             prof['product'] == 'Products.%s' % productname)]
 
         # XXX Currently QI always uses the first profile
         if profiles:
@@ -220,8 +221,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profile_pids = [p for p in profile_pids if self.isProductInstallable(p)]
         for p in profile_pids:
             if p.startswith('Products.'):
-                logger.warning("%s extension use the old Products directory "
-                               "instead of an egg" % p)
                 p = p[9:]
             if p not in pids:
                 pids.append(p)

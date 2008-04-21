@@ -2,10 +2,10 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool 2.1.3 - Unreleased
+CMFQuickInstallerTool 2.1.3 - Released April 21, 2008
 
-    - Fix getProfile method when a product rom the 'Products' namespace. It
-      allows quickinstaller panel to show profile title intead of prodcut name.
+    - Fixed getInstallProfile method for products from the 'Products' namespace.
+      This allows quickinstaller to show profile title instead of product name.
       [encolpe]
 
 CMFQuickInstallerTool 2.1.2 - Released April 20, 2008

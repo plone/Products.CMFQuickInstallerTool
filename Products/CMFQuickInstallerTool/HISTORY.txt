@@ -2,6 +2,9 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
+CMFQuickInstallerTool 2.1.4 - Unreleased
+
+
 CMFQuickInstallerTool 2.1.3 - Released April 21, 2008
 
     - Fixed getInstallProfile method for products from the 'Products' namespace.

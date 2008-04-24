@@ -4,6 +4,11 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.1.4 - Unreleased
 
+    - getInstallMethod should ignore ImportError when looking for install
+      methods for a product. This makes it possible to install products which
+      have a working GenericSetup profile but a broken Install external
+      method.
+      [wichert]
 
 CMFQuickInstallerTool 2.1.3 - Released April 21, 2008
 

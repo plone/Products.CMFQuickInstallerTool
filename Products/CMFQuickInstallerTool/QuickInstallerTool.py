@@ -139,7 +139,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                               'temp',
                                               productname+'.'+mod,
                                               func)
-                    except NotFound, e:
+                    except (ImportError, NotFound), e:
                         continue
                 except RuntimeError, msg:
                     # external method can throw a bunch of these

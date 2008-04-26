@@ -180,7 +180,25 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             except KeyError, e:
                 if not getattr(self, "errors", {}):
                     self.errors = {}
-                self.errors[productname] = dict(
+                # Don't show twice the same error: old install and profile
+                # oldinstall is test in first in other methods we may have an
+                # extra 'Products.' in the namespace
+                checkname = productname
+                if checkname.startswith('Products.'):
+                    checkname = checkname[9:]
+                else:
+                    checkname = 'Products.' + checkname
+                if self.errors.has_key(checkname):
+                    if self.errors[checkname]['value'] == e.args[0]:
+                        return False
+                    else:
+                        # A new error is found, register it
+                        self.errors[productname] = dict(
+                            type= _(u"dependency_missing", default=u"Missing dependency"),
+                            value = e.args[0],
+                            productname = productname)
+                else:
+                    self.errors[productname] = dict(
                         type= _(u"dependency_missing", default=u"Missing dependency"),
                         value = e.args[0],
                         productname = productname)

@@ -4,6 +4,10 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.1.4 - Unreleased
 
+    - The same error should be displayed only once even if it occurs with the
+      old style install method and with the GenericSetup profile
+      [encolpe]
+
     - getInstallMethod should ignore ImportError when looking for install
       methods for a product. This makes it possible to install products which
       have a working GenericSetup profile but a broken Install external

@@ -7,8 +7,8 @@ setup(name='Products.CMFQuickInstallerTool',
       version=version,
       description="CMFQuickInstallerTool is a facility for comfortable "
                   "activation/deactivation of CMF compliant products.",
-      long_description="""\
-      """,
+      long_description=open("README.txt").read() + "\n" + \
+                       open(os.path.join("Products", "CMFQuickInstallerTool", "HISTORY.txt")).read(),
       classifiers=[
         "Framework :: Plone",
         "Framework :: Zope2",
@@ -18,13 +18,14 @@ setup(name='Products.CMFQuickInstallerTool',
       keywords='Zope CMF Plone quickinstall install activation',
       author='Philipp Auersperg',
       author_email='plone-developers@lists.sourceforge.net',
-      url='http://svn.plone.org/svn/collective/CMFQuickInstallerTool/trunk',
+      maintainer='Hanno Schlichting',
+      maintainer_email='plone@hannosch.info',
+      url='http://pypi.python.org/pypi/Products.CMFQuickInstallerTool',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['Products'],
       include_package_data=True,
       zip_safe=False,
-      download_url='http://plone.org/products/cmfquickinstallertool/releases',
       install_requires=[
         'setuptools',
       ],

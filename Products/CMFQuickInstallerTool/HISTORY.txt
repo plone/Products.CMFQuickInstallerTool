@@ -8,6 +8,10 @@ Changelog
       instead of id.
       [hannosch]
 
+    - Correct handling of products with pre-CMF2.1 style actions
+      [wichert]
+
+
 2.1.4 (2008-04-27)
 ------------------
 

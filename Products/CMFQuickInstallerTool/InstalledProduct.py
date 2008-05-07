@@ -318,8 +318,17 @@ class InstalledProduct(SimpleItem):
         if 'actions' in cascade and len(getattr(self, 'actions', [])) > 0:
             portal_actions=getToolByName(self,'portal_actions')
             if CMF21:
-                if len(getattr(self, 'actions', ())) == 2:
-                    for category, action in self.actions:
+                for info in self.actions:
+                    if isinstance(info, basestring):
+                        action = info
+                        # Product was installed before CMF 2.1
+                        # Try to remove the action from all categories
+                        for category in portal_actions.objectIds():
+                            cat = portal_actions[category]
+                            if action in cat.objectIds():
+                                cat._delObject(action)
+                    else:
+                        category, action = info
                         if category in portal_actions.objectIds():
                             cat = portal_actions[category]
                             if action in cat.objectIds():
@@ -327,14 +336,6 @@ class InstalledProduct(SimpleItem):
                             if len(cat.objectIds()) == 0:
                                 del cat
                                 portal_actions._delObject(category)
-                else:
-                    # Product was installed before CMF 2.1
-                    # Try to remove the action from all categories
-                    for action in getattr(self, 'actions', ()):
-                        for category in portal_actions.objectIds():
-                            cat = portal_actions[category]
-                            if action in cat.objectIds():
-                                cat._delObject(action)
             else:
                 actids = [o.id.lower() for o in portal_actions._actions]
                 delactions = [actids.index(id) for id in

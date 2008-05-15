@@ -2,7 +2,7 @@ Changelog for CMFQuickInstallerTool
 
     (name of developer listed in brackets)
 
-CMFQuickInstallerTool 2.0.5 - Unreleased
+CMFQuickInstallerTool 2.0.5 - Released May 15, 2008
 
     - Added getattr code to make sure uninstall for products which have not
       been installed properly doesn't fail that easily.

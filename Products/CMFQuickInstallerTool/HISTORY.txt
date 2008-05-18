@@ -4,9 +4,9 @@ Changelog
 2.1.5 (unreleased)
 ------------------
 
-    - Improved getInstallMethod to log ImportError instead of silently skipping it.
-      It was  unclear why product does not appear in QI even if there is no error 
-      raised on instance startup.
+    - Improved getInstallMethod to log ImportError instead of silently skipping
+      it. It was unclear why product does not appear in QI even if there is no
+      error raised on instance startup.
       [naro]
       
     - Prefer sorting the list of installable and installed products by title

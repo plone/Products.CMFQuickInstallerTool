@@ -121,6 +121,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallMethod(self, productname):
         """ Return the installer method
         """
+        import_error_announced = False
         for mod, func in (('Install','install'),
                           ('Install','Install'),
                           ('install','install'),
@@ -139,7 +140,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                               'temp',
                                               productname+'.'+mod,
                                               func)
-                    except (ImportError, NotFound), e:
+                    except NotFound:
+                        continue
+                    except ImportError, e:
+                        if not import_error_announced:
+                            # do not announce the error 4 times
+                            import_error_announced = True
+                            msg = "%s, ImportError: %s" % (productname, str(e))
+                            logger.log(logging.ERROR, msg)
                         continue
                 except RuntimeError, msg:
                     # external method can throw a bunch of these

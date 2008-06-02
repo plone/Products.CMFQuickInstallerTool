@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1.5 (unreleased)
+2.1.5 (2008-06-02)
 ------------------
 
     - Improved getInstallMethod to log ImportError instead of silently skipping

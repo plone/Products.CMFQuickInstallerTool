@@ -4,6 +4,7 @@ from zope.component import getSiteManager
 from zope.component import queryUtility
 
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
@@ -309,13 +310,13 @@ class InstalledProduct(SimpleItem):
         
         if 'types' in cascade:
             portal_types=getToolByName(self,'portal_types')
-            delObjects(portal_types, getattr(self, 'types', []))
+            delObjects(portal_types, getattr(aq_base(self), 'types', []))
 
         if 'skins' in cascade:
             portal_skins=getToolByName(self,'portal_skins')
-            delObjects(portal_skins, getattr(self, 'skins', []))
+            delObjects(portal_skins, getattr(aq_base(self), 'skins', []))
 
-        if 'actions' in cascade and len(getattr(self, 'actions', [])) > 0:
+        if 'actions' in cascade and len(getattr(aq_base(self), 'actions', [])) > 0:
             portal_actions=getToolByName(self,'portal_actions')
             if CMF21:
                 if len(getattr(self, 'actions', ())) == 2:
@@ -338,16 +339,16 @@ class InstalledProduct(SimpleItem):
             else:
                 actids = [o.id.lower() for o in portal_actions._actions]
                 delactions = [actids.index(id) for id in
-                              getattr(self, 'actions', ()) if id in actids]
+                              getattr(aq_base(self), 'actions', ()) if id in actids]
                 if delactions:
                     portal_actions.deleteActions(delactions)
 
         if 'portalobjects' in cascade:
-            delObjects(portal, getattr(self, 'portalobjects', []))
+            delObjects(portal, getattr(aq_base(self), 'portalobjects', []))
 
         if 'workflows' in cascade:
             portal_workflow=getToolByName(self, 'portal_workflow')
-            delObjects(portal_workflow, getattr(self, 'workflows', []))
+            delObjects(portal_workflow, getattr(aq_base(self), 'workflows', []))
 
         if 'slots' in cascade:
             if self.getLeftSlots():
@@ -360,7 +361,7 @@ class InstalledProduct(SimpleItem):
         if 'registrypredicates' in cascade:
             ctr = getToolByName(self,'content_type_registry')
             ids = [id for id, predicate in ctr.listPredicates()]
-            predicates=getattr(self,'registrypredicates',[])
+            predicates=getattr(aq_base(self),'registrypredicates',[])
             for p in predicates:
                 if p in ids:
                     ctr.removePredicate(p)
@@ -369,13 +370,13 @@ class InstalledProduct(SimpleItem):
                                "registry" % p, severity=logging.WARNING)
 
         if 'adapters' in cascade:
-            adapters = getattr(self, 'adapters', [])
+            adapters = getattr(aq_base(self), 'adapters', [])
             if adapters:
                 sm = getSiteManager()
                 # TODO: expand this to actually cover adapter registrations
 
         if 'utilities' in cascade:
-            utilities = getattr(self, 'utilities', [])
+            utilities = getattr(aq_base(self), 'utilities', [])
             if utilities:
                 sm = getSiteManager()
                 for registration in utilities:
@@ -388,10 +389,10 @@ class InstalledProduct(SimpleItem):
         rr_css = getToolByName(self, 'portal_css', None)
 
         if rr_js is not None:
-            for js in getattr(self,'resources_js',[]):
+            for js in getattr(aq_base(self),'resources_js',[]):
                 rr_js.unregisterResource(js)
         if rr_css is not None:
-            for css in getattr(self,'resources_css',[]):
+            for css in getattr(aq_base(self),'resources_css',[]):
                 rr_css.unregisterResource(css)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')

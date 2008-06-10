@@ -4,6 +4,10 @@ Changelog
 2.1.6 (unreleased)
 ------------------
 
+    - Use aq_base on all attribute retrieval during InstalledProduct's
+      cascade deletion so we don't inadvertently try to delete something
+      retrieved via acquisition.
+      [rafrombrc]
 
 2.1.5 (2008-06-02)
 ------------------

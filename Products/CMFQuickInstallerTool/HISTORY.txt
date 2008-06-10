@@ -4,6 +4,10 @@ Changelog for CMFQuickInstallerTool
 
 CMFQuickInstallerTool 2.0.6 - Unreleased
 
+    - Use aq_base on all attribute access during InstalledProduct's
+      cascade deletion so we don't inadvertently try to delete something
+      retrieved via acquisition.
+      [rafrombrc]
 
 CMFQuickInstallerTool 2.0.5 - Released May 15, 2008
 

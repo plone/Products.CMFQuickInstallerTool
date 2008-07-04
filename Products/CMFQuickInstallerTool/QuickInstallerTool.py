@@ -584,7 +584,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                   omitSnapshots=omitSnapshots)
             res +='ok:\n'
             if r:
-                r += str(r)+'\n'
+                res += str(r)+'\n'
         if REQUEST :
             REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
 

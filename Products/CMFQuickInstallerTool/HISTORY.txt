@@ -4,6 +4,10 @@ Changelog
 2.1.6 (unreleased)
 ------------------
 
+    - Applied a tiny fix that caused good installations to fail during
+      log generation.
+      [gogobd] 
+
     - Use aq_base on all attribute retrieval during InstalledProduct's
       cascade deletion so we don't inadvertently try to delete something
       retrieved via acquisition.

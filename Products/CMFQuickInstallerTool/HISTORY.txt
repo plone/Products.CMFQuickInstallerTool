@@ -1,6 +1,10 @@
 Changelog
 =========
 
+2.1.7
+-----
+
+
 2.1.6 (2008-07-07)
 ------------------
 
@@ -12,6 +16,7 @@ Changelog
       cascade deletion so we don't inadvertently try to delete something
       retrieved via acquisition.
       [rafrombrc]
+
 
 2.1.5 (2008-06-02)
 ------------------

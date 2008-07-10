@@ -367,8 +367,8 @@ class InstalledProduct(SimpleItem):
                 if p in ids:
                     ctr.removePredicate(p)
                 else:
-                    logger.log("Failed to delete '%s' from content type " \
-                               "registry" % p, severity=logging.WARNING)
+                    logger.warning("Failed to delete '%s' from content type " \
+                                   "registry" % p)
 
         if 'adapters' in cascade:
             adapters = getattr(aq_base(self), 'adapters', [])

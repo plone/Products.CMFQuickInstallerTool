@@ -4,6 +4,10 @@ Changelog
 2.1.7
 -----
 
+    - Use aq_parent(aq_inner()) to get at the portal root, otherwise
+      we can end up getting the quickinstaller tool by accident if
+      it's acquired through itself.
+      [sidnei]
 
 2.1.6 (2008-07-07)
 ------------------

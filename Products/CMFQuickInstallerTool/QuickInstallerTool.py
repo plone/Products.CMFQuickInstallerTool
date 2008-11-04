@@ -9,7 +9,7 @@ from zope.i18nmessageid import MessageFactory
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
-from Acquisition import aq_base, aq_parent, aq_get
+from Acquisition import aq_base, aq_parent, aq_get, aq_inner
 
 from Globals import DevelopmentMode
 from Globals import InitializeClass
@@ -465,7 +465,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             prod.log(msg)
             return msg
 
-        portal=aq_parent(self)
+        portal = aq_parent(aq_inner(self))
 
         before=self.snapshotPortal(portal)
 

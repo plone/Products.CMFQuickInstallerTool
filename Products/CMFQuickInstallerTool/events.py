@@ -7,7 +7,7 @@ from Products.GenericSetup.interfaces import IBeforeProfileImportEvent
 from Products.GenericSetup.interfaces import IProfileImportedEvent
 from Products.CMFCore.utils import getToolByName
 
-class Dummy: pass
+class SorryNoCaching(object): pass
 
 
 def findProductForProfile(context, profile_id):
@@ -19,7 +19,7 @@ def findProductForProfile(context, profile_id):
         profile_id = profile_id[8:]
 
     # Cache installable products list to cut portal creation time
-    request = getattr(context, 'REQUEST', Dummy())
+    request = getattr(context, 'REQUEST', SorryNoCaching())
     if not getattr(request, '_cachedInstallableProducts', ()):
         request._cachedInstallableProducts = qi.listInstallableProducts(skipInstalled=False)
 

@@ -16,7 +16,12 @@ def findProductForProfile(context, profile_id):
     if profile_id.startswith("profile-"):
         profile_id = profile_id[8:]
 
-    for product in qi.listInstallableProducts(skipInstalled=False):
+    # Cache installable products list to cut portal creation time
+    request = context.REQUEST
+    if not getattr(request, '_cachedInstallableProducts', ()):
+        request._cachedInstallableProducts = qi.listInstallableProducts(skipInstalled=False)
+
+    for product in request._cachedInstallableProducts:
         profiles = qi.getInstallProfiles(product["id"])
         if profile_id in profiles:
             return product["id"]

@@ -4,6 +4,10 @@ Changelog
 2.1.7
 -----
 
+    - Cache listInstallableProducts in event handler to improve portal
+      creation time.
+      [stefan]
+
     - Use aq_parent(aq_inner()) to get at the portal root, otherwise
       we can end up getting the quickinstaller tool by accident if
       it's acquired through itself.

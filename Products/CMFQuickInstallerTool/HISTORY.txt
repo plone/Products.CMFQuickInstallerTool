@@ -4,6 +4,9 @@ Changelog
 2.1.7
 -----
 
+    - Fixed actions installation tests.
+      [hannosch]
+
     - Cache listInstallableProducts in event handler to improve portal
       creation time.
       [stefan]

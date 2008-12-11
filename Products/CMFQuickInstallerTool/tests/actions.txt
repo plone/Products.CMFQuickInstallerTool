@@ -31,8 +31,8 @@ And register the QI tool as a utility:
 Install a product through an extension profile
 ----------------------------------------------
 
-  >>> qi.installProducts(products=['CMFQuickInstallerTool'], forceProfile=True)
-  '...Installed Products...CMFQuickInstallerTool:ok:...'
+  >>> result = qi.installProduct('Products.CMFQuickInstallerTool',
+  ...     profile='Products.CMFQuickInstallerTool:test')
 
 Make sure the actions were added:
 
@@ -42,19 +42,10 @@ Make sure the actions were added:
   >>> 'test2' in [a.id for a in actions_tool.listActions()]
   True
 
-And we have an InstalledProduct instance in the QI tool which says the product
-is installed again:
-
-  >>> 'CMFQuickInstallerTool' in qi.objectIds()
-  True
-  
-  >>> qi['CMFQuickInstallerTool'].isInstalled()
-  True
-
 Uninstall the product
 ---------------------
 
-  >>> qi.uninstallProducts(products=['CMFQuickInstallerTool'])
+  >>> qi.uninstallProducts(products=['Products.CMFQuickInstallerTool'])
 
 Verify that all added entries were removed again:
 
@@ -67,16 +58,6 @@ Verify that all added entries were removed again:
   >>> 'test_category' in actions_tool.objectIds()
   False
 
-And we have an InstalledProduct instance in the QI tool which says the product
-is not installed anymore:
-
-  >>> 'CMFQuickInstallerTool' in qi.objectIds()
-  True
-  
-  >>> cmfqi = qi['CMFQuickInstallerTool']
-  >>> cmfqi.isInstalled()
-  False
-
 TearDown
 --------
 
@@ -85,11 +66,3 @@ Make sure the QI tool is still there:
   >>> qi = getattr(portal, 'portal_quickinstaller', None)
   >>> qi
   <QuickInstallerTool at /cmf/portal_quickinstaller>
-
-And mark QuickInstaller as installed again:
-
-  >>> qi['CMFQuickInstallerTool'].status = 'installed'
-
-  >>> cmfqi = qi['CMFQuickInstallerTool']
-  >>> cmfqi.isInstalled()
-  True

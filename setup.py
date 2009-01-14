@@ -26,7 +26,22 @@ setup(name='Products.CMFQuickInstallerTool',
       namespace_packages=['Products'],
       include_package_data=True,
       zip_safe=False,
+      extras_require=dict(
+        test=[
+            'zope.testing',
+            'Products.CMFTestCase',
+        ]
+      ),
       install_requires=[
         'setuptools',
+        'zope.annotation',
+        'zope.component',
+        'zope.i18nmessageid',
+        'zope.interface',
+        'Products.CMFCore',
+        'Products.GenericSetup',
+        # 'Acquisition',
+        # 'DateTime',
+        # 'Zope2',
       ],
 )

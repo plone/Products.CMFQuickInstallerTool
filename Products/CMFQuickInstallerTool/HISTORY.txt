@@ -4,6 +4,10 @@ Changelog
 2.1.7
 -----
 
+    - Declare package dependencies and fixed deprecation warnings for use
+      of Globals.
+      [hannosch]
+
     - Fixed actions installation tests.
       [hannosch]
 

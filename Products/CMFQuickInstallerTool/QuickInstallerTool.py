@@ -12,7 +12,7 @@ from AccessControl.requestmethod import postonly
 from Acquisition import aq_base, aq_parent, aq_get, aq_inner
 
 from Globals import DevelopmentMode
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from Globals import INSTANCE_HOME
 from OFS.SimpleItem import SimpleItem
 from OFS.ObjectManager import ObjectManager

@@ -6,7 +6,7 @@ from zope.component import queryUtility
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from DateTime import DateTime
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.utils import getToolByName

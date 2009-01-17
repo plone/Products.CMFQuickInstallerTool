@@ -1,12 +1,18 @@
 Changelog
 =========
 
-2.1.7
------
+3.0 (unreleased)
+----------------
+
+- Updated package metadata and cleaned up old code.
+  [hannosch]
 
 - Declare package dependencies and fixed deprecation warnings for use
   of Globals.
   [hannosch]
+
+2.1.7 (unreleased)
+------------------
 
 - Fixed actions installation tests.
   [hannosch]

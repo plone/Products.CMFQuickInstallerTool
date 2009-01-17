@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '2.1.7'
+version = '3.0'
 
 setup(name='Products.CMFQuickInstallerTool',
       version=version,
       description="CMFQuickInstallerTool is a facility for comfortable "
                   "activation/deactivation of CMF compliant products.",
       long_description=open("README.txt").read() + "\n" + \
-                       open(os.path.join("Products", "CMFQuickInstallerTool", "HISTORY.txt")).read(),
+                       open("CHANGES.txt").read(),
       classifiers=[
         "Framework :: Plone",
         "Framework :: Zope2",
@@ -40,8 +40,8 @@ setup(name='Products.CMFQuickInstallerTool',
         'zope.interface',
         'Products.CMFCore',
         'Products.GenericSetup',
-        # 'Acquisition',
-        # 'DateTime',
-        # 'Zope2',
+        'Acquisition',
+        'DateTime',
+        'Zope2',
       ],
 )

@@ -23,13 +23,13 @@ quite simple (almost all existing CMF  products fulfill them)::
                      and has no install method. It can still use an uninstall
                      method for custom uninstallation tasks though.
 
-Products can be uninstalled and QuickInstellerTool removes the following items
+Products can be uninstalled and QuickInstallerTool removes the following items
 a product creates during install:
 
 - portal actions,
 - portal skins,
 - portal types,
-- portalobjects (objects created in the root of the portal),
+- portal objects (objects created in the root of the portal),
 - workflows,
 - left and right slots (also checks them only for the portal),
 - resource registry entries
@@ -59,15 +59,6 @@ requirements must be met::
 Please note that the customized uninstall method is invoked before (and in
 addition to) the standard removal of objects.
 
-Reinstall
----------
-
-Reinstalling a product invokes uninstall() and install(). If you have special
-code which should work differently on reinstall than uninstall/install you can
-add a second argument to the install or uninstall method named 'reinstall' which
-is true only for a reinstallation. In most cases you shouldn't react differently
-when reinstalling!
-
 Install:
 --------
 
@@ -86,4 +77,4 @@ code which should work differently on reinstall than uninstall/install you can
 add a second argument to the install or uninstall method named 'reinstall' which
 is true only for a reinstallation. In most cases you shouldn't react differently
 when reinstalling!
-
+

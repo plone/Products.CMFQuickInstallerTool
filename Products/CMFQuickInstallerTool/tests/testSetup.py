@@ -17,7 +17,7 @@ class TestQuickInstaller(CMFTestCase.CMFTestCase):
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
-        self.addProduct('CMFQuickInstallerTool')
+        self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testTool(self):
@@ -41,7 +41,7 @@ class TestInstalledProduct(CMFTestCase.CMFTestCase):
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
-        self.addProduct('CMFQuickInstallerTool')
+        self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testSlotsMigration(self):

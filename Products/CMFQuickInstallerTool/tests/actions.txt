@@ -4,7 +4,7 @@ Tests for QuickInstaller Actions installation
 First we need to install quickinstaller itself:
 
   >>> self.setRoles(['Manager'])
-  >>> self.addProduct('CMFQuickInstallerTool')
+  >>> self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
 
   >>> from zope.component import getSiteManager
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool

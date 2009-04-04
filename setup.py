@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '2.1.7'
+version = '2.1.8dev'
 
 setup(name='Products.CMFQuickInstallerTool',
       version=version,

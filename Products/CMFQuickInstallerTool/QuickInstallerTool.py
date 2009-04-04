@@ -1,6 +1,8 @@
 import logging
 import os
 
+import pkg_resources
+
 from zope.component import getSiteManager
 from zope.component import getAllUtilitiesRegisteredFor
 from zope.interface import implements
@@ -345,6 +347,19 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getProductVersion(self,p):
         """Return the version string stored in version.txt.
         """
+        try:
+            dist=pkg_resources.get_distribution(p)
+            return dist.version
+        except pkg_resources.DistributionNotFound:
+            pass
+
+        if "." not in p:
+            try:
+                dist=pkg_resources.get_distribution("Products." + p)
+                return dist.version
+            except pkg_resources.DistributionNotFound:
+                pass
+
         res = self.getProductFile(p, 'version.txt')
         if res is not None:
             res = res.strip()

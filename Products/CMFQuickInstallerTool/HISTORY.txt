@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.1.7
------
+2.1.7 (2009-4-4)
+----------------
 
 - Prefer the egg version of a product instead, only falling back to version.txt
   if it can not be found.
@@ -11,7 +11,6 @@ Changelog
 - Do not use the GenericSetup profile version: the profile version has
   no relation to the package version.
   [wichert]
-
 
 - Fixed actions installation tests.
   [hannosch]
@@ -24,6 +23,7 @@ Changelog
   we can end up getting the quickinstaller tool by accident if
   it's acquired through itself.
   [sidnei]
+
 
 2.1.6 (2008-07-07)
 ------------------

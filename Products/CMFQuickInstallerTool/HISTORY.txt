@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1.8
+2.1.7
 -----
 
 - Prefer the egg version of a product instead, only falling back to version.txt
@@ -12,9 +12,6 @@ Changelog
   no relation to the package version.
   [wichert]
 
-
-2.1.7
------
 
 - Fixed actions installation tests.
   [hannosch]

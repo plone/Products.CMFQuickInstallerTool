@@ -15,8 +15,17 @@ Changelog
   of Globals.
   [hannosch]
 
-2.1.7 (unreleased)
-------------------
+
+2.1.8
+-----
+
+- Do not use the GenericSetup profile version: the profile version has
+  no relation to the package version.
+  [wichert]
+
+
+2.1.7
+-----
 
 - Fixed actions installation tests.
   [hannosch]

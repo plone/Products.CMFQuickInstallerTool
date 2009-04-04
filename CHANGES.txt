@@ -23,6 +23,10 @@ Changelog
   no relation to the package version.
   [wichert]
 
+- Do not use the GenericSetup profile version: the profile version has
+  no relation to the package version.
+  [wichert]
+
 
 2.1.7
 -----

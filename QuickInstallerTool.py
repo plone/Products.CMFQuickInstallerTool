@@ -459,20 +459,20 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         ok = 1
         # return products
         for p in products:
-            res += p +':'
+            res += p + ':'
             try:
-                r=self.installProduct(p, swallowExceptions=not stoponerror,
-                                      reinstall=reinstall)
-                res +='ok:\n'
+                r = self.installProduct(p, swallowExceptions=not stoponerror,
+                                        reinstall=reinstall)
+                res += 'ok:\n'
                 if r:
-                    r += str(r)+'\n'
+                    res += str(r) + '\n'
             except InvalidObjectReference,e:
                 raise
             except Exception,e:
-                ok=0
+                ok = 0
                 if stoponerror:
                     raise
-                res += 'failed:'+str(e)+'\n'
+                res += 'failed:' + str(e) + '\n'
             except :
                 ok=0
                 if stoponerror:

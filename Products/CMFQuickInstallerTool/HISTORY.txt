@@ -32,7 +32,7 @@ Changelog
 2.1.6 (2008-07-07)
 ------------------
 
-- Applied a tiny fix that caused good installations to fail during
+- Applied a tiny fix for a bug that caused good installations to fail during
   log generation.
   [gogobd] 
 

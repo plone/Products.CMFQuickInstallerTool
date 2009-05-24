@@ -28,7 +28,6 @@ from Products.GenericSetup.utils import _getDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
-from Products.CMFQuickInstallerTool.interfaces import IInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 _ = MessageFactory("plone")
@@ -226,8 +225,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """List candidate products which have a GS profiles.
         """
         portal_setup = getToolByName(self, 'portal_setup')
-
-        profiles = portal_setup.listProfileInfo(for_=IInstallable)
+        profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles
         profiles = [prof['product'] for prof in profiles if

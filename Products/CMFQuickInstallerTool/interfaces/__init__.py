@@ -1,3 +1,2 @@
 from installable import INonInstallable
-from installable import IInstallable
 from portal_quickinstaller import IQuickInstallerTool

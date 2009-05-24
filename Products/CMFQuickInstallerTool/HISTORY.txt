@@ -4,15 +4,9 @@ Changelog
 2.1.8 (unreleased)
 ------------------
 
-- Modified listProfileInfo to only list extension profiles registered for IInstallable
-  interface or not specified ('for' attribute not specified in the registerProfile zcml directive).
-  This fixes extension profiles used with an upgradeStep showing up in the list.
-  Need Products.GenericSetup >= 1.4.5dev-r100331
-  [vincentfretin]
 
-
-2.1.7 (2009-04-04)
-------------------
+2.1.7 (2009-4-4)
+----------------
 
 - Prefer the egg version of a product instead, only falling back to version.txt
   if it can not be found.

@@ -20,7 +20,6 @@ from OFS.SimpleItem import SimpleItem
 from OFS.ObjectManager import ObjectManager
 from zExceptions import NotFound
 
-from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.permissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
@@ -226,7 +225,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """List candidate products which have a GS profiles.
         """
         portal_setup = getToolByName(self, 'portal_setup')
-        profiles = portal_setup.listProfileInfo(for_=ISiteRoot)
+        profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles
         profiles = [prof['product'] for prof in profiles if

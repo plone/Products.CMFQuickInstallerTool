@@ -4,10 +4,6 @@ Changelog
 3.0 (unreleased)
 ----------------
 
-- Made listInstallableProfiles only list profiles registered for ISiteRoot,
-  so that migration profiles can be excluded.
-  [davisagli]
-
 - Changed tests to use addProfile instead of addProduct to install this
   package, as we don't have an Extensions.Install module ourselves anymore.
   [hannosch]

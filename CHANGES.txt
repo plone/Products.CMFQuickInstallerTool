@@ -4,6 +4,10 @@ Changelog
 3.0 (unreleased)
 ----------------
 
+- Further optimized the `handleBeforeProfileImportEvent` logic. We ignore any
+  non-installable profiles.
+  [hannosch]
+
 - Changed tests to use addProfile instead of addProduct to install this
   package, as we don't have an Extensions.Install module ourselves anymore.
   [hannosch]

@@ -1,4 +1,5 @@
 from zope.component import adapter
+from zope.component import getAllUtilitiesRegisteredFor
 from zope.annotation.interfaces import IAnnotatable
 
 from Acquisition import aq_parent
@@ -7,17 +8,17 @@ from Products.GenericSetup.interfaces import IBeforeProfileImportEvent
 from Products.GenericSetup.interfaces import IProfileImportedEvent
 from Products.CMFCore.utils import getToolByName
 
+FILTER_PROFILES = True
+try:
+    from Products.CMFPlone.interfaces import INonInstallable
+except ImportError:
+    FILTER_PROFILES = False
+
+
 class SorryNoCaching(object): pass
 
 
-def findProductForProfile(context, profile_id):
-    qi = getToolByName(context, "portal_quickinstaller", None)
-    if qi is None:
-        return None
-
-    if profile_id.startswith("profile-"):
-        profile_id = profile_id[8:]
-
+def findProductForProfile(context, profile_id, qi):
     # Cache installable products list to cut portal creation time
     request = getattr(context, 'REQUEST', SorryNoCaching())
     if not getattr(request, '_cachedInstallableProducts', ()):
@@ -33,22 +34,37 @@ def findProductForProfile(context, profile_id):
 
 @adapter(IBeforeProfileImportEvent)
 def handleBeforeProfileImportEvent(event):
-    if event.profile_id is None or not event.full_import:
+    profile_id = event.profile_id
+    if profile_id is None or not event.full_import:
         return
 
-    context=event.tool
+    if profile_id.startswith("profile-"):
+        profile_id = profile_id[8:]
+    context = event.tool
 
     # We need a request to scribble some data in
     request = getattr(context, "REQUEST", None)
     if request is None:
         return
 
-    product = findProductForProfile(context, event.profile_id)
-    if product is None:
-        return
+    if FILTER_PROFILES:
+        ignore_profiles = getattr(request, '_cachedIgnoredProfiles', ())
+        if not ignore_profiles:
+            ignore_profiles = []
+            utils = getAllUtilitiesRegisteredFor(INonInstallable)
+            for util in utils:
+                ignore_profiles.extend(util.getNonInstallableProfiles())
+            request._cachedIgnoredProfiles = tuple(ignore_profiles)
+
+        if profile_id in ignore_profiles:
+            return
 
     qi = getToolByName(context, "portal_quickinstaller", None)
     if qi is None:
+        return
+
+    product = findProductForProfile(context, profile_id, qi)
+    if product is None:
         return
 
     snapshot = qi.snapshotPortal(aq_parent(context))

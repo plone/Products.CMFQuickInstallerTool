@@ -401,7 +401,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         else:
             state['resources_js']= []
         csstool = getToolByName(portal,'portal_css', None)
-        if jstool is not None:
+        if csstool is not None:
             state['resources_css']= csstool.getResourceIds()
         else:
             state['resources_css']= []

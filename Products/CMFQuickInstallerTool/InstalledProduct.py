@@ -19,13 +19,6 @@ from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
-CMF21 = True
-try:
-    from Products.CMFCore.ActionInformation import ActionCategory
-except ImportError:
-    CMF21 = False
-
-
 logger = logging.getLogger('CMFQuickInstallerTool')
 
 DEFAULT_CASCADE = (
@@ -318,31 +311,24 @@ class InstalledProduct(SimpleItem):
 
         if 'actions' in cascade and len(getattr(aq_base(self), 'actions', [])) > 0:
             portal_actions=getToolByName(self,'portal_actions')
-            if CMF21:
-                for info in self.actions:
-                    if isinstance(info, basestring):
-                        action = info
-                        # Product was installed before CMF 2.1
-                        # Try to remove the action from all categories
-                        for category in portal_actions.objectIds():
-                            cat = portal_actions[category]
-                            if action in cat.objectIds():
-                                cat._delObject(action)
-                    else:
-                        category, action = info
-                        if category in portal_actions.objectIds():
-                            cat = portal_actions[category]
-                            if action in cat.objectIds():
-                                cat._delObject(action)
-                            if len(cat.objectIds()) == 0:
-                                del cat
-                                portal_actions._delObject(category)
-            else:
-                actids = [o.id.lower() for o in portal_actions._actions]
-                delactions = [actids.index(id) for id in
-                              getattr(aq_base(self), 'actions', ()) if id in actids]
-                if delactions:
-                    portal_actions.deleteActions(delactions)
+            for info in self.actions:
+                if isinstance(info, basestring):
+                    action = info
+                    # Product was installed before CMF 2.1
+                    # Try to remove the action from all categories
+                    for category in portal_actions.objectIds():
+                        cat = portal_actions[category]
+                        if action in cat.objectIds():
+                            cat._delObject(action)
+                else:
+                    category, action = info
+                    if category in portal_actions.objectIds():
+                        cat = portal_actions[category]
+                        if action in cat.objectIds():
+                            cat._delObject(action)
+                        if len(cat.objectIds()) == 0:
+                            del cat
+                            portal_actions._delObject(category)
 
         if 'portalobjects' in cascade:
             delObjects(portal, getattr(aq_base(self), 'portalobjects', []))

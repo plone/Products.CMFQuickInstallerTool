@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0a2 - Unreleased
+3.0b1 - 2009-12-27
 ------------------
 
 - Removed no longer needed check for CMF < 2.1.

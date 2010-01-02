@@ -4,6 +4,13 @@ Changelog
 3.0b2 - unreleased
 ------------------
 
+- Limit the installable products screen to listing only extension profiles
+  which are either registered without a `for` attribute (i.e. for any type
+  of context), or registered for `Products.CMFCore.interfaces.ISiteRoot` or
+  `Products.CMFPlone.interfaces.IPloneSiteRoot`. This allows products to
+  use another marker interface to group profiles together, without fear of
+  those showing up in `portal_quickinstaller``.
+  [optilude]
 
 3.0b1 - 2009-12-27
 ------------------

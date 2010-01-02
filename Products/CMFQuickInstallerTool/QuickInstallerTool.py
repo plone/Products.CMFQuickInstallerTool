@@ -32,6 +32,11 @@ from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 _ = MessageFactory("plone")
 
+try:
+    # Allow IPloneSiteRoot or ISiteRoot if we have Plone
+    from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
+except ImportError:
+    from Products.CMFCore.interfaces import ISiteRoot
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -225,7 +230,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """List candidate products which have a GS profiles.
         """
         portal_setup = getToolByName(self, 'portal_setup')
-        profiles = portal_setup.listProfileInfo()
+        profiles = portal_setup.listProfileInfo(ISiteRoot)
 
         # We are only interested in extension profiles
         profiles = [prof['product'] for prof in profiles if

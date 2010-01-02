@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0b2 - unreleased
+3.0b2 - 2010-01-02
 ------------------
 
 - Limit the installable products screen to listing only extension profiles

@@ -9,7 +9,7 @@ Changelog
   of context), or registered for `Products.CMFCore.interfaces.ISiteRoot` or
   `Products.CMFPlone.interfaces.IPloneSiteRoot`. This allows products to
   use another marker interface to group profiles together, without fear of
-  those showing up in `portal_quickinstaller``.
+  those showing up in `portal_quickinstaller`.
   [optilude]
 
 3.0b1 - 2009-12-27

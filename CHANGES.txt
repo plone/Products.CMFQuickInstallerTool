@@ -4,6 +4,9 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Added a get_packages helper methods to reduce the dependencies on the
+  persistent product registry and convert the getProductFile method to use it.
+  [hannosch]
 
 3.0b2 - 2010-01-02
 ------------------

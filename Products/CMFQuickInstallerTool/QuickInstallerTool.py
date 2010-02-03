@@ -30,6 +30,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from Products.CMFQuickInstallerTool.utils import get_packages
 _ = MessageFactory("plone")
 
 try:
@@ -309,13 +310,16 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return res
 
     security.declareProtected(ManagePortal, 'getProductFile')
-    def getProductFile(self,p,fname='readme.txt'):
+    def getProductFile(self, p, fname='readme.txt'):
         """Return the content of a file of the product
         case-insensitive, if it does not exist -> None
         """
-        try:
-            prodpath=self.Control_Panel.Products._getOb(p).home
-        except AttributeError:
+        packages = get_packages()
+        prodpath = packages.get(p)
+        if prodpath is None:
+            prodpath = packages.get('Products.' + p)
+
+        if prodpath is None:
             return None
 
         #now list the directory to get the readme.txt case-insensitive

@@ -246,18 +246,19 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # reset the list of broken products
         self.errors = {}
 
-        # Get product list from control panel
-        pids = self.Control_Panel.Products.objectIds()
-        pids = [p for p in pids if self.isProductInstallable(p)]
+        # Returns full names with Products. prefix for all packages / products
+        packages = set(get_packages())
 
         # Get product list from the extension profiles
         profile_pids = self.listInstallableProfiles()
-        profile_pids = [p for p in profile_pids if self.isProductInstallable(p)]
-        for p in profile_pids:
+
+        pids = []
+        for p in packages.union(profile_pids):
+            if not self.isProductInstallable(p):
+                continue
             if p.startswith('Products.'):
                 p = p[9:]
-            if p not in pids:
-                pids.append(p)
+            pids.append(p)
 
         if skipInstalled:
             installed=[p['id'] for p in self.listInstalledProducts(showHidden=True)]

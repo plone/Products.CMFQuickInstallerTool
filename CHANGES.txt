@@ -4,6 +4,9 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Freed listInstallableProducts from its dependency on the product registry.
+  [hannosch]
+
 - Added a get_packages helper methods to reduce the dependencies on the
   persistent product registry and convert the getProductFile method to use it.
   [hannosch]

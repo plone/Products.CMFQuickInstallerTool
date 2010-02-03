@@ -11,12 +11,13 @@ from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.permissions import ManagePortal
-from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup.utils import _resolveDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFQuickInstallerTool.interfaces.portal_quickinstaller \
     import IInstalledProduct
+from Products.CMFQuickInstallerTool.utils import get_method
+from Products.CMFQuickInstallerTool.utils import get_install_method
 from Products.CMFQuickInstallerTool.utils import updatelist, delObjects
 
 logger = logging.getLogger('CMFQuickInstallerTool')
@@ -203,32 +204,12 @@ class InstalledProduct(SimpleItem):
     def _getMethod(self, modfunc):
         """Returns a method
         """
-        try:
-            productInCP = self.Control_Panel.Products[self.id]
-        except KeyError:
-            return None
-
-        for mod, func in modfunc:
-            if mod in productInCP.objectIds():
-                modFolder = productInCP[mod]
-                if func in modFolder.objectIds():
-                    return modFolder[func]
-
-            try:
-                return ExternalMethod('temp','temp',self.id+'.'+mod, func)
-            except:
-                pass
-
-        return None
+        return get_method(self.id, modfunc, cp=self.Control_Panel)
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
     def getInstallMethod(self):
         """ returns the installer method """
-        res = self._getMethod((('Install','install'),
-                                ('Install','Install'),
-                                ('install','install'),
-                                ('install','Install'),
-                               ))
+        res = get_install_method(self.id, cp=self.Control_Panel)
         if res is None:
             raise AttributeError, ('No Install method found for '
                                    'product %s' % self.id)

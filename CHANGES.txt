@@ -4,6 +4,10 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Refactored common code to check and generate the external install methods into
+  helper methods in utils.
+  [hannosch]
+
 - Freed listInstallableProducts from its dependency on the product registry.
   [hannosch]
 

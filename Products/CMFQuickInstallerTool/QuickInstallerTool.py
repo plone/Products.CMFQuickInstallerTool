@@ -18,11 +18,9 @@ from App.class_init import InitializeClass
 from Globals import INSTANCE_HOME
 from OFS.SimpleItem import SimpleItem
 from OFS.ObjectManager import ObjectManager
-from zExceptions import NotFound
 
 from Products.CMFCore.permissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from Products.GenericSetup import EXTENSION
 from Products.GenericSetup.utils import _getDottedName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -30,6 +28,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable
 from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from Products.CMFQuickInstallerTool.utils import get_install_method
 from Products.CMFQuickInstallerTool.utils import get_packages
 _ = MessageFactory("plone")
 
@@ -129,41 +128,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallMethod(self, productname):
         """ Return the installer method
         """
-        import_error_announced = False
-        for mod, func in (('Install','install'),
-                          ('Install','Install'),
-                          ('install','install'),
-                          ('install','Install')):
-            if productname in self.Control_Panel.Products.objectIds():
-                productInCP = self.Control_Panel.Products[productname]
-
-                if mod in productInCP.objectIds():
-                    modFolder = productInCP[mod]
-                    if func in modFolder.objectIds():
-                        return modFolder[func]
-
-                try:
-                    try:
-                        return ExternalMethod('temp',
-                                              'temp',
-                                              productname+'.'+mod,
-                                              func)
-                    except NotFound:
-                        continue
-                    except ImportError, e:
-                        if not import_error_announced:
-                            # do not announce the error 4 times
-                            import_error_announced = True
-                            msg = "%s, ImportError: %s" % (productname, str(e))
-                            logger.log(logging.ERROR, msg)
-                        continue
-                except RuntimeError, msg:
-                    # external method can throw a bunch of these
-                    msg = "%s, RuntimeError: %s" % (productname, msg)
-                    logger.log(logging.ERROR, msg)
-
-        raise AttributeError, ('No Install method found for '
-                               'product %s' % productname)
+        res = get_install_method(productname, cp=self.Control_Panel)
+        if res is None:
+            raise AttributeError, ('No Install method found for '
+                                   'product %s' % productname)
+        return res
 
     security.declareProtected(ManagePortal, 'getBrokenInstalls')
     def getBrokenInstalls(self):
@@ -183,7 +152,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if productname in not_installable:
             return False
         try:
-            meth=self.getInstallMethod(productname)
+            meth = self.getInstallMethod(productname)
             return True
         except AttributeError:
             profiles = self.getInstallProfiles(productname)

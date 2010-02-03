@@ -4,7 +4,10 @@ import os.path
 
 from Acquisition import aq_base
 from OFS.Application import get_products
+from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from zExceptions import BadRequest
+from zExceptions import NotFound
+
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -60,3 +63,30 @@ def get_packages():
         result[fullname] = os.path.join(basepath, name)
 
     return result
+
+
+def get_install_method(productname, cp=None):
+    modfunc = (('Install','install'),
+               ('Install','Install'),
+               ('install','install'),
+               ('install','Install'))
+    return get_method(productname, modfunc, cp=cp)
+
+
+def get_method(productname, modfunc, cp=None):
+    if productname not in cp.Products.objectIds():
+        return None
+
+    productInCP = cp.Products[productname]
+    for mod, func in modfunc:
+        if mod in productInCP.objectIds():
+            modFolder = productInCP[mod]
+            if func in modFolder.objectIds():
+                return modFolder[func]
+
+        try:
+            return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
+        except (NotFound, ImportError, RuntimeError):
+            pass
+
+    return None

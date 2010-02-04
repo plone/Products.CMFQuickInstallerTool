@@ -204,15 +204,15 @@ class InstalledProduct(SimpleItem):
     def _getMethod(self, modfunc):
         """Returns a method
         """
-        return get_method(self.id, modfunc, cp=self.Control_Panel)
+        return get_method(self.id, modfunc)
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
     def getInstallMethod(self):
         """ returns the installer method """
-        res = get_install_method(self.id, cp=self.Control_Panel)
+        res = get_install_method(self.id)
         if res is None:
-            raise AttributeError, ('No Install method found for '
-                                   'product %s' % self.id)
+            raise AttributeError('No Install method found for '
+                                 'product %s' % self.id)
         else:
             return res
 

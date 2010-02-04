@@ -4,6 +4,10 @@ Changelog
 3.0b3 - unreleased
 ------------------
 
+- Reworked the last bits of the install machinery to work without the product
+  registry.
+  [hannosch]
+
 - Refactored common code to check and generate the external install methods into
   helper methods in utils.
   [hannosch]

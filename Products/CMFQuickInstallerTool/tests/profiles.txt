@@ -73,5 +73,6 @@ We now expect to see Products.Product1 and Products.Product2 in the list of
 installable products, but not Products.Product3.
 
   >>> installable = [x['id'] for x in qi.listInstallableProducts()]
-  >>> self.failUnless('Product1' in installable)
-  >>> self.failUnless('Product2' in installable)
+  >>> self.failUnless('Products.Product1' in installable)
+  >>> self.failUnless('Products.Product2' in installable)
+  >>> self.failIf('Products.Product3' in installable)

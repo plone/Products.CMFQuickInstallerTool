@@ -128,10 +128,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def getInstallMethod(self, productname):
         """ Return the installer method
         """
-        res = get_install_method(productname, cp=self.Control_Panel)
+        res = get_install_method(productname)
         if res is None:
-            raise AttributeError, ('No Install method found for '
-                                   'product %s' % productname)
+            raise AttributeError('No Install method found for '
+                                 'product %s' % productname)
         return res
 
     security.declareProtected(ManagePortal, 'getBrokenInstalls')
@@ -216,17 +216,24 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         self.errors = {}
 
         # Returns full names with Products. prefix for all packages / products
-        packages = set(get_packages())
-
-        # Get product list from the extension profiles
-        profile_pids = self.listInstallableProfiles()
+        packages = get_packages()
 
         pids = []
-        for p in packages.union(profile_pids):
+        for p in packages:
             if not self.isProductInstallable(p):
                 continue
             if p.startswith('Products.'):
                 p = p[9:]
+            pids.append(p)
+
+        # Get product list from the extension profiles
+        profile_pids = self.listInstallableProfiles()
+
+        for p in profile_pids:
+            if p in pids or p in packages:
+                continue
+            if not self.isProductInstallable(p):
+                continue
             pids.append(p)
 
         if skipInstalled:

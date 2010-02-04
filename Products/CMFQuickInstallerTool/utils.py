@@ -13,10 +13,10 @@ logger = logging.getLogger('CMFQuickInstallerTool')
 
 IGNORED = frozenset([
     'BTreeFolder2', 'ExternalEditor', 'ExternalMethod', 'Five', 'MIMETools',
-    'MailHost', 'OFSP', 'PageTemplates', 'PlacelessTranslationService',
-    'PluginIndexes', 'PythonScripts', 'Sessions', 'SiteAccess', 'SiteErrorLog',
-    'StandardCacheManagers', 'TemporaryFolder', 'Transience', 'ZCTextIndex',
-    'ZCatalog', 'ZODBMountPoint', 'ZReST', 'ZSQLMethods',
+    'MailHost', 'OFSP', 'PageTemplates', 'PluginIndexes', 'PythonScripts',
+    'Sessions', 'SiteAccess', 'SiteErrorLog', 'StandardCacheManagers',
+    'TemporaryFolder', 'Transience', 'ZCTextIndex', 'ZCatalog',
+    'ZODBMountPoint', 'ZReST', 'ZSQLMethods',
 ])
 
 
@@ -65,28 +65,33 @@ def get_packages():
     return result
 
 
-def get_install_method(productname, cp=None):
+def get_install_method(productname):
     modfunc = (('Install','install'),
                ('Install','Install'),
                ('install','install'),
                ('install','Install'))
-    return get_method(productname, modfunc, cp=cp)
+    return get_method(productname, modfunc)
 
 
-def get_method(productname, modfunc, cp=None):
-    if productname not in cp.Products.objectIds():
+def get_method(productname, modfunc):
+    packages = get_packages()
+    package = packages.get(productname, None)
+    if package is None:
+        package = packages.get('Products.' + productname, None)
+        if package is None:
+            return None
+
+    extensions = os.path.join(package, 'Extensions')
+    if not os.path.isdir(extensions):
         return None
 
-    productInCP = cp.Products[productname]
+    files = os.listdir(extensions)
     for mod, func in modfunc:
-        if mod in productInCP.objectIds():
-            modFolder = productInCP[mod]
-            if func in modFolder.objectIds():
-                return modFolder[func]
-
-        try:
-            return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
-        except (NotFound, ImportError, RuntimeError):
-            pass
+        if mod + '.py' in files:
+            try:
+                # id, title, module, function
+                return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
+            except (NotFound, ImportError, RuntimeError):
+                pass
 
     return None

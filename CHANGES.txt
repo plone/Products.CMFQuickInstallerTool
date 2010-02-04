@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0b3 - unreleased
+3.0b3 - 2010-02-04
 ------------------
 
 - Reworked the last bits of the install machinery to work without the product

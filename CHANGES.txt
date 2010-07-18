@@ -1,9 +1,11 @@
 Changelog
 =========
 
-3.0b4 - unreleased
-------------------
+3.0 - unreleased
+----------------
 
+- Use the standard libraries doctest module.
+  [hannosch]
 
 3.0b3 - 2010-02-04
 ------------------

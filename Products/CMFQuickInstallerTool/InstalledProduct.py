@@ -362,6 +362,10 @@ class InstalledProduct(SimpleItem):
         if rr_css is not None:
             for css in getattr(aq_base(self),'resources_css',[]):
                 rr_css.unregisterResource(css)
+        
+        portal_controlpanel = getToolByName(self, 'portal_controlpanel', None)
+        if portal_controlpanel is not None:
+            portal_controlpanel.unregisterApplication(self.id)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
     def getInstalledVersion(self):

@@ -4,6 +4,8 @@ Changelog
 3.0.1 - unreleased
 ------------------
 
+- Uninstall control panels.
+  [elro]
 
 3.0 - 2010-07-18
 ----------------

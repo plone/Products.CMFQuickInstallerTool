@@ -4,6 +4,10 @@ Changelog
 3.0.2 - unreleased
 ------------------
 
+- Use the new get_registered_packages API in Zope 2.13+ to get the registered
+  packages, instead of the _registered_packages attribute of the Products
+  module.
+  [davisagli]
 
 3.0.1 - 2010-09-09
 ------------------

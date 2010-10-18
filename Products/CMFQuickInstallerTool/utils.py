@@ -8,6 +8,13 @@ from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from zExceptions import BadRequest
 from zExceptions import NotFound
 
+try:
+    # Zope 2.13+
+    from OFS.metaconfigure import get_registered_packages
+except ImportError:
+    def get_registered_packages():
+        import Products
+        return getattr(Products, '_registered_packages', ())
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -44,8 +51,7 @@ def get_packages():
     """Returns a dict of package name to package path."""
     result = {}
 
-    import Products
-    packages = getattr(Products, '_registered_packages', ())
+    packages = get_registered_packages()
     for package in packages:
         name = package.__name__
         path = package.__path__[0]

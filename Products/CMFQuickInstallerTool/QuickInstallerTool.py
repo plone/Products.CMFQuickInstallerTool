@@ -101,7 +101,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # TODO Remove the manual Products.* check here. It is still needed.
         profiles = [prof['id'] for prof in profiles if
             prof['type'] == EXTENSION and
-            (prof['product'] == productname or 
+            (prof['product'] == productname or
              prof['product'] == 'Products.%s' % productname)]
 
         return profiles
@@ -116,7 +116,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # We are only interested in extension profiles for the product
         profiles = [prof for prof in profiles if
             prof['type'] == EXTENSION and
-            (prof['product'] == productname or 
+            (prof['product'] == productname or
              prof['product'] == 'Products.%s' % productname)]
 
         # XXX Currently QI always uses the first profile
@@ -139,7 +139,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """ Return all the broken installs """
         errs = getattr(self, "errors", {})
         return errs.values()
-    
+
     security.declareProtected(ManagePortal, 'isProductInstallable')
     def isProductInstallable(self, productname):
         """Asks wether a product is installable by trying to get its install
@@ -160,7 +160,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 return False
             setup_tool = getToolByName(self, 'portal_setup')
             try:
-                # XXX Currently QI always uses the first profile 
+                # XXX Currently QI always uses the first profile
                 setup_tool.getProfileDependencyChain(profiles[0])
             except KeyError, e:
                 if not getattr(self, "errors", {}):
@@ -274,7 +274,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             profile = self.getInstallProfile(r)
             if profile:
                 name = profile['title']
-            
+
             res.append({'id':r,
                         'title':name,
                         'status':p.getStatus(),
@@ -596,7 +596,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if not p in self.objectIds():
             ip = InstalledProduct(p)
             self._setObject(p,ip)
-            
+
         p = getattr(self, p)
         p.update(settings,locked=locked, hidden=hidden, **kw)
 
@@ -639,7 +639,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     reinstallProducts = postonly(reinstallProducts)
 
     def getQIElements(self):
-        res = ['types', 'skins', 'actions', 'portalobjects', 'workflows', 
+        res = ['types', 'skins', 'actions', 'portalobjects', 'workflows',
                   'leftslots', 'rightslots', 'registrypredicates',
                   'resources_js', 'resources_css']
         return res

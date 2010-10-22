@@ -177,7 +177,7 @@ class InstalledProduct(SimpleItem):
     security.declareProtected(ManagePortal, 'getValue')
     def getValue(self,name):
         return getattr(self,name,[])
-    
+
     security.declareProtected(ManagePortal, 'getRegistryPredicates')
     def getRegistryPredicates(self):
         """Return the custom entries in the content_type_registry
@@ -243,7 +243,7 @@ class InstalledProduct(SimpleItem):
     def uninstall(self, cascade=default_cascade, reinstall=False, REQUEST=None):
         """Uninstalls the product and removes its dependencies
         """
-        portal = getToolByName(self, 'portal_url').getPortalObject() 
+        portal = getToolByName(self, 'portal_url').getPortalObject()
 
         # TODO eventually we will land Event system and could remove
         # this 'removal_inprogress' hack
@@ -268,7 +268,7 @@ class InstalledProduct(SimpleItem):
             beforeUninstall = beforeUninstall.__of__(portal)
             beforeRes, cascade = beforeUninstall(portal, reinstall=reinstall,
                                                 product=self, cascade=cascade)
-        
+
         self._cascadeRemove(cascade)
 
         self.status='uninstalled'
@@ -280,8 +280,8 @@ class InstalledProduct(SimpleItem):
     def _cascadeRemove(self, cascade):
         """Cascaded removal of objects
         """
-        portal = getToolByName(self, 'portal_url').getPortalObject() 
-        
+        portal = getToolByName(self, 'portal_url').getPortalObject()
+
         if 'types' in cascade:
             portal_types=getToolByName(self,'portal_types')
             delObjects(portal_types, getattr(aq_base(self), 'types', []))
@@ -362,7 +362,7 @@ class InstalledProduct(SimpleItem):
         if rr_css is not None:
             for css in getattr(aq_base(self),'resources_css',[]):
                 rr_css.unregisterResource(css)
-        
+
         portal_controlpanel = getToolByName(self, 'portal_controlpanel', None)
         if portal_controlpanel is not None:
             portal_controlpanel.unregisterApplication(self.id)

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.2 - unreleased
+3.0.2 - 2010-10-27
 ------------------
 
 - Use the new get_registered_packages API in Zope 2.13+ to get the registered

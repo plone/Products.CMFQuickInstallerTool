@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.3 - unreleased
+3.0.3 - 2010-11-06
 ------------------
 
 - Updated the delete portalobjects method to NOT delete items that implement

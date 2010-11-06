@@ -3,7 +3,10 @@ Changelog
 
 3.0.3 - unreleased
 ------------------
-
+- Updated the delete portalobjects method to NOT delete items that implement 
+  IContentish or IFolderish. This will help people who create custom products 
+  and put content containers at the root on install
+  [eleddy]
 
 3.0.2 - 2010-10-27
 ------------------

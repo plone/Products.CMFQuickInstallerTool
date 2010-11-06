@@ -7,6 +7,10 @@ from OFS.Application import get_products
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from zExceptions import BadRequest
 from zExceptions import NotFound
+from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IFolderish
+from zope.interface import implements
+
 
 try:
     # Zope 2.13+
@@ -42,7 +46,9 @@ def delObjects(cont, ids):
     delids=[id for id in ids if hasattr(aq_base(cont),id)]
     for delid in delids:
         try:
-            cont.manage_delObjects(delid)
+            obj = cont.get(delid)
+            if not (IContentish.providedBy(obj) or IFolderish.providedBy(obj)):
+                cont.manage_delObjects(delid)
         except (AttributeError, KeyError, BadRequest):
             logger.warning("Failed to delete '%s' in '%s'" % (delid, cont.id))
 

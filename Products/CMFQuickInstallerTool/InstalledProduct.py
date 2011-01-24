@@ -347,11 +347,21 @@ class InstalledProduct(SimpleItem):
             utilities = getattr(aq_base(self), 'utilities', [])
             if utilities:
                 sm = getSiteManager()
+                mapping = sm.objectItems()
+
                 for registration in utilities:
                     provided = _resolveDottedName(registration[0])
                     name = registration[1]
-                    if queryUtility(provided, name=name) is not None:
+                    utility = queryUtility(provided, name=name)
+
+                    if utility is not None:
                         sm.unregisterUtility(provided=provided, name=name)
+
+                        # Make sure utilities are removed from the
+                        # site manager's mapping as well
+                        for name, value in mapping:
+                            if value is utility:
+                                sm._delObject(name, suppress_events=True)
 
         rr_js = getToolByName(self, 'portal_javascripts', None)
         rr_css = getToolByName(self, 'portal_css', None)

@@ -4,6 +4,10 @@ Changelog
 3.0.4 - unreleased
 ------------------
 
+- Remove utility mapping in site manager's dictionary to enable a
+  complete uninstall. This fixes an issue where a cascade-based
+  uninstall would not entirely remove utilities, but merely unregister
+  them from the component registry.
 
 3.0.3 - 2010-11-06
 ------------------

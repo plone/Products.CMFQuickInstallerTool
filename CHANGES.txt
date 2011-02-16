@@ -4,6 +4,9 @@ Changelog
 3.0.4 - unreleased
 ------------------
 
+- Protect isProductInstalled so it is only callable by Managers.
+  [davisagli]
+
 - Remove utility mapping in site manager's dictionary to enable a
   complete uninstall. This fixes an issue where a cascade-based
   uninstall would not entirely remove utilities, but merely unregister

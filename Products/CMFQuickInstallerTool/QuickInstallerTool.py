@@ -595,6 +595,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         return res
 
+    security.declareProtected(ManagePortal, 'isProductInstalled')
     def isProductInstalled(self, productname):
         """Check wether a product is installed (by name)
         """

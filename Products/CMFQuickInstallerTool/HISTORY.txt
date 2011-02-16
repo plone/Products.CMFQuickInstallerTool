@@ -4,6 +4,8 @@ Changelog
 2.1.8 (unreleased)
 ------------------
 
+- Protect isProductInstalled so it is only callable by Managers.
+  [davisagli]
 
 2.1.7 (2009-4-4)
 ----------------

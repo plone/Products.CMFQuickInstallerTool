@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.4 - unreleased
+3.0.4 - 2011-02-26
 ------------------
 
 - Protect isProductInstalled so it is only callable by Managers.

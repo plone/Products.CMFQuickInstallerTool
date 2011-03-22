@@ -12,13 +12,15 @@ CMFTestCase.setupCMFSite()
 
 OPTIONFLAGS = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
-profile_registry.registerProfile('test',
-           'CMFQI test profile',
-           'Test profile for CMFQuickInstallerTool',
-           'profiles/test',
-           'Products.CMFQuickInstallerTool',
-           EXTENSION,
-           for_=None)
+
+def registerTestProfile(test):
+    profile_registry.registerProfile('test',
+               'CMFQI test profile',
+               'Test profile for CMFQuickInstallerTool',
+               'profiles/test',
+               'Products.CMFQuickInstallerTool',
+               EXTENSION,
+               for_=None)
 
 
 def test_suite():
@@ -26,6 +28,7 @@ def test_suite():
         Suite('actions.txt',
               optionflags=OPTIONFLAGS,
               package='Products.CMFQuickInstallerTool.tests',
+              setUp=registerTestProfile,
               test_class=CMFTestCase.FunctionalTestCase),
         Suite('profiles.txt',
               optionflags=OPTIONFLAGS,

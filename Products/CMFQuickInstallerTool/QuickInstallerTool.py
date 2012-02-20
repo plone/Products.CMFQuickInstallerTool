@@ -533,10 +533,9 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             after = self.snapshotPortal(portal)
             settings = self.deriveSettingsFromSnapshots(before, after)
 
-        jstool = getToolByName(self,'portal_javascripts', None)
-        if jstool is not None:
-            if len(settings['types']) > 0:
-                rr_css=getToolByName(portal,'portal_css')
+        rr_css = getToolByName(self, 'portal_css', None)
+        if rr_css is not None:
+            if 'resources_css' in settings and len(settings['resources_css']) > 0:
                 rr_css.cookResources()
 
         msg=str(res)

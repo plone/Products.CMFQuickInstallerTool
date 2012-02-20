@@ -150,7 +150,41 @@ is not installed anymore again:
   >>> cal = qi['CMFCalendar']
   >>> cal.isInstalled()
   False
-  
+
+Install a product which has a GenericSetup dependency
+-----------------------------------------------------
+
+There was a bug where if you installed a product which depends on another
+product, and then uninstalled it, the dependency's entries would be
+removed. Let's make sure that doesn't happen!
+
+First we need to fake a product that depends on CMFCalendar:
+  >>> import sys
+  >>> from Products.CMFQuickInstallerTool import tests
+  >>> sys.modules['Products.TestCMFCalendar'] = tests
+  >>> from Products.GenericSetup.registry import _profile_registry
+  >>> _profile_registry.registerProfile('default', 'Test',
+  ...     '', tests.__path__[0], 'TestCMFCalendar', 2)
+
+Now we install our fake product:
+
+  >>> qi.installProducts(products=['TestCMFCalendar'], omitSnapshots=True)
+  '...Installed Products...TestCMFCalendar:ok:...'
+
+And confirm that CMFCalendar stuff was installed:
+
+  >>> 'portal_calendar' in portal.objectIds()
+  True
+
+And remove it:
+
+  >>> qi.uninstallProducts(products=['TestCMFCalendar'])
+
+The CMFCalendar stuff should still be present:
+
+  >>> 'portal_calendar' in portal.objectIds()
+  True
+
 
 Install and Reinstall without deleting custom content
 -----------------------------------------------------

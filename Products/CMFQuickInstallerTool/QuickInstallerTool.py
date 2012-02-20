@@ -523,9 +523,15 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if not omitSnapshots:
             portal_setup.createSnapshot(after_id)
 
-        after=self.snapshotPortal(portal)
-
-        settings=self.deriveSettingsFromSnapshots(before, after)
+        if profile:
+            # If installation was done via a profile, the settings were already
+            # snapshotted in the IProfileImportedEvent handler, and we should
+            # use those because the ones derived here include settings from
+            # dependency profiles.
+            settings = {}
+        else:
+            after = self.snapshotPortal(portal)
+            settings = self.deriveSettingsFromSnapshots(before, after)
 
         jstool = getToolByName(self,'portal_javascripts', None)
         if jstool is not None:

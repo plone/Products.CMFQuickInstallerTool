@@ -31,7 +31,7 @@ And register the QI tool as a utility:
 Install a product through an extension profile
 ----------------------------------------------
 
-  >>> result = qi.installProduct('Products.CMFQuickInstallerTool',
+  >>> result = qi.installProduct('CMFQuickInstallerTool',
   ...     profile='Products.CMFQuickInstallerTool:test')
 
 Make sure the actions were added:
@@ -45,7 +45,7 @@ Make sure the actions were added:
 Uninstall the product
 ---------------------
 
-  >>> qi.uninstallProducts(products=['Products.CMFQuickInstallerTool'])
+  >>> qi.uninstallProducts(products=['CMFQuickInstallerTool'])
 
 Verify that all added entries were removed again:
 

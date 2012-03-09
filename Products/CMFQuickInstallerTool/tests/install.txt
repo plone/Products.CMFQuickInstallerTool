@@ -90,10 +90,9 @@ And we have an InstalledProduct instance in the QI tool which says the product
 is not installed anymore:
 
   >>> 'CMFCalendar' in qi.objectIds()
-  True
+  False
   
-  >>> cal = qi['CMFCalendar']
-  >>> cal.isInstalled()
+  >>> qi.isProductInstalled('CMFCalendar')
   False
 
   >>> setup = getToolByName(portal, 'portal_setup')
@@ -145,10 +144,9 @@ And we have an InstalledProduct instance in the QI tool which says the product
 is not installed anymore again:
 
   >>> 'CMFCalendar' in qi.objectIds()
-  True
+  False
   
-  >>> cal = qi['CMFCalendar']
-  >>> cal.isInstalled()
+  >>> qi.isProductInstalled('CMFCalendar')
   False
 
 Install a product which has a GenericSetup dependency

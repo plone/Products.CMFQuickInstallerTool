@@ -616,6 +616,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         for pid in products:
             prod=getattr(self,pid)
             prod.uninstall(cascade=cascade, reinstall=reinstall)
+            if reinstall == False:
+                self.manage_delObjects(pid)
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])

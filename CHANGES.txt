@@ -13,6 +13,11 @@ Changelog
 - Add some missing test setup.
   [davisagli]
 
+- Remove InstalledProduct instance when a product is uninstalled.
+  Leaving the instance around can prevent settings from being stored
+  properly on subsequent installation of the product.
+  [rochecompaan]
+
 3.0.5 - 2011-03-31
 ------------------
 

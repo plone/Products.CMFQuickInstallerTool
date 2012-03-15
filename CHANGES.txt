@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.6 - Unreleased
+3.0.6 (2012-03-15)
 ------------------
 
 - Fixed a bug where products installed via a GenericSetup profile would

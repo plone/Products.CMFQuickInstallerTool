@@ -213,7 +213,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
            with keys:(id,title,hasError,status)
         """
         # reset the list of broken products
-        self.errors = {}
+        if getattr(self, 'errors', True):
+            self.errors = {}
 
         # Returns full names with Products. prefix for all packages / products
         packages = get_packages()

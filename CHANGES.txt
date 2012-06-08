@@ -4,6 +4,10 @@ Changelog
 3.0.6 - Unreleased
 ------------------
 
+- Fixed a bug where listing the installable products would always
+  result in a transaction payload.
+  [malthe]
+
 - Fixed a bug where products installed via a GenericSetup profile would
   record the installed items from all of the profile's dependencies.
   This would then result in too much being removed when the product

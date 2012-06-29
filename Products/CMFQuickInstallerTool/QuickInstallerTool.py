@@ -564,9 +564,11 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         return res
 
     security.declareProtected(ManagePortal, 'installProducts')
-    def installProducts(self, products=[], stoponerror=True, reinstall=False,
+    def installProducts(self, products=None, stoponerror=True, reinstall=False,
                         REQUEST=None, forceProfile=False, omitSnapshots=True):
         """ """
+        if products is None:
+            products = []
         res = """
     Installed Products
     ====================
@@ -608,12 +610,14 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         p.update(settings,locked=locked, hidden=hidden, **kw)
 
     security.declareProtected(ManagePortal, 'uninstallProducts')
-    def uninstallProducts(self, products=[],
+    def uninstallProducts(self, products=None,
                           cascade=InstalledProduct.default_cascade,
                           reinstall=False,
                           REQUEST=None):
         """Removes a list of products
         """
+        if products is None:
+            products = []
         for pid in products:
             prod=getattr(self,pid)
             prod.uninstall(cascade=cascade, reinstall=reinstall)

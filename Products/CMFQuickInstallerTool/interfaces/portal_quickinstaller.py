@@ -30,7 +30,7 @@ class IQuickInstallerTool(Interface):
             if swallowExceptions is true, exceptions are caught and logged
         '''
 
-    def installProducts(products=[], stoponerror=False, REQUEST=None,
+    def installProducts(products=None, stoponerror=False, REQUEST=None,
                         forceProfile=False):
         ''' installs the products specified in the products list'''
 

@@ -22,6 +22,11 @@ Changelog
   properly on subsequent installation of the product.
   [rochecompaan]
 
+- interfaces/portal_quickinstaller.py:
+  Don't use list as default parameter value.
+  [kleist]
+
+
 3.0.5 - 2011-03-31
 ------------------
 

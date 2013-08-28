@@ -4,6 +4,10 @@ Changelog
 3.0.6 - Unreleased
 ------------------
 
+- switch to using volatile attributes for detected errors so we don't
+  write to the ZODB on read
+  [vangheem]
+
 - Fixed a bug where listing the installable products would always
   result in a transaction payload.
   [malthe]

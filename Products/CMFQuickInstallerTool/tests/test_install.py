@@ -12,7 +12,6 @@ from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
 
 CMFTestCase.installProduct('CMFQuickInstallerTool')
-CMFTestCase.installProduct('CMFCalendar')
 
 CMFTestCase.setupCMFSite()
 
@@ -35,10 +34,10 @@ class QILayer(CMFSite):
                    EXTENSION,
                    for_=None)
         
-        # install a test-only patch to make sure the CMFCalendar profile is installable
+        # install a test-only patch to make sure the test profiles are installable
         cls.orig_isProductInstallable = QuickInstallerTool.isProductInstallable
         def patched_isProductInstallable(self, productname):
-            if 'CMFCalendar' in productname or 'CMFQuickInstallerTool' in productname:
+            if 'QITest' in productname or 'CMFQuickInstallerTool' in productname:
                 return True
             return cls.orig_isProductInstallable(self, productname)
         QuickInstallerTool.isProductInstallable = patched_isProductInstallable

@@ -28,7 +28,6 @@ setup(name='Products.CMFQuickInstallerTool',
       extras_require=dict(
         test=[
             'zope.testing',
-            'Products.CMFCalendar',
             'Products.CMFTestCase',
         ]
       ),

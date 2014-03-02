@@ -8,7 +8,6 @@ First we need to install quickinstaller itself:
 
   >>> from zope.component import getSiteManager
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
-  >>> from Products.CMFCalendar.interfaces import ICalendarTool
   >>> from Products.CMFCore.utils import getToolByName
 
 Now set three convenience variables for later use:
@@ -21,133 +20,63 @@ Now set three convenience variables for later use:
   >>> qi
   <QuickInstallerTool at /cmf/portal_quickinstaller>
 
-  >>> types_tool = portal.portal_types
-  >>> types_tool
-  <TypesTool at /cmf/portal_types>
-
 And register the QI tool as a utility:
 
   >>> sm = getSiteManager()
   >>> sm.registerUtility(qi, IQuickInstallerTool)
 
-Install a product through an external method
---------------------------------------------
+And create a fake add-on for us to install:
 
-Before installing CMFCalendar as an example lets make sure none of the
-installed objects are already present:
+  >>> import sys
+  >>> from Products.CMFQuickInstallerTool import interfaces
+  >>> sys.modules['Products.QITest'] = interfaces
+  >>> from Products.GenericSetup.registry import _profile_registry
+  >>> _profile_registry.registerProfile('default', 'Test',
+  ...     '', interfaces.__path__[0], 'QITest', 2)
 
-  >>> 'Event' in types_tool.objectIds()
-  False
 
-  >>> 'portal_calendar' in portal.objectIds()
-  False
+Install a product
+-----------------
 
-And we have no InstalledProduct instance in the QI tool:
+Before installing QITest as an example, let's make sure
+we have no InstalledProduct instance in the QI tool:
 
-  >>> 'CMFCalendar' in qi.objectIds()
+  >>> 'QITest' in qi.objectIds()
   False
 
 After checking that the product is not installed yet, we do install it:
 
-  >>> qi.installProducts(products=['CMFCalendar'])
-  '...Installed Products...CMFCalendar:ok:...'
+  >>> qi.installProducts(products=['QITest'])
+  '...Installed Products...QITest:ok:...'
 
-Make sure the calendar tool and the Event type are added:
+Now we have an InstalledProduct instance in the QI tool:
 
-  >>> 'portal_calendar' in portal.objectIds()
+  >>> 'QITest' in qi.objectIds()
   True
 
-  >>> 'Event' in portal.portal_types.objectIds()
-  True
-
-  >>> getToolByName(portal, 'portal_calendar')
-  <CalendarTool at .../portal_calendar>
-
-And we have an InstalledProduct instance in the QI tool:
-
-  >>> 'CMFCalendar' in qi.objectIds()
-  True
-
-  >>> cal = qi['CMFCalendar']
-  >>> cal.isInstalled()
+  >>> product = qi['QITest']
+  >>> product.isInstalled()
   True
 
 
 Uninstall the product again
 ---------------------------
 
-  >>> qi.uninstallProducts(products=['CMFCalendar'])
+  >>> qi.uninstallProducts(products=['QITest'])
 
-Verify that all added entries were removed again:
+And we no longer have an InstalledProduct instance in the QI tool:
 
-  >>> 'Event' in types_tool.objectIds()
-  False
-
-  >>> 'portal_calendar' in portal.objectIds()
-  False
-
-And we have an InstalledProduct instance in the QI tool which says the product
-is not installed anymore:
-
-  >>> 'CMFCalendar' in qi.objectIds()
+  >>> 'QITest' in qi.objectIds()
   False
   
-  >>> qi.isProductInstalled('CMFCalendar')
+  >>> qi.isProductInstalled('QITest')
   False
 
   >>> setup = getToolByName(portal, 'portal_setup')
-  >>> logs = [i for i in setup.objectIds() if 'CMFCalendar' in i]
+  >>> logs = [i for i in setup.objectIds() if 'QITest' in i]
   >>> for i in logs:
   ...     setup._delObject(i)
 
-Install a product through an extension profile
-----------------------------------------------
-
->>> qi.installProducts(products=['CMFCalendar'], forceProfile=True, omitSnapshots=True)
-'...Installed Products...CMFCalendar:ok:...'
-
-Make sure the calendar tool and the Event type are added:
-
-  >>> 'portal_calendar' in portal.objectIds()
-  True
-
-  >>> getToolByName(portal, 'portal_calendar')
-  <CalendarTool at .../portal_calendar>
-
-  >>> 'Event' in portal.portal_types.objectIds()
-  True
-
-And we have an InstalledProduct instance in the QI tool which says the product
-is installed again:
-
-  >>> 'CMFCalendar' in qi.objectIds()
-  True
-  
-  >>> cal = qi['CMFCalendar']
-  >>> cal.isInstalled()
-  True
-
-Uninstall the product again
----------------------------
-
-  >>> qi.uninstallProducts(products=['CMFCalendar'])
-
-Verify that all added entries were removed again:
-
-  >>> 'Event' in types_tool.objectIds()
-  False
-
-  >>> 'portal_calendar' in portal.objectIds()
-  False
-
-And we have an InstalledProduct instance in the QI tool which says the product
-is not installed anymore again:
-
-  >>> 'CMFCalendar' in qi.objectIds()
-  False
-  
-  >>> qi.isProductInstalled('CMFCalendar')
-  False
 
 Install a product which has a GenericSetup dependency
 -----------------------------------------------------
@@ -156,31 +85,31 @@ There was a bug where if you installed a product which depends on another
 product, and then uninstalled it, the dependency's entries would be
 removed. Let's make sure that doesn't happen!
 
-First we need to fake a product that depends on CMFCalendar:
+First we need to fake a product that depends on QITest:
   >>> import sys
   >>> from Products.CMFQuickInstallerTool import tests
-  >>> sys.modules['Products.TestCMFCalendar'] = tests
+  >>> sys.modules['Products.QITest2'] = tests
   >>> from Products.GenericSetup.registry import _profile_registry
   >>> _profile_registry.registerProfile('default', 'Test',
-  ...     '', tests.__path__[0], 'TestCMFCalendar', 2)
+  ...     '', tests.__path__[0], 'QITest2', 2)
 
 Now we install our fake product:
 
-  >>> qi.installProducts(products=['TestCMFCalendar'], omitSnapshots=True)
-  '...Installed Products...TestCMFCalendar:ok:...'
+  >>> qi.installProducts(products=['QITest2'], omitSnapshots=True)
+  '...Installed Products...QITest2:ok:...'
 
-And confirm that CMFCalendar stuff was installed:
+And confirm that QITest stuff was installed:
 
-  >>> 'portal_calendar' in portal.objectIds()
+  >>> qi['QITest'].isInstalled()
   True
 
 And remove it:
 
-  >>> qi.uninstallProducts(products=['TestCMFCalendar'])
+  >>> qi.uninstallProducts(products=['QITest2'])
 
-The CMFCalendar stuff should still be present:
+The QITest stuff should still be present:
 
-  >>> 'portal_calendar' in portal.objectIds()
+  >>> qi['QITest'].isInstalled()
   True
 
 
@@ -200,8 +129,8 @@ for logging. For now lets artificially time it
 
   >>> import time;time.sleep(1)
   
-  >>> qi.installProducts(products=['CMFCalendar'])
-  '...Installed Products...CMFCalendar:ok:...'
+  >>> qi.installProducts(products=['QITest'])
+  '...Installed Products...QITest:ok:...'
   
 Add a folder to the root - this should remain after uninstall
   
@@ -213,11 +142,11 @@ Fudge the snapshot
   
   >>> after = qi.snapshotPortal(portal)
   >>> settings = qi.deriveSettingsFromSnapshots(before, after)
-  >>> p = qi['CMFCalendar']
+  >>> p = qi['QITest']
   >>> p.update(settings=settings)
   
 Uninstall the product and confirm the content is still there
   
-  >>> qi.uninstallProducts(products=['CMFCalendar'])
+  >>> qi.uninstallProducts(products=['QITest'])
   >>> 'test' in portal.objectIds()
   True

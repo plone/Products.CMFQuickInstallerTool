@@ -90,6 +90,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def __init__(self):
         self.id = 'portal_quickinstaller'
 
+    @property
+    def errors(self):
+        return getattr(self, '_v_errors', {})
+
     security.declareProtected(ManagePortal, 'getInstallProfiles')
     def getInstallProfiles(self, productname):
         """ Return the installer profile id
@@ -137,7 +141,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     security.declareProtected(ManagePortal, 'getBrokenInstalls')
     def getBrokenInstalls(self):
         """ Return all the broken installs """
-        errs = getattr(self, "errors", {})
+        errs = getattr(self, "_v_errors", {})
         return errs.values()
 
     security.declareProtected(ManagePortal, 'isProductInstallable')
@@ -163,8 +167,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 # XXX Currently QI always uses the first profile
                 setup_tool.getProfileDependencyChain(profiles[0])
             except KeyError, e:
-                if not getattr(self, "errors", {}):
-                    self.errors = {}
+                if not getattr(self, "_v_errors", {}):
+                    self._v_errors = {}
                 # Don't show twice the same error: old install and profile
                 # oldinstall is test in first in other methods we may have an
                 # extra 'Products.' in the namespace
@@ -173,17 +177,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     checkname = checkname[9:]
                 else:
                     checkname = 'Products.' + checkname
-                if self.errors.has_key(checkname):
-                    if self.errors[checkname]['value'] == e.args[0]:
+                if self._v_errors.has_key(checkname):
+                    if self._v_errors[checkname]['value'] == e.args[0]:
                         return False
                     else:
                         # A new error is found, register it
-                        self.errors[productname] = dict(
+                        self._v_errors[productname] = dict(
                             type= _(u"dependency_missing", default=u"Missing dependency"),
                             value = e.args[0],
                             productname = productname)
                 else:
-                    self.errors[productname] = dict(
+                    self._v_errors[productname] = dict(
                         type= _(u"dependency_missing", default=u"Missing dependency"),
                         value = e.args[0],
                         productname = productname)
@@ -213,8 +217,8 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
            with keys:(id,title,hasError,status)
         """
         # reset the list of broken products
-        if getattr(self, 'errors', True):
-            self.errors = {}
+        if getattr(self, '_v_errors', True):
+            self._v_errors = {}
 
         # Returns full names with Products. prefix for all packages / products
         packages = get_packages()

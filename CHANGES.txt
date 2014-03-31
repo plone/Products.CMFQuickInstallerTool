@@ -4,6 +4,10 @@ Changelog
 3.0.6 - Unreleased
 ------------------
 
+- Allow to pass the option to skip certain steps to GenericSetup's
+  runAllImportStepsFromProfile.
+  [pbauer]
+
 - switch to using volatile attributes for detected errors so we don't
   write to the ZODB on read
   [vangheem]

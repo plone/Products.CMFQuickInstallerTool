@@ -446,7 +446,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=None, reinstall=False,
                        forceProfile=False, omitSnapshots=True,
-                       profile=None):
+                       profile=None, stepsToSkip=None):
         """Install a product by name
         """
         __traceback_info__ = (p,)
@@ -514,7 +514,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                                    'Multiple extension profiles found for product '
                                    '%s. Used profile: %s' % (p, profile))
 
-                portal_setup.runAllImportStepsFromProfile('profile-%s' % profile)
+                portal_setup.runAllImportStepsFromProfile(
+                    'profile-%s' % profile,
+                    stepsToSkip=stepsToSkip,
+                )
                 status='installed'
             else:
                 # No install method and no profile, log / abort?

@@ -516,7 +516,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
                 portal_setup.runAllImportStepsFromProfile(
                     'profile-%s' % profile,
-                    stepsToSkip=stepsToSkip,
+                    steps_to_skip=stepsToSkip,
                 )
                 status='installed'
             else:

@@ -446,7 +446,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def installProduct(self, p, locked=False, hidden=False,
                        swallowExceptions=None, reinstall=False,
                        forceProfile=False, omitSnapshots=True,
-                       profile=None, stepsToSkip=None):
+                       profile=None, blacklistedSteps=None):
         """Install a product by name
         """
         __traceback_info__ = (p,)
@@ -516,7 +516,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
                 portal_setup.runAllImportStepsFromProfile(
                     'profile-%s' % profile,
-                    steps_to_skip=stepsToSkip,
+                    blacklisted_steps=blacklistedSteps,
                 )
                 status='installed'
             else:

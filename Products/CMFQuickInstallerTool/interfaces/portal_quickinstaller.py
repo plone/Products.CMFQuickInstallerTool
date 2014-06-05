@@ -22,12 +22,16 @@ class IQuickInstallerTool(Interface):
             from the Filesystem '''
 
     def installProduct(p, locked=False, hidden=False,
-                       swallowExceptions=False, forceProfile=False):
+                       swallowExceptions=False, forceProfile=False,
+                       blacklistedSteps=None):
         ''' installs a product by name
             throws AlreadyInstalled exception, if components of the product are
             already installed
 
             if swallowExceptions is true, exceptions are caught and logged
+
+            'blacklistedSteps' can be a list of step-names that will be handed
+            to GenericSetup and skipped on install.
         '''
 
     def installProducts(products=None, stoponerror=False, REQUEST=None,

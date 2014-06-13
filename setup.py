@@ -6,8 +6,8 @@ setup(name='Products.CMFQuickInstallerTool',
       version=version,
       description="CMFQuickInstallerTool is a facility for comfortable "
                   "activation/deactivation of CMF compliant products.",
-      long_description=open("README.txt").read() + "\n" + \
-                       open("CHANGES.txt").read(),
+      long_description=open("README.rst").read() + "\n" + \
+                       open("CHANGES.rst").read(),
       classifiers=[
         "Framework :: Plone",
         "Framework :: Zope2",

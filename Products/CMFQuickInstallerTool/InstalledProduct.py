@@ -28,7 +28,6 @@ DEFAULT_CASCADE = (
 )
 
 
-
 class InstalledProduct(SimpleItem):
     """Class storing information about an installed product
 
@@ -43,8 +42,8 @@ class InstalledProduct(SimpleItem):
 
     meta_type = "Installed Product"
 
-    manage_options=(
-        {'label':'View','action':'manage_installationInfo'},
+    manage_options = (
+        {'label': 'View', 'action': 'manage_installationInfo'},
         ) + SimpleItem.manage_options
 
     security = ClassSecurityInfo()
@@ -54,26 +53,27 @@ class InstalledProduct(SimpleItem):
         'forms/installed_product_overview', globals(),
         __name__='manage_installationInfo')
 
-    default_cascade=['types', 'skins', 'actions', 'portalobjects',
+    default_cascade = ['types', 'skins', 'actions', 'portalobjects',
                      'workflows', 'slots', 'registrypredicates',
                      'adapters', 'utilities']
 
     def __init__(self, id):
-        self.id=id
-        self.transcript=[]
-        self.leftslots=[]
-        self.rightslots=[]
-        self.locked=None
-        self.hidden=None
-        self.installedversion=None
-        self.status='new'
-        self.error=False
+        self.id = id
+        self.transcript = []
+        self.leftslots = []
+        self.rightslots = []
+        self.locked = None
+        self.hidden = None
+        self.installedversion = None
+        self.status = 'new'
+        self.error = False
         self.afterid = None
         self.beforeid = None
         for key in DEFAULT_CASCADE:
             setattr(self, key, [])
 
     security.declareProtected(ManagePortal, 'update')
+
     def update(self, settings, installedversion='', logmsg='',
                status='installed', error=False, locked=False, hidden=False,
                afterid=None, beforeid=None):
@@ -88,114 +88,134 @@ class InstalledProduct(SimpleItem):
 
         for k in settings.keys():
             old = k in reg.keys() and reg[k] or []
-            updatelist(getattr(self,k), settings[k], old)
+            updatelist(getattr(self, k), settings[k], old)
 
-        self.transcript.insert(0, {'timestamp':DateTime(), 'msg':logmsg})
-        self.locked=locked
-        self.hidden=hidden
-        self.installedversion=installedversion
+        self.transcript.insert(0, {'timestamp': DateTime(), 'msg': logmsg})
+        self.locked = locked
+        self.hidden = hidden
+        self.installedversion = installedversion
         self.afterid = afterid
         self.beforeid = beforeid
 
         if status:
-            self.status=status
+            self.status = status
 
-        self.error=error
+        self.error = error
 
     security.declareProtected(ManagePortal, 'log')
+
     def log(self, logmsg):
         """Adds a log to the transcript
         """
-        self.transcript.insert(0, {'timestamp':DateTime(), 'msg':logmsg})
+        self.transcript.insert(0, {'timestamp': DateTime(), 'msg': logmsg})
 
     security.declareProtected(ManagePortal, 'hasError')
+
     def hasError(self):
         """Returns if the prod is in error state
         """
         return getattr(self, 'error', False)
 
     security.declareProtected(ManagePortal, 'isLocked')
+
     def isLocked(self):
         """Is the product locked for uninstall
         """
         return getattr(self, 'locked', False)
 
     security.declareProtected(ManagePortal, 'isHidden')
+
     def isHidden(self):
         """Is the product hidden
         """
         return getattr(self, 'hidden', False)
 
     security.declareProtected(ManagePortal, 'isVisible')
+
     def isVisible(self):
         return not self.isHidden()
 
     security.declareProtected(ManagePortal, 'isInstalled')
+
     def isInstalled(self):
-        return self.status=='installed'
+        return self.status == 'installed'
 
     security.declareProtected(ManagePortal, 'getStatus')
+
     def getStatus(self):
         return self.status
 
     security.declareProtected(ManagePortal, 'getTypes')
+
     def getTypes(self):
         return self.types
 
     security.declareProtected(ManagePortal, 'getSkins')
+
     def getSkins(self):
         return self.skins
 
     security.declareProtected(ManagePortal, 'getActions')
+
     def getActions(self):
         return self.actions
 
     security.declareProtected(ManagePortal, 'getPortalObjects')
+
     def getPortalObjects(self):
         return self.portalobjects
 
     security.declareProtected(ManagePortal, 'getWorkflows')
+
     def getWorkflows(self):
         return self.workflows
 
     security.declareProtected(ManagePortal, 'getLeftSlots')
+
     def getLeftSlots(self):
         if getattr(self, 'leftslots', None) is None:
             self.leftslots = []
         return self.leftslots
 
     security.declareProtected(ManagePortal, 'getRightSlots')
+
     def getRightSlots(self):
         if getattr(self, 'rightslots', None) is None:
             self.rightslots = []
         return self.rightslots
 
     security.declareProtected(ManagePortal, 'getSlots')
+
     def getSlots(self):
-        return self.getLeftSlots()+self.getRightSlots()
+        return self.getLeftSlots() + self.getRightSlots()
 
     security.declareProtected(ManagePortal, 'getValue')
-    def getValue(self,name):
-        return getattr(self,name,[])
+
+    def getValue(self, name):
+        return getattr(self, name, [])
 
     security.declareProtected(ManagePortal, 'getRegistryPredicates')
+
     def getRegistryPredicates(self):
         """Return the custom entries in the content_type_registry
         """
         return getattr(self, 'registrypredicates', [])
 
     security.declareProtected(ManagePortal, 'getAfterId')
+
     def getAfterId(self):
         return self.afterid
 
     security.declareProtected(ManagePortal, 'getBeforeId')
+
     def getBeforeId(self):
         return self.beforeid
 
     security.declareProtected(ManagePortal, 'getTranscriptAsText')
+
     def getTranscriptAsText(self):
-        if getattr(self,'transcript',None):
-            msgs = [t['timestamp'].ISO()+'\n'+str(t['msg'])
+        if getattr(self, 'transcript', None):
+            msgs = [t['timestamp'].ISO() + '\n' + str(t['msg'])
                     for t in self.transcript]
             return '\n=============\n'.join(msgs)
         else:
@@ -207,6 +227,7 @@ class InstalledProduct(SimpleItem):
         return get_method(self.id, modfunc)
 
     security.declareProtected(ManagePortal, 'getInstallMethod')
+
     def getInstallMethod(self):
         """ returns the installer method """
         res = get_install_method(self.id)
@@ -217,29 +238,33 @@ class InstalledProduct(SimpleItem):
             return res
 
     security.declareProtected(ManagePortal, 'getUninstallMethod')
+
     def getUninstallMethod(self):
         """ returns the uninstaller method """
-        return self._getMethod((('Install','uninstall'),
-                                ('Install','Uninstall'),
-                                ('install','uninstall'),
-                                ('install','Uninstall'),
+        return self._getMethod((('Install', 'uninstall'),
+                                ('Install', 'Uninstall'),
+                                ('install', 'uninstall'),
+                                ('install', 'Uninstall'),
                                ))
 
     security.declareProtected(ManagePortal, 'getAfterInstallMethod')
+
     def getAfterInstallMethod(self):
         """ returns the after installer method """
-        return self._getMethod((('Install','afterInstall'),
-                                ('install','afterInstall'),
+        return self._getMethod((('Install', 'afterInstall'),
+                                ('install', 'afterInstall'),
                                ))
 
     security.declareProtected(ManagePortal, 'getBeforeUninstallMethod')
+
     def getBeforeUninstallMethod(self):
         """ returns the before uninstaller method """
-        return self._getMethod((('Install','beforeUninstall'),
-                                ('install','beforeUninstall'),
+        return self._getMethod((('Install', 'beforeUninstall'),
+                                ('install', 'beforeUninstall'),
                                ))
 
     security.declareProtected(ManagePortal, 'uninstall')
+
     def uninstall(self, cascade=default_cascade, reinstall=False, REQUEST=None):
         """Uninstalls the product and removes its dependencies
         """
@@ -250,8 +275,8 @@ class InstalledProduct(SimpleItem):
         if self.isLocked() and getattr(portal, 'removal_inprogress', False):
             raise ValueError, 'The product is locked and cannot be uninstalled!'
 
-        res=''
-        afterRes=''
+        res = ''
+        afterRes = ''
 
         uninstaller = self.getUninstallMethod()
         beforeUninstall = self.getBeforeUninstallMethod()
@@ -259,10 +284,10 @@ class InstalledProduct(SimpleItem):
         if uninstaller:
             uninstaller = uninstaller.__of__(portal)
             try:
-                res=uninstaller(portal, reinstall=reinstall)
+                res = uninstaller(portal, reinstall=reinstall)
                 # XXX log it
             except TypeError:
-                res=uninstaller(portal)
+                res = uninstaller(portal)
 
         if beforeUninstall:
             beforeUninstall = beforeUninstall.__of__(portal)
@@ -271,10 +296,10 @@ class InstalledProduct(SimpleItem):
 
         self._cascadeRemove(cascade)
 
-        self.status='uninstalled'
-        self.log('uninstalled\n'+str(res)+str(afterRes))
+        self.status = 'uninstalled'
+        self.log('uninstalled\n' + str(res) + str(afterRes))
 
-        if REQUEST and REQUEST.get('nextUrl',None):
+        if REQUEST and REQUEST.get('nextUrl', None):
             return REQUEST.RESPONSE.redirect(REQUEST['nextUrl'])
 
     def _cascadeRemove(self, cascade):
@@ -283,15 +308,15 @@ class InstalledProduct(SimpleItem):
         portal = getToolByName(self, 'portal_url').getPortalObject()
 
         if 'types' in cascade:
-            portal_types=getToolByName(self,'portal_types')
+            portal_types = getToolByName(self, 'portal_types')
             delObjects(portal_types, getattr(aq_base(self), 'types', []))
 
         if 'skins' in cascade:
-            portal_skins=getToolByName(self,'portal_skins')
+            portal_skins = getToolByName(self, 'portal_skins')
             delObjects(portal_skins, getattr(aq_base(self), 'skins', []))
 
         if 'actions' in cascade and len(getattr(aq_base(self), 'actions', [])) > 0:
-            portal_actions=getToolByName(self,'portal_actions')
+            portal_actions = getToolByName(self, 'portal_actions')
             for info in self.actions:
                 if isinstance(info, basestring):
                     action = info
@@ -315,21 +340,21 @@ class InstalledProduct(SimpleItem):
             delObjects(portal, getattr(aq_base(self), 'portalobjects', []))
 
         if 'workflows' in cascade:
-            portal_workflow=getToolByName(self, 'portal_workflow')
+            portal_workflow = getToolByName(self, 'portal_workflow')
             delObjects(portal_workflow, getattr(aq_base(self), 'workflows', []))
 
         if 'slots' in cascade:
             if self.getLeftSlots():
-                portal.left_slots=[s for s in portal.left_slots
+                portal.left_slots = [s for s in portal.left_slots
                                    if s not in self.getLeftSlots()]
             if self.getRightSlots():
-                portal.right_slots=[s for s in portal.right_slots
+                portal.right_slots = [s for s in portal.right_slots
                                     if s not in self.getRightSlots()]
 
         if 'registrypredicates' in cascade:
-            ctr = getToolByName(self,'content_type_registry')
+            ctr = getToolByName(self, 'content_type_registry')
             ids = [id for id, predicate in ctr.listPredicates()]
-            predicates=getattr(aq_base(self),'registrypredicates',[])
+            predicates = getattr(aq_base(self), 'registrypredicates', [])
             for p in predicates:
                 if p in ids:
                     ctr.removePredicate(p)
@@ -367,10 +392,10 @@ class InstalledProduct(SimpleItem):
         rr_css = getToolByName(self, 'portal_css', None)
 
         if rr_js is not None:
-            for js in getattr(aq_base(self),'resources_js',[]):
+            for js in getattr(aq_base(self), 'resources_js', []):
                 rr_js.unregisterResource(js)
         if rr_css is not None:
-            for css in getattr(aq_base(self),'resources_css',[]):
+            for css in getattr(aq_base(self), 'resources_css', []):
                 rr_css.unregisterResource(css)
 
         portal_controlpanel = getToolByName(self, 'portal_controlpanel', None)
@@ -378,6 +403,7 @@ class InstalledProduct(SimpleItem):
             portal_controlpanel.unregisterApplication(self.id)
 
     security.declareProtected(ManagePortal, 'getInstalledVersion')
+
     def getInstalledVersion(self):
         """Return the version of the product in the moment of installation
         """

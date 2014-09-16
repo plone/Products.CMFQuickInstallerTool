@@ -15,7 +15,8 @@ except ImportError:
     FILTER_PROFILES = False
 
 
-class SorryNoCaching(object): pass
+class SorryNoCaching(object):
+    pass
 
 
 def findProductForProfile(context, profile_id, qi):

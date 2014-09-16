@@ -35,7 +35,7 @@ def updatelist(a, b, c=None):
 
 def delObjects(cont, ids):
     """ abbreviation to delete objects """
-    delids=[id for id in ids if hasattr(aq_base(cont),id)]
+    delids = [id for id in ids if hasattr(aq_base(cont), id)]
     for delid in delids:
         try:
             obj = cont.get(delid)
@@ -70,10 +70,10 @@ def get_packages():
 
 
 def get_install_method(productname):
-    modfunc = (('Install','install'),
-               ('Install','Install'),
-               ('install','install'),
-               ('install','Install'))
+    modfunc = (('Install', 'install'),
+               ('Install', 'Install'),
+               ('install', 'install'),
+               ('install', 'Install'))
     return get_method(productname, modfunc)
 
 
@@ -94,7 +94,7 @@ def get_method(productname, modfunc):
         if mod + '.py' in files:
             try:
                 # id, title, module, function
-                return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
+                return ExternalMethod('temp', 'temp', productname + '.' + mod, func)
             except (NotFound, ImportError, RuntimeError):
                 pass
 

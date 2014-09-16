@@ -1,5 +1,6 @@
 from zope.interface import Interface, Attribute
 
+
 class IQuickInstallerTool(Interface):
     ''' the QuickInstaller Tool
         contains 'InstalledProduct' instances
@@ -38,7 +39,7 @@ class IQuickInstallerTool(Interface):
                         forceProfile=False):
         ''' installs the products specified in the products list'''
 
-    def getProductFile(p,fname='readme.txt'):
+    def getProductFile(p, fname='readme.txt'):
         ''' returns the content of a file of the product case-insensitive, if it
              does not exist -> None '''
 
@@ -51,7 +52,7 @@ class IQuickInstallerTool(Interface):
     def isProductInstalled(productname):
         ''' checks wether a product is installed (by name) '''
 
-    def notifyInstalled(p,locked=True, hidden=False, **kw):
+    def notifyInstalled(p, locked=True, hidden=False, **kw):
         ''' marks a product that has been installed without QuickInstaller
          as installed
          if locked is set -> the prod cannot be uninstalled
@@ -59,15 +60,16 @@ class IQuickInstallerTool(Interface):
          the **kw param is passed to the constructor of InstalledProduct
          '''
 
-    def uninstallProducts( products, cascade=['types','skins','actions',
-        'portalobjects','workflows','slots','registrypredicates'],REQUEST=None):
+    def uninstallProducts(products, cascade=['types', 'skins', 'actions',
+        'portalobjects', 'workflows', 'slots', 'registrypredicates'], REQUEST=None):
         ''' removes a list of products, cascade defines which items created by
             the install shall be uninstalled '''
 
-    def reinstallProducts( products, REQUEST=None):
+    def reinstallProducts(products, REQUEST=None):
         ''' reinstalls a list of products, the main difference to
             ininstall/reinstall is that it does not remove portal objects
             created  during install (e.g. tools, etc.)'''
+
 
 class IInstalledProduct(Interface):
     ''' represents the installed product
@@ -75,13 +77,13 @@ class IInstalledProduct(Interface):
 
     id = Attribute('id', 'Must be set to the same name as the product directory')
 
-    types = Attribute('types','default: []')
-    skins = Attribute('types','default: []')
-    actions = Attribute('types','default: []')
-    portalobjects = Attribute('types','default: []')
-    workflows = Attribute('types','default: []')
-    leftslots = Attribute('types','default: []')
-    rightslots = Attribute('types','default: []')
+    types = Attribute('types', 'default: []')
+    skins = Attribute('types', 'default: []')
+    actions = Attribute('types', 'default: []')
+    portalobjects = Attribute('types', 'default: []')
+    workflows = Attribute('types', 'default: []')
+    leftslots = Attribute('types', 'default: []')
+    rightslots = Attribute('types', 'default: []')
 
     def __init__(id):
         ''' constructor '''
@@ -108,8 +110,8 @@ class IInstalledProduct(Interface):
     def getTranscriptAsText():
         ''' return the product's install log as plain text '''
 
-    def uninstall(cascade=['types','skins','actions','portalobjects',
-            'workflows','slots','registrypredicates'],REQUEST=None):
+    def uninstall(cascade=['types', 'skins', 'actions', 'portalobjects',
+            'workflows', 'slots', 'registrypredicates'], REQUEST=None):
         '''uninstalls the prod and removes its deps
            the parameter 'cascade' specifies what should be deleted while
            uninstalling the product
@@ -117,6 +119,7 @@ class IInstalledProduct(Interface):
            if the Product has an uninstall() method in its Install.py it gets
            called automatically
         '''
+
     def getInstalledVersion():
         ''' returns the version of the prod in the moment of installation '''
 

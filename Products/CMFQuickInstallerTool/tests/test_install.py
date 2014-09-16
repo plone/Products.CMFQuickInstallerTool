@@ -3,7 +3,7 @@ import unittest
 
 import zope.component
 from Products.GenericSetup import EXTENSION, profile_registry
-from plone.app import testing 
+from plone.app import testing
 from plone.testing import layered
 
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool
@@ -14,9 +14,10 @@ OPTIONFLAGS = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
 TEST_PATCHES = {}
 
+
 class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
-    defaultBases = (testing.PLONE_FIXTURE,)
+    defaultBases = (testing.PLONE_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
         sm = zope.component.getSiteManager()
@@ -33,6 +34,7 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable
+
         def patched_isProductInstallable(self, productname):
             if 'QITest' in productname or 'CMFQuickInstallerTool' in productname:
                 return True
@@ -47,11 +49,11 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
         sm = zope.component.getSiteManager()
         sm.unregisterHandler(handleBeforeProfileImportEvent)
         sm.unregisterHandler(handleProfileImportedEvent)
-        
 
 CQI_FIXTURE = QuickInstallerCaseFixture()
 CQI_FUNCTIONAL_TESTING = testing.FunctionalTesting(
-    bases=(CQI_FIXTURE,), name='CMFQuickInstallerToolTest:Functional')
+    bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Functional')
+
 
 def test_suite():
     suite = unittest.TestSuite()

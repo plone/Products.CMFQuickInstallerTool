@@ -24,13 +24,14 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
         sm.registerHandler(handleBeforeProfileImportEvent)
         sm.registerHandler(handleProfileImportedEvent)
 
-        profile_registry.registerProfile('test',
-                   'CMFQI test profile',
-                   'Test profile for CMFQuickInstallerTool',
-                   'profiles/test',
-                   'Products.CMFQuickInstallerTool',
-                   EXTENSION,
-                   for_=None)
+        profile_registry.registerProfile(
+            'test',
+            'CMFQI test profile',
+            'Test profile for CMFQuickInstallerTool',
+            'profiles/test',
+            'Products.CMFQuickInstallerTool',
+            EXTENSION,
+            for_=None)
 
     def setUpPloneSite(self, portal):
         TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable
@@ -59,8 +60,9 @@ def test_suite():
     suite = unittest.TestSuite()
     for testfile in ['actions.txt', 'profiles.txt', 'install.txt']:
         suite.addTest(layered(
-            doctest.DocFileSuite('actions.txt',
+            doctest.DocFileSuite(
+                'actions.txt',
                 package='Products.CMFQuickInstallerTool.tests',
                 optionflags=OPTIONFLAGS),
-        layer=CQI_FUNCTIONAL_TESTING))
+            layer=CQI_FUNCTIONAL_TESTING))
     return suite

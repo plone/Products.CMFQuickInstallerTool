@@ -25,11 +25,11 @@ IGNORED = frozenset([
 
 def updatelist(a, b, c=None):
     for l in b:
-        if not l in a:
+        if l not in a:
             if c is None:
                 a.append(l)
             else:
-                if not l in c:
+                if l not in c:
                     a.append(l)
 
 
@@ -94,7 +94,8 @@ def get_method(productname, modfunc):
         if mod + '.py' in files:
             try:
                 # id, title, module, function
-                return ExternalMethod('temp', 'temp', productname + '.' + mod, func)
+                return ExternalMethod('temp', 'temp',
+                                      productname + '.' + mod, func)
             except (NotFound, ImportError, RuntimeError):
                 pass
 

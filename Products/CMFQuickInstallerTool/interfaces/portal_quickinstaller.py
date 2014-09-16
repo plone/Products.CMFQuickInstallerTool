@@ -60,8 +60,10 @@ class IQuickInstallerTool(Interface):
          the **kw param is passed to the constructor of InstalledProduct
          '''
 
-    def uninstallProducts(products, cascade=['types', 'skins', 'actions',
-        'portalobjects', 'workflows', 'slots', 'registrypredicates'], REQUEST=None):
+    def uninstallProducts(products,
+                          cascade=['types', 'skins', 'actions',
+                                   'portalobjects', 'workflows', 'slots',
+                                   'registrypredicates'], REQUEST=None):
         ''' removes a list of products, cascade defines which items created by
             the install shall be uninstalled '''
 
@@ -111,7 +113,8 @@ class IInstalledProduct(Interface):
         ''' return the product's install log as plain text '''
 
     def uninstall(cascade=['types', 'skins', 'actions', 'portalobjects',
-            'workflows', 'slots', 'registrypredicates'], REQUEST=None):
+                           'workflows', 'slots', 'registrypredicates'],
+                  REQUEST=None):
         '''uninstalls the prod and removes its deps
            the parameter 'cascade' specifies what should be deleted while
            uninstalling the product

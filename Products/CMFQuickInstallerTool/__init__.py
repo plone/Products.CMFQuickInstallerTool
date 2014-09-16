@@ -7,9 +7,8 @@ AlreadyInstalled
 def initialize(context):
     import Products.CMFQuickInstallerTool.QuickInstallerTool
     ToolInit('CMF QuickInstaller Tool',
-                    tools=(QuickInstallerTool.QuickInstallerTool, ),
-                    icon='tool.gif'
-                    ).initialize(context)
+             tools=(QuickInstallerTool.QuickInstallerTool, ),
+             icon='tool.gif').initialize(context)
 
     context.registerClass(
         QuickInstallerTool.QuickInstallerTool,

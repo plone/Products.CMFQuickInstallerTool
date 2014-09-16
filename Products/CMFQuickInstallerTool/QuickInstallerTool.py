@@ -184,7 +184,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                     checkname = checkname[9:]
                 else:
                     checkname = 'Products.' + checkname
-                if self._v_errors.has_key(checkname):
+                if checkname in self._v_errors:
                     if self._v_errors[checkname]['value'] == e.args[0]:
                         return False
                     else:
@@ -298,7 +298,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                         'isHidden': p.isHidden(),
                         'installedVersion': p.getInstalledVersion()})
         res.sort(lambda x, y: cmp(x.get('title', x.get('id', None)),
-                                 y.get('title', y.get('id', None))))
+                                  y.get('title', y.get('id', None))))
         return res
 
     security.declareProtected(ManagePortal, 'getProductFile')
@@ -315,7 +315,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if prodpath is None:
             return None
 
-        #now list the directory to get the readme.txt case-insensitive
+        # now list the directory to get the readme.txt case-insensitive
         try:
             files = os.listdir(prodpath)
         except OSError:
@@ -400,16 +400,9 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         state['utilities'] = tuple(getSiteManager().registeredUtilities())
 
         jstool = getToolByName(portal, 'portal_javascripts', None)
-        if jstool is not None:
-            state['resources_js'] = jstool.getResourceIds()
-        else:
-            state['resources_js'] = []
+        state['resources_js'] = jstool and jstool.getResourceIds() or []
         csstool = getToolByName(portal, 'portal_css', None)
-        if csstool is not None:
-            state['resources_css'] = csstool.getResourceIds()
-        else:
-            state['resources_css'] = []
-
+        state['resources_css'] = csstool and csstool.getResourceIds() or []
         return state
 
     security.declareProtected(ManagePortal, 'deriveSettingsFromSnapshots')
@@ -420,13 +413,13 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         adapters = []
         if len(after['adapters']) > len(before['adapters']):
             registrations = [reg for reg in after['adapters']
-                                  if reg not in before['adapters']]
+                             if reg not in before['adapters']]
             # TODO: expand this to actually cover adapter registrations
 
         utilities = []
         if len(after['utilities']) > len(before['utilities']):
             registrations = [reg for reg in after['utilities']
-                                  if reg not in before['utilities']]
+                             if reg not in before['utilities']]
 
             for registration in registrations:
                 reg = (_getDottedName(registration.provided), registration.name)
@@ -481,11 +474,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if hasattr(self, "REQUEST"):
             reqstorage = IAnnotatable(self.REQUEST, None)
             if reqstorage is not None:
-                key = "Products.CMFQUickInstaller.Installing"
-                if reqstorage.has_key(key):
-                    installing = reqstorage[key]
-                else:
-                    installing = reqstorage[key] = set()
+                installing = reqstorage.get("Products.CMFQUickInstaller.Installing", set())
                 installing.add(p)
         else:
             reqstorage = None
@@ -563,16 +552,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         version = self.getProductVersion(p)
 
         # add the product
-        self.notifyInstalled(p,
-                      settings=settings,
-                      installedversion=version,
-                      logmsg=res,
-                      status=status,
-                      error=False,
-                      locked=locked,
-                      hidden=hidden,
-                      afterid=after_id,
-                      beforeid=before_id)
+        self.notifyInstalled(
+            p,
+            settings=settings,
+            installedversion=version,
+            logmsg=res,
+            status=status,
+            error=False,
+            locked=locked,
+            hidden=hidden,
+            afterid=after_id,
+            beforeid=before_id)
 
         prod = getattr(self, p)
         afterInstall = prod.getAfterInstallMethod()
@@ -624,7 +614,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         without QuickInstaller as installed
         """
 
-        if not p in self.objectIds():
+        if p not in self.objectIds():
             ip = InstalledProduct(p)
             self._setObject(p, ip)
 
@@ -644,7 +634,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         for pid in products:
             prod = getattr(self, pid)
             prod.uninstall(cascade=cascade, reinstall=reinstall)
-            if reinstall == False:
+            if not reinstall:
                 self.manage_delObjects(pid)
 
         if REQUEST:

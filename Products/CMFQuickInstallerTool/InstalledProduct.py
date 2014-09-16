@@ -53,9 +53,9 @@ class InstalledProduct(SimpleItem):
         'forms/installed_product_overview', globals(),
         __name__='manage_installationInfo')
 
-    default_cascade = ['types', 'skins', 'actions', 'portalobjects',
-                     'workflows', 'slots', 'registrypredicates',
-                     'adapters', 'utilities']
+    default_cascade = [
+        'types', 'skins', 'actions', 'portalobjects', 'workflows', 'slots',
+        'registrypredicates', 'adapters', 'utilities']
 
     def __init__(self, id):
         self.id = id
@@ -273,7 +273,7 @@ class InstalledProduct(SimpleItem):
         # TODO eventually we will land Event system and could remove
         # this 'removal_inprogress' hack
         if self.isLocked() and getattr(portal, 'removal_inprogress', False):
-            raise ValueError, 'The product is locked and cannot be uninstalled!'
+            raise ValueError('The product is locked and cannot be uninstalled!')
 
         res = ''
         afterRes = ''
@@ -359,7 +359,7 @@ class InstalledProduct(SimpleItem):
                 if p in ids:
                     ctr.removePredicate(p)
                 else:
-                    logger.warning("Failed to delete '%s' from content type " \
+                    logger.warning("Failed to delete '%s' from content type "
                                    "registry" % p)
 
         if 'adapters' in cascade:

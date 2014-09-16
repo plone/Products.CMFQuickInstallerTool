@@ -1,10 +1,6 @@
 #
 # Setup tests
 #
-
-import unittest
-
-from Testing import ZopeTestCase
 from plone.app.testing.bbb import PloneTestCase
 
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct

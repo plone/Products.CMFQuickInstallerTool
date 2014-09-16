@@ -9,16 +9,8 @@ from zExceptions import BadRequest
 from zExceptions import NotFound
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IFolderish
-from zope.interface import implements
 
-
-try:
-    # Zope 2.13+
-    from OFS.metaconfigure import get_registered_packages
-except ImportError:
-    def get_registered_packages():
-        import Products
-        return getattr(Products, '_registered_packages', ())
+from OFS.metaconfigure import get_registered_packages
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 

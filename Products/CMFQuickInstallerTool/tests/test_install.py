@@ -62,18 +62,3 @@ def test_suite():
                 optionflags=OPTIONFLAGS),
         layer=CQI_FUNCTIONAL_TESTING))
     return suite
-
-    return unittest.TestSuite((
-        Suite('actions.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        Suite('profiles.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        Suite('install.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        ))

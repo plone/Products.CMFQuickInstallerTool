@@ -35,6 +35,7 @@ _ = MessageFactory("plone")
 try:
     # Allow IPloneSiteRoot or ISiteRoot if we have Plone
     from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
+    ISiteRoot   # pyflakes
 except ImportError:
     from Products.CMFCore.interfaces import ISiteRoot
 
@@ -156,7 +157,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if productname in not_installable:
             return False
         try:
-            meth = self.getInstallMethod(productname)
+            self.getInstallMethod(productname)
             return True
         except AttributeError:
             profiles = self.getInstallProfiles(productname)
@@ -580,7 +581,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     Installed Products
     ====================
     """
-        ok = True
         # return products
         for p in products:
             res += p +':'

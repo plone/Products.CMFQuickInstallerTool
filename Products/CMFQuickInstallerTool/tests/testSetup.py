@@ -1,23 +1,14 @@
 #
 # Setup tests
 #
-
-import unittest
-
-from Testing import ZopeTestCase
-from Products.CMFTestCase import CMFTestCase
-
-CMFTestCase.installProduct('CMFQuickInstallerTool')
-CMFTestCase.setupCMFSite()
+from plone.app.testing.bbb import PloneTestCase
 
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 
 
-class TestQuickInstaller(CMFTestCase.CMFTestCase):
+class TestQuickInstaller(PloneTestCase):
 
     def afterSetUp(self):
-        self.setRoles(['Manager'])
-        self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testTool(self):
@@ -37,11 +28,9 @@ class TestQuickInstaller(CMFTestCase.CMFTestCase):
         self.failIf('CMFQuickInstallerTool' in prods)
 
 
-class TestInstalledProduct(CMFTestCase.CMFTestCase):
+class TestInstalledProduct(PloneTestCase):
 
     def afterSetUp(self):
-        self.setRoles(['Manager'])
-        self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testSlotsMigration(self):
@@ -70,13 +59,3 @@ class TestInstalledProduct(CMFTestCase.CMFTestCase):
 
         slots = old.getSlots()
         self.failUnless(slots == [])
-
-
-def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestQuickInstaller))
-    suite.addTest(unittest.makeSuite(TestInstalledProduct))
-    return suite
-
-if __name__ == '__main__':
-    unittest.main(defaultTest="test_suite")

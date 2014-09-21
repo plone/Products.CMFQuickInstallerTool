@@ -2,49 +2,48 @@ import doctest
 import unittest
 
 import zope.component
-from Products.CMFTestCase import CMFTestCase
-from Products.CMFTestCase.layer import CMFSite
 from Products.GenericSetup import EXTENSION, profile_registry
-from Testing.ZopeTestCase import FunctionalDocFileSuite as Suite
+from plone.app import testing
+from plone.testing import layered
 
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool
 from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
 
-CMFTestCase.installProduct('CMFQuickInstallerTool')
-
-CMFTestCase.setupCMFSite()
-
 OPTIONFLAGS = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
+TEST_PATCHES = {}
 
-class QILayer(CMFSite):
 
-    @classmethod
-    def setUp(cls):
+class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
+
+    defaultBases = (testing.PLONE_FIXTURE, )
+
+    def setUpZope(self, app, configurationContext):
         sm = zope.component.getSiteManager()
         sm.registerHandler(handleBeforeProfileImportEvent)
         sm.registerHandler(handleProfileImportedEvent)
 
-        profile_registry.registerProfile('test',
-                   'CMFQI test profile',
-                   'Test profile for CMFQuickInstallerTool',
-                   'profiles/test',
-                   'Products.CMFQuickInstallerTool',
-                   EXTENSION,
-                   for_=None)
-        
-        # install a test-only patch to make sure the test profiles are installable
-        cls.orig_isProductInstallable = QuickInstallerTool.isProductInstallable
+        profile_registry.registerProfile(
+            'test',
+            'CMFQI test profile',
+            'Test profile for CMFQuickInstallerTool',
+            'profiles/test',
+            'Products.CMFQuickInstallerTool',
+            EXTENSION,
+            for_=None)
+
+    def setUpPloneSite(self, portal):
+        TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable
+
         def patched_isProductInstallable(self, productname):
             if 'QITest' in productname or 'CMFQuickInstallerTool' in productname:
                 return True
-            return cls.orig_isProductInstallable(self, productname)
+            return TEST_PATCHES['orig_isProductInstallable'](self, productname)
         QuickInstallerTool.isProductInstallable = patched_isProductInstallable
-    
-    @classmethod
-    def tearDown(cls):
-        QuickInstallerTool.isProductInstallable = cls.orig_isProductInstallable
+
+    def tearDownPloneSite(self, portal):
+        QuickInstallerTool.isProductInstallable = TEST_PATCHES['orig_isProductInstallable']
 
         profile_registry.unregisterProfile('test', 'Products.CMFQuickInstallerTool')
 
@@ -52,23 +51,18 @@ class QILayer(CMFSite):
         sm.unregisterHandler(handleBeforeProfileImportEvent)
         sm.unregisterHandler(handleProfileImportedEvent)
 
-
-class QITestCase(CMFTestCase.FunctionalTestCase):
-    layer = QILayer
+CQI_FIXTURE = QuickInstallerCaseFixture()
+CQI_FUNCTIONAL_TESTING = testing.FunctionalTesting(
+    bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Functional')
 
 
 def test_suite():
-    return unittest.TestSuite((
-        Suite('actions.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        Suite('profiles.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        Suite('install.txt',
-              optionflags=OPTIONFLAGS,
-              package='Products.CMFQuickInstallerTool.tests',
-              test_class=QITestCase),
-        ))
+    suite = unittest.TestSuite()
+    for testfile in ['actions.txt', 'profiles.txt', 'install.txt']:
+        suite.addTest(layered(
+            doctest.DocFileSuite(
+                'actions.txt',
+                package='Products.CMFQuickInstallerTool.tests',
+                optionflags=OPTIONFLAGS),
+            layer=CQI_FUNCTIONAL_TESTING))
+    return suite

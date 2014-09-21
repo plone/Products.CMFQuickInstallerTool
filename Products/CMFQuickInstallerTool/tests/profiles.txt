@@ -10,27 +10,22 @@ if their extension profiles are either:
 
 This allows us to hide extension profiles not intended for site configuration.
 
-First we need to install quickinstaller itself:
-
-  >>> self.setRoles(['Manager'])
-  >>> self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
+First we set three convenience variables for later use:
 
   >>> from zope.component import getSiteManager
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
 
-Now set three convenience variables for later use:
-
-  >>> portal = self.app.cmf
+  >>> portal = layer['portal']
   >>> portal
-  <CMFSite at /cmf>
+  <PloneSite at /plone>
 
   >>> qi = getattr(portal, 'portal_quickinstaller', None)
   >>> qi
-  <QuickInstallerTool at /cmf/portal_quickinstaller>
+  <QuickInstallerTool at /plone/portal_quickinstaller>
 
   >>> actions_tool = portal.portal_actions
   >>> actions_tool
-  <ActionsTool at /cmf/portal_actions>
+  <ActionsTool at /plone/portal_actions>
 
 And register the QI tool as a utility:
 

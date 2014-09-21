@@ -1,24 +1,19 @@
 Tests for QuickInstaller installation
 =====================================
 
-First we need to install quickinstaller itself:
-
-  >>> self.setRoles(['Manager'])
-  >>> self.addProfile('Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
+First we set three convenience variables for later use:
 
   >>> from zope.component import getSiteManager
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
   >>> from Products.CMFCore.utils import getToolByName
 
-Now set three convenience variables for later use:
-
-  >>> portal = self.app.cmf
+  >>> portal = layer['plone']
   >>> portal
-  <CMFSite at /cmf>
+  <PloneSite at /plone>
 
   >>> qi = getattr(portal, 'portal_quickinstaller', None)
   >>> qi
-  <QuickInstallerTool at /cmf/portal_quickinstaller>
+  <QuickInstallerTool at /plone/portal_quickinstaller>
 
 And register the QI tool as a utility:
 

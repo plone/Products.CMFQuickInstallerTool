@@ -34,6 +34,11 @@ Changelog
   Don't use list as default parameter value.
   [kleist]
 
+- Ported tests to plone.app.testing and removed CMFTestCase dependency
+  [tomgross]
+
+- PEP8 cleanup
+  [tomgross]
 
 3.0.5 - 2011-03-31
 ------------------

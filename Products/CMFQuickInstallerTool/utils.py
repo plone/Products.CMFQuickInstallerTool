@@ -9,16 +9,8 @@ from zExceptions import BadRequest
 from zExceptions import NotFound
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IFolderish
-from zope.interface import implements
 
-
-try:
-    # Zope 2.13+
-    from OFS.metaconfigure import get_registered_packages
-except ImportError:
-    def get_registered_packages():
-        import Products
-        return getattr(Products, '_registered_packages', ())
+from OFS.metaconfigure import get_registered_packages
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -33,17 +25,17 @@ IGNORED = frozenset([
 
 def updatelist(a, b, c=None):
     for l in b:
-        if not l in a:
+        if l not in a:
             if c is None:
                 a.append(l)
             else:
-                if not l in c:
+                if l not in c:
                     a.append(l)
 
 
 def delObjects(cont, ids):
     """ abbreviation to delete objects """
-    delids=[id for id in ids if hasattr(aq_base(cont),id)]
+    delids = [id for id in ids if hasattr(aq_base(cont), id)]
     for delid in delids:
         try:
             obj = cont.get(delid)
@@ -78,10 +70,10 @@ def get_packages():
 
 
 def get_install_method(productname):
-    modfunc = (('Install','install'),
-               ('Install','Install'),
-               ('install','install'),
-               ('install','Install'))
+    modfunc = (('Install', 'install'),
+               ('Install', 'Install'),
+               ('install', 'install'),
+               ('install', 'Install'))
     return get_method(productname, modfunc)
 
 
@@ -102,7 +94,8 @@ def get_method(productname, modfunc):
         if mod + '.py' in files:
             try:
                 # id, title, module, function
-                return ExternalMethod('temp', 'temp', productname+'.'+mod, func)
+                return ExternalMethod('temp', 'temp',
+                                      productname + '.' + mod, func)
             except (NotFound, ImportError, RuntimeError):
                 pass
 

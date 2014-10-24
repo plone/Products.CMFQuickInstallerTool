@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.6 - Unreleased
+3.0.6 (2014-10-24)
 ------------------
 
 - Allow to pass the option to skip certain steps to GenericSetup's

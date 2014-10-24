@@ -1,13 +1,7 @@
 Changelog
 =========
 
-3.0.7 (unreleased)
-------------------
-
-- Nothing changed yet.
-
-
-3.0.6 (2014-10-24)
+3.0.7 (2014-10-24)
 ------------------
 
 - Allow to pass the option to skip certain steps to GenericSetup's
@@ -21,15 +15,6 @@ Changelog
 - Fixed a bug where listing the installable products would always
   result in a transaction payload.
   [malthe]
-
-- Fixed a bug where products installed via a GenericSetup profile would
-  record the installed items from all of the profile's dependencies.
-  This would then result in too much being removed when the product
-  was uninstalled.
-  [davisagli]
-
-- Add some missing test setup.
-  [davisagli]
 
 - Remove InstalledProduct instance when a product is uninstalled.
   Leaving the instance around can prevent settings from being stored
@@ -45,6 +30,19 @@ Changelog
 
 - PEP8 cleanup
   [tomgross]
+
+3.0.6 (2012-03-15)
+------------------
+
+- Fixed a bug where products installed via a GenericSetup profile would
+  record the installed items from all of the profile's dependencies.
+  This would then result in too much being removed when the product
+  was uninstalled.
+  [davisagli]
+
+- Add some missing test setup.
+  [davisagli]
+
 
 3.0.5 - 2011-03-31
 ------------------

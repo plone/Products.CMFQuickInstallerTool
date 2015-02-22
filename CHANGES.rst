@@ -4,8 +4,9 @@ Changelog
 3.0.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- No longer prevent INonInstallable profiles from being recorded as installed
+  products. (Really they are auto-installed products, not non-installable ones.)
+  [davisagli]
 
 3.0.7 (2014-10-24)
 ------------------
@@ -48,7 +49,6 @@ Changelog
 
 - Add some missing test setup.
   [davisagli]
-
 
 3.0.5 - 2011-03-31
 ------------------

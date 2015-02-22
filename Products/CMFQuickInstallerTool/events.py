@@ -1,18 +1,9 @@
-from zope.component import adapter
-from zope.component import getAllUtilitiesRegisteredFor
-from zope.annotation.interfaces import IAnnotatable
-
 from Acquisition import aq_parent
-
+from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.interfaces import IBeforeProfileImportEvent
 from Products.GenericSetup.interfaces import IProfileImportedEvent
-from Products.CMFCore.utils import getToolByName
-
-FILTER_PROFILES = True
-try:
-    from Products.CMFPlone.interfaces import INonInstallable
-except ImportError:
-    FILTER_PROFILES = False
+from zope.annotation.interfaces import IAnnotatable
+from zope.component import adapter
 
 
 class SorryNoCaching(object):
@@ -47,18 +38,6 @@ def handleBeforeProfileImportEvent(event):
     request = getattr(context, "REQUEST", None)
     if request is None:
         return
-
-    if FILTER_PROFILES:
-        ignore_profiles = getattr(request, '_cachedIgnoredProfiles', ())
-        if not ignore_profiles:
-            ignore_profiles = []
-            utils = getAllUtilitiesRegisteredFor(INonInstallable)
-            for util in utils:
-                ignore_profiles.extend(util.getNonInstallableProfiles())
-            request._cachedIgnoredProfiles = tuple(ignore_profiles)
-
-        if profile_id in ignore_profiles:
-            return
 
     qi = getToolByName(context, "portal_quickinstaller", None)
     if qi is None:

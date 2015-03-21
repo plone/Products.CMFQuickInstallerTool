@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.8 (unreleased)
+3.0.8 (2015-03-21)
 ------------------
 
 - No longer prevent INonInstallable profiles from being recorded as installed

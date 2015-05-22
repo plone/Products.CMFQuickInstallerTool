@@ -22,6 +22,8 @@ IGNORED = frozenset([
     'ZODBMountPoint', 'ZReST', 'ZSQLMethods',
 ])
 
+UNINSTALL_ID = 'uninstalled'
+
 
 def updatelist(a, b, c=None):
     for l in b:

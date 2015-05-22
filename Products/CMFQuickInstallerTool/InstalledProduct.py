@@ -288,6 +288,14 @@ class InstalledProduct(SimpleItem):
                 # XXX log it
             except TypeError:
                 res = uninstaller(portal)
+        elif not reinstall:
+            # If there is no uninstall-method we run a uninstall-profile
+            qi = getToolByName(self, 'portal_quickinstaller')
+            uninstall_profile = qi.getUninstallProfile(self.id)
+            if uninstall_profile:
+                portal_setup = getToolByName(self, 'portal_setup')
+                portal_setup.runAllImportStepsFromProfile(
+                    'profile-%s' % uninstall_profile['id'])
 
         if beforeUninstall:
             beforeUninstall = beforeUninstall.__of__(portal)

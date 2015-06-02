@@ -7,7 +7,7 @@ First we set three convenience variables for later use:
   >>> from Products.CMFQuickInstallerTool.interfaces import IQuickInstallerTool
   >>> from Products.CMFCore.utils import getToolByName
 
-  >>> portal = layer['plone']
+  >>> portal = layer['portal']
   >>> portal
   <PloneSite at /plone>
 

@@ -4,7 +4,8 @@ Changelog
 3.0.9 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Readded doctests which were not run after port to plone.app.testing
+  [tomgross]
 
 
 3.0.8 (2015-03-21)

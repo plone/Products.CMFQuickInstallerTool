@@ -61,7 +61,7 @@ def test_suite():
     for testfile in ['actions.txt', 'profiles.txt', 'install.txt']:
         suite.addTest(layered(
             doctest.DocFileSuite(
-                'actions.txt',
+                testfile,
                 package='Products.CMFQuickInstallerTool.tests',
                 optionflags=OPTIONFLAGS),
             layer=CQI_FUNCTIONAL_TESTING))

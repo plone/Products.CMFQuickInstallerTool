@@ -5,7 +5,6 @@ import zope.component
 from Products.GenericSetup import EXTENSION, profile_registry
 from plone.app import testing
 from plone.testing import layered
-from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool
 from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent
@@ -18,7 +17,7 @@ TEST_PATCHES = {}
 
 class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
-    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE, )
+    defaultBases = (testing.PLONE_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
         sm = zope.component.getSiteManager()
@@ -62,7 +61,7 @@ def test_suite():
     for testfile in ['actions.txt', 'profiles.txt', 'install.txt']:
         suite.addTest(layered(
             doctest.DocFileSuite(
-                testfile,
+                'actions.txt',
                 package='Products.CMFQuickInstallerTool.tests',
                 optionflags=OPTIONFLAGS),
             layer=CQI_FUNCTIONAL_TESTING))

@@ -5,11 +5,21 @@ import zope.component
 from Products.GenericSetup import EXTENSION, profile_registry
 from plone.app import testing
 from plone.testing import layered
-from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool
 from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
+
+import pkg_resources
+try:
+    pkg_resources.get_distribution('plone.app.contenttypes')
+except pkg_resources.DistributionNotFound:
+    # assume we have an other content framework (Archetypes) here
+    TESTING_FIXTURE = testing.PLONE_FIXTURE
+else:
+    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
+    TESTING_FIXTURE = PLONE_APP_CONTENTTYPES_FIXTURE
+
 
 OPTIONFLAGS = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
 
@@ -18,7 +28,7 @@ TEST_PATCHES = {}
 
 class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
-    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE, )
+    defaultBases = (TESTING_FIXTURE, )
 
     def setUpZope(self, app, configurationContext):
         sm = zope.component.getSiteManager()

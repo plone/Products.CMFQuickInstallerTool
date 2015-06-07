@@ -41,6 +41,9 @@ except ImportError:
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
+# By convention the uninstall-profile is called 'uninstall'
+UNINSTALL_ID = 'uninstall'
+
 
 class AlreadyInstalled(Exception):
     """ Would be nice to say what Product was trying to be installed """
@@ -130,6 +133,25 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         # XXX Currently QI always uses the first profile
         if profiles:
             return profiles[0]
+        return None
+
+    security.declareProtected(ManagePortal, 'getUninstallProfile')
+
+    def getUninstallProfile(self, productname):
+        """ Return the uninstaller profile id
+        """
+        portal_setup = getToolByName(self, 'portal_setup')
+        profiles = portal_setup.listProfileInfo()
+
+        # We are only interested in extension profiles for the product
+        profiles = [prof for prof in profiles if
+                    prof['type'] == EXTENSION and
+                    (prof['product'] == productname or
+                     prof['product'] == 'Products.%s' % productname)]
+        if profiles:
+            for profile in profiles:
+                if profile['id'].split(':')[-1] == UNINSTALL_ID:
+                    return profile
         return None
 
     security.declareProtected(ManagePortal, 'getInstallMethod')

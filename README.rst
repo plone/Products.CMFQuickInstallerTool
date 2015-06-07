@@ -13,12 +13,12 @@ the information about the installed products.
 The requirements for a product to be installable with QuickInstallerTool are
 quite simple (almost all existing CMF  products fulfill them)::
 
-  External Product:  The product has to implement an external 
-                     method 'install' in a python module 'Install.py' 
+  External Product:  The product has to implement an external
+                     method 'install' in a python module 'Install.py'
                      in its Extensions directory.
-                     
+
                      OR
-                     
+
                      The product ships with a GenericSetup extension profile
                      and has no install method. It can still use an uninstall
                      method for custom uninstallation tasks though.
@@ -52,12 +52,15 @@ Customized uninstall
 In order to use a customize uninstall, the following
 requirements must be met::
 
-  External Product:  The product has to implement an external 
-                     method 'uninstall in a python module 'Install.py' 
+  External Product:  The product has to implement an external
+                     method 'uninstall in a python module 'Install.py'
                      in its Extensions directory.
 
 Please note that the customized uninstall method is invoked before (and in
 addition to) the standard removal of objects.
+
+Alternatively you can register a profile 'uninstall'. That will be run on
+uninstall if ther is no method 'uninstall'.
 
 Install:
 --------

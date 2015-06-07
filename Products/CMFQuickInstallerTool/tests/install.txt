@@ -150,3 +150,92 @@ Uninstall the product and confirm the content is still there
   >>> qi.uninstallProducts(products=['QITest'])
   >>> 'test' in portal.objectIds()
   True
+
+
+Test getUninstallProfile method
+-------------------------------
+
+  >>> sys.modules['Products.QITest3'] = tests
+  >>> qi.installProducts(products=['QITest3'])
+  '...Installed Products...QITest3:ok:...'
+
+  >>> qi.getUninstallProfile('QITest3')
+  >>> _profile_registry.registerProfile('uninstall', 'Test',
+  ...     '', interfaces.__path__[0], 'QITest3', 2)
+  >>> uninstall = qi.getUninstallProfile('QITest3')
+  >>> uninstall['id']
+  'QITest3:uninstall'
+
+Cleanup
+
+  >>> qi.uninstallProducts(products=['QITest3'])
+
+
+Uninstalling should run the uninstall-profile
+---------------------------------------------
+
+We need to test against a step that is not auto-removed by _cascadeRemove,
+so we add "UninstallTest" to default_page_types in site_properties via
+a propertiestool.xml.
+
+Create a dummy product
+
+  >>> sys.modules['Products.QITest4'] = tests
+
+Make sure there is no dummy in site_properties
+
+  >>> portal_properties = portal.portal_properties
+  >>> portal_properties
+  <PropertiesTool at /plone/portal_properties>
+  >>> sp = portal_properties.site_properties
+  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  False
+
+Installing the product should not run any profile and thus set no properties.
+
+  >>> qi.installProducts(products=['QITest4'])
+  '...Installed Products...QITest4:ok:...'
+  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  False
+
+Register a 'default'-profile that points to profiles/test
+
+  >>> interfaces_path = interfaces.__path__[0]
+  >>> default_path = interfaces_path[:-11] + '/profiles/test'
+  >>> _profile_registry.registerProfile('default', 'UninstallTest', '', default_path, 'QITest4', 2)
+
+Installing the product now runs the default-profile.
+
+  >>> qi.installProducts(products=['QITest4'])
+  '...Installed Products...QITest4:ok:...'
+
+Make sure the property was set by the default-profile.
+
+  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  True
+
+There is no uninstall-profile yet, so the property is kept on uninstalling.
+
+  >>> qi.getUninstallProfile('QITest4')
+  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  True
+
+Install again.
+
+  >>> qi.installProducts(products=['QITest4'])
+  '...Installed Products...QITest4:ok:...'
+
+Register a uninstall profile that points to the profiles/test_uninstall
+
+  >>> uninstall_path = interfaces_path[:-11] + '/profiles/test_uninstall'
+  >>> _profile_registry.registerProfile('uninstall', 'UninstallTest', '', uninstall_path, 'QITest4', 2)
+
+  >>> uninstall = qi.getUninstallProfile('QITest4')
+  >>> uninstall['id']
+  'QITest4:uninstall'
+
+Uninstalling now runs the uninstall-profile, thus removing the property.
+
+  >>> qi.uninstallProducts(products=['QITest4'])
+  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  False

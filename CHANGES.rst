@@ -4,6 +4,11 @@ Changelog
 3.0.9 (unreleased)
 ------------------
 
+- When uninstalling always run a profile 'uninstall' if no other
+  uninstall-method is found.
+  Fixes https://github.com/plone/Products.CMFQuickInstallerTool/issues/4
+  [pbauer]
+
 - Readded doctests which were not run after port to plone.app.testing
   [tomgross]
 

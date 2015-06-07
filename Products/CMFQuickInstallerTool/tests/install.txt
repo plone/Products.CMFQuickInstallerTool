@@ -63,7 +63,7 @@ And we no longer have an InstalledProduct instance in the QI tool:
 
   >>> 'QITest' in qi.objectIds()
   False
-  
+
   >>> qi.isProductInstalled('QITest')
   False
 
@@ -111,37 +111,42 @@ The QITest stuff should still be present:
 Install and Reinstall without deleting custom content
 -----------------------------------------------------
 
-Custom products can add content items (especially folders) to the root 
+Custom products can add content items (especially folders) to the root
 of a plone site. We want to be sure NOT to delete these "non-tool"
-items. To emulate this we can install any product, add some content, 
-and then fudge the snapshot to make it seem like it was added by the 
+items. To emulate this we can install any product, add some content,
+and then fudge the snapshot to make it seem like it was added by the
 install of the product.
-  
+
   >>> before = qi.snapshotPortal(portal)
-  
+
 Generic Setup does not like so many installs and needs to fix its timestamp
 for logging. For now lets artificially time it
 
   >>> import time;time.sleep(1)
-  
+
   >>> qi.installProducts(products=['QITest'])
   '...Installed Products...QITest:ok:...'
-  
-Add a folder to the root - this should remain after uninstall
-  
+
+First make sure we can actually create content.
+
+  >>> from plone.app.testing import setRoles
+  >>> setRoles(portal, 'test_user_1_', ['Contributor'])
+
+Add a document to the root - this should remain after uninstall.
+
   >>> portal.manage_addFolder("test", title="Test")
   >>> 'test' in portal.objectIds()
   True
-  
+
 Fudge the snapshot
-  
+
   >>> after = qi.snapshotPortal(portal)
   >>> settings = qi.deriveSettingsFromSnapshots(before, after)
   >>> p = qi['QITest']
   >>> p.update(settings=settings)
-  
+
 Uninstall the product and confirm the content is still there
-  
+
   >>> qi.uninstallProducts(products=['QITest'])
   >>> 'test' in portal.objectIds()
   True

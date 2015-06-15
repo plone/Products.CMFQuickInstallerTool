@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.9 (unreleased)
+3.0.9 (2015-06-15)
 ------------------
 
 - When uninstalling always run a profile 'uninstall' if no other

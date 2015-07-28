@@ -1,4 +1,6 @@
-from zope.interface import Interface, Attribute
+# -*- coding: utf-8 -*-
+from zope.interface import Attribute
+from zope.interface import Interface
 
 
 class IQuickInstallerTool(Interface):
@@ -22,7 +24,7 @@ class IQuickInstallerTool(Interface):
         ''' is the product directory present (to check if it has been deleted
             from the Filesystem '''
 
-    def installProduct(p, locked=False, hidden=False,
+    def installProduct(productname, locked=False, hidden=False,
                        swallowExceptions=False, forceProfile=False,
                        blacklistedSteps=None):
         ''' installs a product by name
@@ -39,20 +41,20 @@ class IQuickInstallerTool(Interface):
                         forceProfile=False):
         ''' installs the products specified in the products list'''
 
-    def getProductFile(p, fname='readme.txt'):
+    def getProductFile(productname, fname='readme.txt'):
         ''' returns the content of a file of the product case-insensitive, if it
              does not exist -> None '''
 
-    def getProductReadme(p):
+    def getProductReadme(productname):
         ''' returns the readme file of the product case-insensitive '''
 
-    def getProductVersion(p):
+    def getProductVersion(productname):
         ''' returns the version string stored in version.txt'''
 
     def isProductInstalled(productname):
         ''' checks wether a product is installed (by name) '''
 
-    def notifyInstalled(p, locked=True, hidden=False, **kw):
+    def notifyInstalled(productname, locked=True, hidden=False, **kw):
         ''' marks a product that has been installed without QuickInstaller
          as installed
          if locked is set -> the prod cannot be uninstalled

@@ -1,48 +1,53 @@
-from setuptools import setup, find_packages
+# -*- coding: utf-8 -*-
+from setuptools import find_packages
+from setuptools import setup
 
 version = '3.0.10.dev0'
+long_description = open("README.rst").read()
+long_description += '\n'
+long_description += open("CHANGES.rst").read()
 
-setup(name='Products.CMFQuickInstallerTool',
-      version=version,
-      description="CMFQuickInstallerTool is a facility for comfortable "
-                  "activation/deactivation of CMF compliant products.",
-      long_description=open("README.rst").read() + "\n" + \
-                       open("CHANGES.rst").read(),
-      classifiers=[
+setup(
+    name='Products.CMFQuickInstallerTool',
+    version=version,
+    description="A facility for comfortable activation/deactivation of CMF "
+                "compliant add ons for Zope.",
+    long_description=long_description,
+    classifiers=[
         "Framework :: Plone",
         "Framework :: Plone :: 5.0",
         "Framework :: Zope2",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-      ],
-      keywords='Zope CMF Plone quickinstall install activation',
-      author='Philipp Auersperg',
-      author_email='plone-developers@lists.sourceforge.net',
-      maintainer='Hanno Schlichting',
-      maintainer_email='hannosch@plone.org',
-      url='http://pypi.python.org/pypi/Products.CMFQuickInstallerTool',
-      license='GPL',
-      packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['Products'],
-      include_package_data=True,
-      zip_safe=False,
-      extras_require=dict(
-        test=[
-            'zope.testing',
-            'plone.app.testing',
-        ]
-      ),
-      install_requires=[
-        'setuptools',
-        'zope.annotation',
-        'zope.component',
-        'zope.i18nmessageid',
-        'zope.interface',
-        'Products.CMFCore',
-        'Products.GenericSetup',
-        'Acquisition',
-        'DateTime',
-        'Zope2',
-      ],
+    ],
+    keywords='Zope CMF Plone quickinstall install activation',
+    author='Philipp Auersperg',
+    author_email='plone-developers@lists.sourceforge.net',
+    maintainer='Hanno Schlichting',
+    maintainer_email='hannosch@plone.org',
+    url='http://pypi.python.org/pypi/Products.CMFQuickInstallerTool',
+    license='GPL',
+    packages=find_packages(exclude=['ez_setup']),
+    namespace_packages=['Products'],
+    include_package_data=True,
+    zip_safe=False,
+    extras_require=dict(
+      test=[
+          'zope.testing',
+          'plone.app.testing',
+      ]
+    ),
+    install_requires=[
+      'setuptools',
+      'zope.annotation',
+      'zope.component',
+      'zope.i18nmessageid',
+      'zope.interface',
+      'Products.CMFCore',
+      'Products.GenericSetup',
+      'Acquisition',
+      'DateTime',
+      'Zope2',
+    ],
 )

@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 #
 # Setup tests
 #
 from plone.app.testing.bbb import PloneTestCase
-
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
 
 

@@ -1,16 +1,15 @@
-import logging
-import os
-import os.path
-
+# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from OFS.Application import get_products
+from OFS.metaconfigure import get_registered_packages
+from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IFolderish
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from zExceptions import BadRequest
 from zExceptions import NotFound
-from Products.CMFCore.interfaces import IContentish
-from Products.CMFCore.interfaces import IFolderish
-
-from OFS.metaconfigure import get_registered_packages
+import logging
+import os
+import os.path
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -23,14 +22,10 @@ IGNORED = frozenset([
 ])
 
 
-def updatelist(a, b, c=None):
+def updatelist(a, b, c=[]):
     for l in b:
-        if l not in a:
-            if c is None:
-                a.append(l)
-            else:
-                if l not in c:
-                    a.append(l)
+        if l not in a and l not in c:
+            a.append(l)
 
 
 def delObjects(cont, ids):
@@ -70,10 +65,12 @@ def get_packages():
 
 
 def get_install_method(productname):
-    modfunc = (('Install', 'install'),
-               ('Install', 'Install'),
-               ('install', 'install'),
-               ('install', 'Install'))
+    modfunc = (
+        ('Install', 'install'),
+        ('Install', 'Install'),
+        ('install', 'install'),
+        ('install', 'Install')
+    )
     return get_method(productname, modfunc)
 
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Acquisition import aq_parent
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.interfaces import IBeforeProfileImportEvent
@@ -14,7 +15,9 @@ def findProductForProfile(context, profile_id, qi):
     # Cache installable products list to cut portal creation time
     request = getattr(context, 'REQUEST', SorryNoCaching())
     if not getattr(request, '_cachedInstallableProducts', ()):
-        request._cachedInstallableProducts = qi.listInstallableProducts(skipInstalled=False)
+        request._cachedInstallableProducts = qi.listInstallableProducts(
+            skipInstalled=False
+        )
 
     for product in request._cachedInstallableProducts:
         profiles = qi.getInstallProfiles(product["id"])
@@ -57,7 +60,7 @@ def handleBeforeProfileImportEvent(event):
     if product in installing:
         return
 
-    if storage.has_key("Products.CMFQuickInstallerTool.Events"):
+    if "Products.CMFQuickInstallerTool.Events" in storage:
         data = storage["Products.CMFQuickInstallerTool.Events"]
     else:
         data = storage["Products.CMFQuickInstallerTool.Events"] = {}
@@ -94,10 +97,11 @@ def handleProfileImportedEvent(event):
     settings = qi.deriveSettingsFromSnapshots(info["snapshot"], after)
     version = qi.getProductVersion(info["product"])
     qi.notifyInstalled(
-            info["product"],
-            locked=False,
-            logmsg="Installed via setup tool",
-            settings=settings,
-            installedversion=version,
-            status='installed',
-            error=False)
+        info["product"],
+        locked=False,
+        logmsg="Installed via setup tool",
+        settings=settings,
+        installedversion=version,
+        status='installed',
+        error=False,
+    )

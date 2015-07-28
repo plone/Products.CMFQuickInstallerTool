@@ -4,27 +4,22 @@ Products.CMFQuickInstallerTool
 Features
 --------
 
-CMFQuickInstallerTool is a facility for comfortable activation/deactivation of
-CMF compliant products inside a CMF site.
+CMFQuickInstallerTool is a facility for comfortable activation/deactivation of CMF compliant products inside a Zope/CMF site.
 
-Therefore it has to be installed as a tool inside a CMF portal, where it stores
-the information about the installed products.
+Therefore it has to be installed as a tool inside a CMF portal,
+where it stores the information about the installed products.
 
-The requirements for a product to be installable with QuickInstallerTool are
-quite simple (almost all existing CMF  products fulfill them)::
+The requirements for a product to be installable with QuickInstallerTool are quite simple
+(almost all existing CMF products fulfill them):
 
-  External Product:  The product has to implement an external
-                     method 'install' in a python module 'Install.py'
-                     in its Extensions directory.
+- the product has to implement an external method ``install`` in a python module ``Install.py`` in its ``Extensions`` directory (old style).
 
-                     OR
+OR
 
-                     The product ships with a GenericSetup extension profile
-                     and has no install method. It can still use an uninstall
-                     method for custom uninstallation tasks though.
+- The addon/product ships with a GenericSetup extension profile (but has no install method as above).
+  If there are multiple profiles the alphabetically first wins.
 
-Products can be uninstalled and QuickInstallerTool removes the following items
-a product creates during install:
+Products can be uninstalled and QuickInstallerTool removes the following items a product creates during install:
 
 - portal actions,
 - portal skins,
@@ -34,33 +29,29 @@ a product creates during install:
 - left and right slots (also checks them only for the portal),
 - resource registry entries
 
-Attention:
-
-QuickInstallerTool just tracks which objects are ADDED, but not what is changed
-or deleted.
+.. note::
+   QuickInstallerTool just tracks which objects are **added**, but not what is changed or deleted.
 
 Usage
 -----
 
-In the ZMI click on portal_quickinstaller. The management screen allows you to
-select products for installation and uninstallation. You can browse into the
-installed products and see what was created and the logs of the install process.
+In the ZMI click on portal_quickinstaller.
+The management screen allows you to select products for installation and uninstallation.
+You can browse into the installed products and see what was created and the logs of the install process.
 
 Customized uninstall
 --------------------
 
-In order to use a customize uninstall, the following
-requirements must be met::
+In order to use a customize uninstall, the following requirements must be met:
 
-  External Product:  The product has to implement an external
-                     method 'uninstall in a python module 'Install.py'
-                     in its Extensions directory.
+- the product has to implement an external method ``uninstall`` in a python module ``Install.py`` in its ``Extensions`` directory.
+  Please note that the customized uninstall method is invoked before (and in addition to) the standard removal of objects.
 
-Please note that the customized uninstall method is invoked before (and in
-addition to) the standard removal of objects.
+OR
 
-Alternatively you can register a profile 'uninstall'. That will be run on
-uninstall if ther is no method 'uninstall'.
+- the addon/product has to ship with a GenericSetup extension profile postfixed with ``uninstall``.
+  That will be run on uninstall only if there is no external method ``uninstall``.
+
 
 Install:
 --------
@@ -75,9 +66,6 @@ Uninstall:
 Reinstall
 ---------
 
-Reinstalling a product invokes uninstall() and install(). If you have special
-code which should work differently on reinstall than uninstall/install you can
-add a second argument to the install or uninstall method named 'reinstall' which
-is true only for a reinstallation. In most cases you shouldn't react differently
-when reinstalling!
-
+Reinstalling a product invokes uninstall() and install().
+If you have special code which should work differently on reinstall than uninstall/install you can add a second argument to the install or uninstall method named 'reinstall' which is true only for a reinstallation.
+In most cases you shouldn't react differently when reinstalling!

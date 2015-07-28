@@ -4,7 +4,8 @@ Changelog
 3.0.10 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Cleanup: PEP8, decorators for security+zca, et al.
+  [jensens]
 
 
 3.0.9 (2015-06-15)

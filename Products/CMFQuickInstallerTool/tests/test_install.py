@@ -1,14 +1,13 @@
-import doctest
-import unittest
-
-import zope.component
-from Products.GenericSetup import EXTENSION, profile_registry
+# -*- coding: utf-8 -*-
 from plone.app import testing
 from plone.testing import layered
-
-from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool
-from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent
+from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent  # noqa
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
+from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool  # noqa
+from Products.GenericSetup import EXTENSION, profile_registry
+import doctest
+import unittest
+import zope.component
 
 import pkg_resources
 try:
@@ -45,19 +44,23 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
             for_=None)
 
     def setUpPloneSite(self, portal):
-        TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable
+        TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable  # noqa
 
         def patched_isProductInstallable(self, productname):
-            if 'QITest' in productname or 'CMFQuickInstallerTool' in productname:
+            if (
+                'QITest' in productname
+                or 'CMFQuickInstallerTool' in productname
+            ):
                 return True
             return TEST_PATCHES['orig_isProductInstallable'](self, productname)
         QuickInstallerTool.isProductInstallable = patched_isProductInstallable
 
     def tearDownPloneSite(self, portal):
-        QuickInstallerTool.isProductInstallable = TEST_PATCHES['orig_isProductInstallable']
-
-        profile_registry.unregisterProfile('test', 'Products.CMFQuickInstallerTool')
-
+        QuickInstallerTool.isProductInstallable = TEST_PATCHES['orig_isProductInstallable']  # noqa
+        profile_registry.unregisterProfile(
+            'test',
+            'Products.CMFQuickInstallerTool'
+        )
         sm = zope.component.getSiteManager()
         sm.unregisterHandler(handleBeforeProfileImportEvent)
         sm.unregisterHandler(handleProfileImportedEvent)

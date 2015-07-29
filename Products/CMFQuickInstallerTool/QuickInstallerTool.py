@@ -300,10 +300,10 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             record = {'id': pid, 'title': name}
             if installed_product:
                 record['status'] = installed_product.getStatus()
-                record['error'] = installed_product.hasError()
+                record['hasError'] = installed_product.hasError()
             else:
                 record['status'] = 'new'
-                record['error'] = False
+                record['hasError'] = False
             res.append(record)
         res.sort(
             lambda x, y: cmp(

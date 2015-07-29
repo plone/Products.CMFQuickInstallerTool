@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.10 (unreleased)
+3.0.10 (2015-07-29)
 -------------------
 
 - Cleanup: PEP8, decorators for security+zca, et al.

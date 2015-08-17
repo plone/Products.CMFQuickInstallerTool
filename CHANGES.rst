@@ -4,7 +4,10 @@ Changelog
 3.0.11 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fixed getting profiles registered explicitly for ``IPloneSiteRoot``
+  instead CMFCore ``ISiteRoot``.  Bug introduced in 3.0.10.  See for
+  example https://github.com/plone/plone.app.mosaic/issues/124
+  [maurits]
 
 
 3.0.10 (2015-07-29)

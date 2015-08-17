@@ -34,9 +34,9 @@ import warnings
 try:
     pkg_resources.get_distribution('Products.CMFPlone')
 except pkg_resources.DistributionNotFound:
-    from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
-else:
     from Products.CMFCore.interfaces import ISiteRoot
+else:
+    from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
 
 _ = MessageFactory("plone")
 

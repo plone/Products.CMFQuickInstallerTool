@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.11 (unreleased)
+3.0.11 (2015-08-22)
 -------------------
 
 - Fixed getting profiles registered explicitly for ``IPloneSiteRoot``

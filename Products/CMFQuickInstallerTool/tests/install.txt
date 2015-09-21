@@ -57,6 +57,14 @@ Now we have an InstalledProduct instance in the QI tool:
 Uninstall the product again
 ---------------------------
 
+First pretend the profile has a version:
+
+  >>> setup = getToolByName(portal, 'portal_setup')
+  >>> profile_id = qi.getInstallProfile('QITest')['id']
+  >>> setup.setLastVersionForProfile(profile_id, '42')
+
+Now uninstall the product:
+
   >>> qi.uninstallProducts(products=['QITest'])
 
 And we no longer have an InstalledProduct instance in the QI tool:
@@ -67,7 +75,12 @@ And we no longer have an InstalledProduct instance in the QI tool:
   >>> qi.isProductInstalled('QITest')
   False
 
-  >>> setup = getToolByName(portal, 'portal_setup')
+The portal_setup no longer knows its installed profile version, as we
+have cleaned that up:
+
+  >>> setup.getLastVersionForProfile(profile_id)
+  'unknown'
+
   >>> logs = [i for i in setup.objectIds() if 'QITest' in i]
   >>> for i in logs:
   ...     setup._delObject(i)

@@ -4,7 +4,9 @@ Changelog
 3.0.12 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- When uninstalling a product, mark its install profile as
+  ``unknown``, so ``portal_setup`` also regards it as not installed.
+  [maurits]
 
 
 3.0.11 (2015-08-22)

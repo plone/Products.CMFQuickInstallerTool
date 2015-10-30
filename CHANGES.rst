@@ -4,7 +4,13 @@ Changelog
 3.0.13 (unreleased)
 -------------------
 
-- Nothing changed yet.
+New:
+
+- *add item here*
+
+Fixes:
+
+- *add item here*
 
 
 3.0.12 (2015-09-21)

@@ -747,18 +747,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 if profile is not None:
                     # Mark profile as uninstalled/unknown.
                     profile_id = profile['id']
-                    # XXX We want to use unsetLastVersionForProfile,
-                    # but that requires a merge and release of this
-                    # GenericSetup pull request:
-                    # https://github.com/zopefoundation/Products.GenericSetup/pull/18
-                    # portal_setup.unsetLastVersionForProfile(profile_id)
-                    # Instead we must copy and set the
-                    # (non-persistent) profile upgrade versions.
-                    prof_versions = portal_setup._profile_upgrade_versions.copy()
-                    if profile_id not in prof_versions:
-                        continue
-                    del prof_versions[profile_id]
-                    portal_setup._profile_upgrade_versions = prof_versions
+                    portal_setup.unsetLastVersionForProfile(profile_id)
 
         if REQUEST:
             return REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])

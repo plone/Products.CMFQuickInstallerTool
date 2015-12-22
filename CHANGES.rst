@@ -6,7 +6,8 @@ Changelog
 
 New:
 
-- *add item here*
+- Use ``unsetLastVersionForProfile`` from Products.GenericSetup 1.8.1.
+  [maurits]
 
 Fixes:
 

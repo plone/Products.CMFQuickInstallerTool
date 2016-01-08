@@ -9,10 +9,6 @@ New:
 - Use ``unsetLastVersionForProfile`` from Products.GenericSetup 1.8.1.
   [maurits]
 
-Fixes:
-
-- *add item here*
-
 
 3.0.12 (2015-09-21)
 -------------------

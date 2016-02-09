@@ -28,7 +28,7 @@ setup(
     author_email='plone-developers@lists.sourceforge.net',
     maintainer='Hanno Schlichting',
     maintainer_email='hannosch@plone.org',
-    url='http://pypi.python.org/pypi/Products.CMFQuickInstallerTool',
+    url='https://pypi.python.org/pypi/Products.CMFQuickInstallerTool',
     license='GPL',
     packages=find_packages(exclude=['ez_setup']),
     namespace_packages=['Products'],

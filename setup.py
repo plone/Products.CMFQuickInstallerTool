@@ -39,6 +39,7 @@ setup(
       test=[
           'zope.testing',
           'plone.app.testing',
+          'plone.protect>=2.0.2',
       ]
     ),
     install_requires=[

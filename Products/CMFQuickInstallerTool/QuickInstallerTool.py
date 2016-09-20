@@ -661,6 +661,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 res = res + '\n' + str(afterRes)
         return res
 
+    @postonly
     @security.protected(ManagePortal)
     def installProducts(
         self,
@@ -689,8 +690,17 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             if step_result:
                 res += str(step_result) + '\n'
         if REQUEST:
-            REQUEST.RESPONSE.redirect(REQUEST['HTTP_REFERER'])
-
+            url = REQUEST['HTTP_REFERER']
+            if url:
+                # The url should be in the portal, otherwise this could be a
+                # hacking attempt.
+                urltool = getToolByName(self, 'portal_url')
+                # In tests, the referer can be 'localhost', which would be
+                # treated as a relative url to the not existing
+                # http://nohost/plone/portal_quickinstaller/localhost
+                if url == 'localhost' or not urltool.isURLInPortal(url):
+                    url = self.absolute_url()
+            REQUEST.RESPONSE.redirect(url)
         return res
 
     @security.protected(ManagePortal)

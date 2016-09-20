@@ -10,7 +10,8 @@ New:
 
 Fixes:
 
-- *add item here*
+- Apply security hotfix 20160830 for ``installProducts`` redirection.
+  On top of that, we require a POST request.  [maurits]
 
 
 3.0.13 (2016-01-08)

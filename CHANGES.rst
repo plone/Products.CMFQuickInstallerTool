@@ -4,11 +4,11 @@ Changelog
 3.0.14 (unreleased)
 -------------------
 
-New:
+Bug fixes:
 
-- *add item here*
-
-Fixes:
+- Added link to the Add-ons control panel in the QI ZMI form.
+  And say the form itself is deprecated.
+  [maurits]
 
 - Apply security hotfix 20160830 for ``installProducts`` redirection.
   On top of that, we require a POST request.  [maurits]

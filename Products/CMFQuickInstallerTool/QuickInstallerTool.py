@@ -6,8 +6,7 @@ from Acquisition import aq_get
 from Acquisition import aq_inner
 from Acquisition import aq_parent
 from App.class_init import InitializeClass
-from Globals import DevelopmentMode
-from Globals import INSTANCE_HOME
+from App.config import getConfiguration
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.permissions import ManagePortal
@@ -813,12 +812,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     def isDevelopmentMode(self):
         """Is the Zope server in debug mode?
         """
-        return not not DevelopmentMode
+        return bool(getConfiguration().debug_mode)
 
     @security.protected(ManagePortal)
     def getInstanceHome(self):
         """Return location of $INSTANCE_HOME
         """
-        return INSTANCE_HOME
+        return os.environ.get('INSTANCE_HOME')
 
 InitializeClass(QuickInstallerTool)

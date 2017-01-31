@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix imports since Globals was removed in Zope4
+  [pbauer]
 
 
 3.0.14 (2016-10-03)

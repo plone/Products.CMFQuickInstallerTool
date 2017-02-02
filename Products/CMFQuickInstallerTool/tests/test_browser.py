@@ -88,6 +88,11 @@ class QIBrowserTest(unittest.TestCase):
         product = self._get_product_for_install(qi)
         url = '%s/installProducts' % qi.absolute_url()
         csrf_token = createToken()
+        # First we need to get a url so we have a referer to get back to.
+        # Otherwise we get a redirect to '', which means to 'installProducts',
+        # which will fail because it is a GET request.
+        self.browser.open(qi.absolute_url())
+        # Now the POST.
         self.browser.post(url, 'products:list=%s&_authenticator=%s' % (
             product, csrf_token))
         # The product must have successfully been installed.

@@ -4,14 +4,6 @@ Changelog
 3.0.15 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fix imports since Globals was removed in Zope4

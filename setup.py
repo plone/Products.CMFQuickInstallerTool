@@ -49,6 +49,7 @@ setup(
       'zope.i18nmessageid',
       'zope.interface',
       'Products.CMFCore',
+      'Products.ExternalMethod',
       'Products.GenericSetup>=1.8.1',
       'Acquisition',
       'DateTime',

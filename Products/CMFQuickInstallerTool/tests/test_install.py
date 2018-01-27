@@ -4,12 +4,15 @@ from plone.testing import layered
 from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent  # noqa
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool  # noqa
-from Products.GenericSetup import EXTENSION, profile_registry
+from Products.GenericSetup import EXTENSION
+from Products.GenericSetup import profile_registry
+
 import doctest
+import pkg_resources
 import unittest
 import zope.component
 
-import pkg_resources
+
 try:
     pkg_resources.get_distribution('plone.app.contenttypes')
 except pkg_resources.DistributionNotFound:
@@ -64,6 +67,7 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
         sm = zope.component.getSiteManager()
         sm.unregisterHandler(handleBeforeProfileImportEvent)
         sm.unregisterHandler(handleProfileImportedEvent)
+
 
 CQI_FIXTURE = QuickInstallerCaseFixture()
 CQI_FUNCTIONAL_TESTING = testing.FunctionalTesting(

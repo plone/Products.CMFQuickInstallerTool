@@ -79,7 +79,8 @@ class IInstalledProduct(Interface):
     ''' represents the installed product
         is contained inside the QuickInstallerTool '''
 
-    id = Attribute('id', 'Must be set to the same name as the product directory')
+    id = Attribute(
+        'id', 'Must be set to the same name as the product directory')
 
     types = Attribute('types', 'default: []')
     skins = Attribute('types', 'default: []')

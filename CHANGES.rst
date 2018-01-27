@@ -14,6 +14,8 @@ New features:
 
 Bug fixes:
 
+- Add Python 2 / 3 compatibility.  [maurits]
+
 - Add undeclared Products.ExternalMethod dependency.  [esteele]
 
 

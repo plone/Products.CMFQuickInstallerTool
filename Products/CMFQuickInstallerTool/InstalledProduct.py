@@ -16,7 +16,10 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from zope.component import getSiteManager
 from zope.component import queryUtility
 from zope.interface import implementer
+
 import logging
+import six
+
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 
@@ -321,7 +324,7 @@ class InstalledProduct(SimpleItem):
         ):
             portal_actions = getToolByName(self, 'portal_actions')
             for info in self.actions:
-                if isinstance(info, basestring):
+                if isinstance(info, six.string_types):
                     action = info
                     # Product was installed before CMF 2.1
                     # Try to remove the action from all categories
@@ -417,5 +420,6 @@ class InstalledProduct(SimpleItem):
         """Return the version of the product in the moment of installation
         """
         return getattr(self, 'installedversion', None)
+
 
 InitializeClass(InstalledProduct)

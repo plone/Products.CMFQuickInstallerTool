@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from Products.CMFQuickInstallerTool.tests.test_install import CQI_FUNCTIONAL_TESTING  # noqa
 from plone.app.testing import login
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -7,6 +6,7 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.protect import createToken
 from plone.testing import z2
+from Products.CMFQuickInstallerTool.tests.test_install import CQI_FUNCTIONAL_TESTING  # noqa
 from zExceptions import Forbidden
 
 import unittest
@@ -21,7 +21,8 @@ class QIBrowserTest(unittest.TestCase):
         self.request = self.layer['request']
         login(self.portal, TEST_USER_NAME)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        import transaction; transaction.commit()
+        import transaction
+        transaction.commit()
         self.browser = z2.Browser(app)
         self.browser.addHeader(
             'Authorization',

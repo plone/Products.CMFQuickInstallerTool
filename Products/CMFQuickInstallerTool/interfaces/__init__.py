@@ -1,4 +1,6 @@
 from installable import INonInstallable
-INonInstallable   # pyflakes
 from portal_quickinstaller import IQuickInstallerTool
+
+
+INonInstallable   # pyflakes
 IQuickInstallerTool   # pyflakes

@@ -7,9 +7,11 @@ from Products.CMFCore.interfaces import IFolderish
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from zExceptions import BadRequest
 from zExceptions import NotFound
+
 import logging
 import os
 import os.path
+
 
 logger = logging.getLogger('CMFQuickInstallerTool')
 

@@ -25,10 +25,13 @@ from zope.component import getAllUtilitiesRegisteredFor
 from zope.component import getSiteManager
 from zope.i18nmessageid import MessageFactory
 from zope.interface import implementer
+
 import logging
 import os
 import pkg_resources
+import six
 import warnings
+
 
 try:
     pkg_resources.get_distribution('Products.CMFPlone')
@@ -70,6 +73,10 @@ class HiddenProducts(object):
         return ['CMFQuickInstallerTool', 'Products.CMFQuickInstallerTool']
 
 
+def _product_sort_key(product):
+    return product.get('title', product.get('id', None))
+
+
 @implementer(IQuickInstallerTool)
 class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
     """
@@ -90,7 +97,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         {
             'label': 'Install',
             'action': 'manage_installProductsForm'},
-        ) + ObjectManager.manage_options
+    ) + ObjectManager.manage_options
 
     security.declareProtected(ManagePortal, 'manage_installProductsForm')
     manage_installProductsForm = PageTemplateFile(
@@ -199,7 +206,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         try:
             # XXX Currently QI always uses the first profile
             setup_tool.getProfileDependencyChain(profiles[0])
-        except KeyError, e:
+        except KeyError as e:
             self._init_errors()
             # Don't show twice the same error: old install and profile
             # oldinstall is test in first in other methods we may have an
@@ -304,12 +311,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 record['status'] = 'new'
                 record['hasError'] = False
             res.append(record)
-        res.sort(
-            lambda x, y: cmp(
-                x.get('title', x.get('id', None)),
-                y.get('title', y.get('id', None))
-            )
-        )
+        res.sort(key=_product_sort_key)
         return res
 
     @security.protected(ManagePortal)
@@ -339,12 +341,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 'isHidden': installed_product.isHidden(),
                 'installedVersion': installed_product.getInstalledVersion()
             })
-        res.sort(
-            lambda x, y: cmp(
-                x.get('title', x.get('id', None)),
-                y.get('title', y.get('id', None))
-            )
-        )
+        res.sort(key=_product_sort_key)
         return res
 
     @security.protected(ManagePortal)
@@ -371,12 +368,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
                 continue
             text = open(os.path.join(prodpath, fil)).read()
             try:
-                return unicode(text)
+                return six.text_type(text)
             except UnicodeDecodeError:
                 try:
-                    return unicode(text, 'utf-8')
+                    return six.text_type(text, 'utf-8')
                 except UnicodeDecodeError:
-                    return unicode(text, 'utf-8', 'replace')
+                    return six.text_type(text, 'utf-8', 'replace')
         return None
 
     @security.protected(ManagePortal)
@@ -768,7 +765,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         uninstall/install is that it does not remove portal objects
         created during install (e.g. tools, etc.)
         """
-        if isinstance(products, basestring):
+        if isinstance(products, six.string_types):
             products = [products]
 
         # only delete everything EXCEPT portalobjects (tools etc) for reinstall
@@ -819,5 +816,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """Return location of $INSTANCE_HOME
         """
         return os.environ.get('INSTANCE_HOME')
+
 
 InitializeClass(QuickInstallerTool)

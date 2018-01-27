@@ -14,7 +14,7 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Add undeclared Products.ExternalMethod dependency.  [esteele]
 
 
 3.0.15 (2017-02-12)

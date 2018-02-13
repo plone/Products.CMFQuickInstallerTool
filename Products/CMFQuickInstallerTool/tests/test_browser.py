@@ -47,6 +47,11 @@ class QIBrowserTest(unittest.TestCase):
         # Fall back to the first one.
         return installable_ids[0]
 
+    def test_portal_quickinstaller(self):
+        url = 'portal_quickinstaller/manage_installProductsForm'
+        view = self.portal.restrictedTraverse(url)
+        self.assertTrue(view(), msg='{0} is broken'.format(url))
+
     def test_installProducts_call(self):
         # It should work fine without a REQUEST argument.
         qi = self.portal.portal_quickinstaller

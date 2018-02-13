@@ -10,6 +10,7 @@ AlreadyInstalled
 def initialize(context):
     from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool  # noqa
     from Products.CMFQuickInstallerTool.QuickInstallerTool import addQuickInstallerTool  # noqa
+    # TODO: maybe copy Products/CMFPlone/skins/plone_images/product_icon.png
     ToolInit(
         'CMF QuickInstaller Tool',
         tools=(QuickInstallerTool, ),

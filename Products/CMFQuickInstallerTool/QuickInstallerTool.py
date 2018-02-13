@@ -90,6 +90,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     meta_type = 'CMF QuickInstaller Tool'
     id = 'portal_quickinstaller'
+    # toolicon = 'skins/plone_images/product_icon.png'
 
     security = ClassSecurityInfo()
 
@@ -817,5 +818,94 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         return os.environ.get('INSTANCE_HOME')
 
+    @security.protected(ManagePortal)
+    def upgradeInfo(self, pid):
+        # Returns a dict with two booleans values, stating if an upgrade
+        # required and available.
+        available = self.isProductInstallable(pid)
+        if not available:
+            return False
+        # Product version as per version.txt or fallback on metadata file
+        product_version = str(self.getProductVersion(pid))
+        installed_product_version = self._getOb(pid).getInstalledVersion()
+        profile = self.getInstallProfile(pid)
+        if profile is None:
+            # No GS profile, simple case as before, we can always upgrade
+            return dict(
+                required=product_version != installed_product_version,
+                available=True,
+                hasProfile=False,
+                installedVersion=installed_product_version,
+                newVersion=product_version,
+            )
+        profile_id = profile['id']
+        setup = getToolByName(self, 'portal_setup')
+        profile_version = str(setup.getVersionForProfile(profile_id))
+        if profile_version == 'latest':
+            profile_version = self.getLatestUpgradeStep(profile_id)
+        if profile_version == 'unknown':
+            # If a profile doesn't have a metadata.xml use product version
+            profile_version = product_version
+        installed_profile_version = setup.getLastVersionForProfile(profile_id)
+        # getLastVersionForProfile returns the version as a tuple or unknown.
+        if installed_profile_version != 'unknown':
+            installed_profile_version = str(
+                '.'.join(installed_profile_version))
+        return dict(
+            required=profile_version != installed_profile_version,
+            available=len(setup.listUpgrades(profile_id)) > 0,
+            hasProfile=True,
+            installedVersion=installed_profile_version,
+            newVersion=profile_version,
+        )
+
+    @security.protected(ManagePortal)
+    def getLatestUpgradeStep(self, profile_id):
+        """
+        Get the highest ordered upgrade step available to
+        a specific profile.
+
+        If anything errors out then go back to "old way"
+        by returning 'unknown'
+        """
+        setup = getToolByName(self, 'portal_setup')
+        profile_version = 'unknown'
+        try:
+            available = setup.listUpgrades(profile_id, True)
+            if available:  # could return empty sequence
+                latest = available[-1]
+                profile_version = max(latest['dest'],
+                                      key=pkg_resources.parse_version)
+        except Exception:
+            pass
+
+        return profile_version
+
+    @security.protected(ManagePortal)
+    def upgradeProduct(self, pid):
+        profile = self.getInstallProfile(pid)
+        if profile is None:
+            # No upgrade profiles
+            return self.reinstallProducts(products=[pid])
+        profile_id = profile['id']
+        setup = getToolByName(self, 'portal_setup')
+        upgrades = setup.listUpgrades(profile_id)
+        for upgrade in upgrades:
+            # An upgrade may be a single step (for a bare upgradeStep)
+            # or a list of steps (for upgradeSteps containing upgradeStep
+            # directives).
+            if not type(upgrade) is list:
+                upgrade = [upgrade]
+            for upgradestep in upgrade:
+                step = upgradestep['step']
+                step.doStep(setup)
+        version = str(profile['version'])
+        if version == 'latest':
+            version = self.getLatestUpgradeStep(profile_id)
+        setup.setLastVersionForProfile(profile_id, version)
+
 
 InitializeClass(QuickInstallerTool)
+# TODO: we probably want this, copied from CMPlone:
+# from Products.CMFCore.utils import registerToolInterface
+# registerToolInterface('portal_quickinstaller', IQuickInstallerTool)

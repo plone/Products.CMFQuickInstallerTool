@@ -60,6 +60,8 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
     def tearDownPloneSite(self, portal):
         QuickInstallerTool.isProductInstallable = TEST_PATCHES['orig_isProductInstallable']  # noqa
+
+    def tearDownZope(self, app):
         profile_registry.unregisterProfile(
             'test',
             'Products.CMFQuickInstallerTool'
@@ -70,6 +72,8 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
 
 CQI_FIXTURE = QuickInstallerCaseFixture()
+CQI_INTEGRATION_TESTING = testing.IntegrationTesting(
+    bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Integration')
 CQI_FUNCTIONAL_TESTING = testing.FunctionalTesting(
     bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Functional')
 

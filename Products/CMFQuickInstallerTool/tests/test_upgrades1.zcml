@@ -9,7 +9,7 @@
       title="Null upgrade step"
       description=""
       handler="Products.CMFQuickInstallerTool.tests.testQuickInstallerTool.dummy_handler"
-      profile="Products.CMFPlone:testfixture"
+      profile="Products.CMFQuickInstallerTool:test"
       />
 
   <genericsetup:upgradeStep
@@ -18,7 +18,7 @@
       title="Add pants"
       description=""
       handler="Products.CMFQuickInstallerTool.tests.testQuickInstallerTool.dummy_handler"
-      profile="Products.CMFPlone:testfixture"
+      profile="Products.CMFQuickInstallerTool:test"
       />
 
   <genericsetup:upgradeStep
@@ -27,7 +27,7 @@
       title="Remove pants"
       description=""
       handler="Products.CMFQuickInstallerTool.tests.testQuickInstallerTool.dummy_handler"
-      profile="Products.CMFPlone:testfixture"
+      profile="Products.CMFQuickInstallerTool:test"
       />
 
 </configure>

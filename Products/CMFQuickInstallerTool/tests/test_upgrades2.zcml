@@ -8,8 +8,8 @@
       destination="banana"
       title="Add pants"
       description=""
-      handler="Products.CMFPlone.tests.testQuickInstallerTool.dummy_handler"
-      profile="Products.CMFPlone:testfixture"
+      handler="Products.CMFQuickInstallerTool.tests.testQuickInstallerTool.dummy_handler"
+      profile="Products.CMFQuickInstallerTool:test"
       />
 
   <genericsetup:upgradeStep
@@ -17,8 +17,8 @@
       destination="dandelions"
       title="Remove pants"
       description=""
-      handler="Products.CMFPlone.tests.testQuickInstallerTool.dummy_handler"
-      profile="Products.CMFPlone:testfixture"
+      handler="Products.CMFQuickInstallerTool.tests.testQuickInstallerTool.dummy_handler"
+      profile="Products.CMFQuickInstallerTool:test"
       />
 
 </configure>

@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
-from Products.CMFPlone.tests import PloneTestCase
-from Products.CMFPlone import tests
+from Products.CMFQuickInstallerTool import tests
+from Products.CMFQuickInstallerTool.tests.test_install import CQI_INTEGRATION_TESTING  # noqa
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 from zope.configuration import xmlconfig
+import unittest
 
 
-class TestQuickInstallerTool(PloneTestCase.PloneTestCase):
+class TestQuickInstallerTool(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = CQI_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         self.qi = self.portal.portal_quickinstaller
 
     def _installed(self):
@@ -16,14 +22,14 @@ class TestQuickInstallerTool(PloneTestCase.PloneTestCase):
         return [p['id'] for p in self.qi.listInstallableProducts()]
 
     def testInstallUninstallProduct(self):
+        import pkg_resources
         try:
-            import Products.CMFPlacefulWorkflow
-            Products.CMFPlacefulWorkflow  # pyflakes
-        except ImportError:
+            pkg_resources.get_distribution('Products.CMFPlacefulWorkflow')
+        except pkg_resources.DistributionNotFound:
             return
         # CMFPlacefulWorkflow should be uninstalled, we install it and
         # it should not show up as installable
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.qi.installProducts(['CMFPlacefulWorkflow', ])
         self.assertTrue('CMFPlacefulWorkflow' in self._installed())
         self.assertFalse('CMFPlacefulWorkflow' in self._available())
@@ -37,7 +43,8 @@ class TestQuickInstallerTool(PloneTestCase.PloneTestCase):
             package=tests,
             context=self.layer['configurationContext']
         )
-        latest = self.qi.getLatestUpgradeStep('Products.CMFPlone:testfixture')
+        latest = self.qi.getLatestUpgradeStep(
+            'Products.CMFQuickInstallerTool:test')
         self.assertTrue(latest == '3')
 
     def testLatestUpgradeProfiles2(self):
@@ -49,7 +56,8 @@ class TestQuickInstallerTool(PloneTestCase.PloneTestCase):
             package=tests,
             context=self.layer['configurationContext']
         )
-        latest = self.qi.getLatestUpgradeStep('Products.CMFPlone:testfixture')
+        latest = self.qi.getLatestUpgradeStep(
+            'Products.CMFQuickInstallerTool:test')
         self.assertTrue(latest == '3')
 
 

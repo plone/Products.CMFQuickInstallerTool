@@ -2,35 +2,42 @@
 #
 # Setup tests
 #
-from plone.app.testing.bbb import PloneTestCase
+from Products.CMFPlone.testing import PRODUCTS_CMFPLONE_INTEGRATION_TESTING
 from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+import unittest
 
 
-class TestQuickInstaller(PloneTestCase):
+class TestQuickInstaller(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = PRODUCTS_CMFPLONE_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testTool(self):
-        self.failUnless('portal_quickinstaller' in self.portal.objectIds())
+        self.assertTrue('portal_quickinstaller' in self.portal.objectIds())
 
     def testIsNotInstalled(self):
-        self.failIf(self.qi.isProductInstalled('CMFQuickInstallerTool'))
+        self.assertFalse(self.qi.isProductInstalled('CMFQuickInstallerTool'))
 
     def testIsNotListedAsInstallable(self):
         prods = self.qi.listInstallableProducts()
         prods = [x['id'] for x in prods]
-        self.failIf('CMFQuickInstallerTool' in prods)
+        self.assertFalse('CMFQuickInstallerTool' in prods)
 
     def testIsNotListedAsInstalled(self):
         prods = self.qi.listInstalledProducts()
         prods = [x['id'] for x in prods]
-        self.failIf('CMFQuickInstallerTool' in prods)
+        self.assertFalse('CMFQuickInstallerTool' in prods)
 
 
-class TestInstalledProduct(PloneTestCase):
+class TestInstalledProduct(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = PRODUCTS_CMFPLONE_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testSlotsMigration(self):
@@ -39,8 +46,8 @@ class TestInstalledProduct(PloneTestCase):
 
         # New instances should have the properties
         new = InstalledProduct('new')
-        self.failUnless(hasattr(new, 'leftslots'))
-        self.failUnless(hasattr(new, 'rightslots'))
+        self.assertTrue(hasattr(new, 'leftslots'))
+        self.assertTrue(hasattr(new, 'rightslots'))
 
         # Now emulate an old instance
         old = InstalledProduct('old')
@@ -50,12 +57,12 @@ class TestInstalledProduct(PloneTestCase):
         # Make sure calling the API will give you no error but silently
         # add the property
         left = old.getLeftSlots()
-        self.failUnless(left == [])
-        self.failUnless(old.leftslots == [])
+        self.assertTrue(left == [])
+        self.assertTrue(old.leftslots == [])
 
         right = old.getRightSlots()
-        self.failUnless(right == [])
-        self.failUnless(old.rightslots == [])
+        self.assertTrue(right == [])
+        self.assertTrue(old.rightslots == [])
 
         slots = old.getSlots()
-        self.failUnless(slots == [])
+        self.assertTrue(slots == [])

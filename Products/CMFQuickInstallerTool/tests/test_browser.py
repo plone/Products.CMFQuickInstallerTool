@@ -6,7 +6,7 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.protect import createToken
 from plone.testing import z2
-from Products.CMFQuickInstallerTool.tests.test_install import CQI_FUNCTIONAL_TESTING  # noqa
+from Products.CMFQuickInstallerTool.testing import CQI_FUNCTIONAL_TESTING
 from zExceptions import Forbidden
 
 import unittest

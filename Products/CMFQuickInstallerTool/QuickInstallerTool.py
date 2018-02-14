@@ -911,7 +911,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
             # An upgrade may be a single step (for a bare upgradeStep)
             # or a list of steps (for upgradeSteps containing upgradeStep
             # directives).
-            if not type(upgrade) is list:
+            if not isinstance(upgrade, list):
                 upgrade = [upgrade]
             for upgradestep in upgrade:
                 step = upgradestep['step']

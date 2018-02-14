@@ -44,8 +44,8 @@ class TestQuickInstallerTool(unittest.TestCase):
             context=self.layer['configurationContext']
         )
         latest = self.qi.getLatestUpgradeStep(
-            'Products.CMFQuickInstallerTool:test')
-        self.assertTrue(latest == '3')
+            'Products.CMFQuickInstallerTool.tests:default')
+        self.assertEqual(latest, '3')
 
     def testLatestUpgradeProfiles2(self):
         # make sure strings don't break things
@@ -57,8 +57,8 @@ class TestQuickInstallerTool(unittest.TestCase):
             context=self.layer['configurationContext']
         )
         latest = self.qi.getLatestUpgradeStep(
-            'Products.CMFQuickInstallerTool:test')
-        self.assertTrue(latest == '3')
+            'Products.CMFQuickInstallerTool.tests:default')
+        self.assertEqual(latest, '3')
 
 
 def dummy_handler():

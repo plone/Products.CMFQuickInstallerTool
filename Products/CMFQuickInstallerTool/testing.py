@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone.app import testing
+from plone.testing import z2
 from Products.CMFQuickInstallerTool.events import handleBeforeProfileImportEvent  # noqa
 from Products.CMFQuickInstallerTool.events import handleProfileImportedEvent
 from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool  # noqa
@@ -33,13 +34,13 @@ class QuickInstallerInstalledFixture(testing.PloneSandboxLayer):
         sm = zope.component.getSiteManager()
         sm.registerHandler(handleBeforeProfileImportEvent)
         sm.registerHandler(handleProfileImportedEvent)
-
+        z2.installProduct(app, 'Products.CMFQuickInstallerTool.tests')
         profile_registry.registerProfile(
-            'test',
+            'default',
             'CMFQI test profile',
             'Test profile for CMFQuickInstallerTool',
             'profiles/test',
-            'Products.CMFQuickInstallerTool',
+            'Products.CMFQuickInstallerTool.tests',
             EXTENSION,
             for_=None)
 
@@ -59,12 +60,13 @@ class QuickInstallerInstalledFixture(testing.PloneSandboxLayer):
 
     def tearDownZope(self, app):
         profile_registry.unregisterProfile(
-            'test',
-            'Products.CMFQuickInstallerTool'
+            'default',
+            'Products.CMFQuickInstallerTool.tests'
         )
         sm = zope.component.getSiteManager()
         sm.unregisterHandler(handleBeforeProfileImportEvent)
         sm.unregisterHandler(handleProfileImportedEvent)
+
 
 BASE_CQI_FIXTURE = QuickInstallerInstalledFixture()
 CQI_INTEGRATION_TESTING = testing.IntegrationTesting(
@@ -72,46 +74,24 @@ CQI_INTEGRATION_TESTING = testing.IntegrationTesting(
 
 
 class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
+    """Layer with a hack to always consider the QITest package installable.
+
+    This avoids needing to register dummy products.
+    """
 
     defaultBases = (BASE_CQI_FIXTURE,)
-
-    def setUpZope(self, app, configurationContext):
-        sm = zope.component.getSiteManager()
-        sm.registerHandler(handleBeforeProfileImportEvent)
-        sm.registerHandler(handleProfileImportedEvent)
-
-        profile_registry.registerProfile(
-            'test',
-            'CMFQI test profile',
-            'Test profile for CMFQuickInstallerTool',
-            'profiles/test',
-            'Products.CMFQuickInstallerTool',
-            EXTENSION,
-            for_=None)
 
     def setUpPloneSite(self, portal):
         TEST_PATCHES['orig_isProductInstallable'] = QuickInstallerTool.isProductInstallable  # noqa
 
         def patched_isProductInstallable(self, productname):
-            if (
-                'QITest' in productname
-                or 'CMFQuickInstallerTool' in productname
-            ):
+            if 'QITest' in productname:
                 return True
             return TEST_PATCHES['orig_isProductInstallable'](self, productname)
         QuickInstallerTool.isProductInstallable = patched_isProductInstallable
 
     def tearDownPloneSite(self, portal):
         QuickInstallerTool.isProductInstallable = TEST_PATCHES['orig_isProductInstallable']  # noqa
-
-    def tearDownZope(self, app):
-        profile_registry.unregisterProfile(
-            'test',
-            'Products.CMFQuickInstallerTool'
-        )
-        sm = zope.component.getSiteManager()
-        sm.unregisterHandler(handleBeforeProfileImportEvent)
-        sm.unregisterHandler(handleProfileImportedEvent)
 
 
 CQI_FIXTURE = QuickInstallerCaseFixture()

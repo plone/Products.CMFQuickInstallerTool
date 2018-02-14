@@ -118,7 +118,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
     meta_type = 'CMF QuickInstaller Tool'
     id = 'portal_quickinstaller'
-    # toolicon = 'skins/plone_images/product_icon.png'
 
     security = ClassSecurityInfo()
 
@@ -153,7 +152,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
-        # TODO Remove the manual Products.* check here. It is still needed.
+        # We keep the manual Products.* check here.  It is still needed.
         profiles = [
             prof for prof in profiles
             if prof['type'] == EXTENSION
@@ -176,7 +175,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         profiles = self._install_profile_info(productname)
 
-        # XXX Currently QI always uses the first profile
+        # QI always uses the first profile
         if profiles:
             return profiles[0]
         return None
@@ -233,7 +232,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         setup_tool = getToolByName(self, 'portal_setup')
         try:
-            # XXX Currently QI always uses the first profile
+            # QI always uses the first profile
             setup_tool.getProfileDependencyChain(profiles[0])
         except KeyError as e:
             self._init_errors()
@@ -489,7 +488,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if len(after['adapters']) > len(before['adapters']):
             registrations = [reg for reg in after['adapters']
                              if reg not in before['adapters']]
-            # TODO: expand this to actually cover adapter registrations
 
         utilities = []
         if len(after['utilities']) > len(before['utilities']):
@@ -583,7 +581,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         else:
             reqstorage = None
 
-        # XXX We can not use getToolByName since that returns a utility
+        # We can not use getToolByName since that might return a utility
         # without a RequestContainer. This breaks import steps that need
         # to run tools which request self.REQUEST.
         portal_setup = aq_get(portal, 'portal_setup', None, 1)
@@ -934,6 +932,3 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
 
 InitializeClass(QuickInstallerTool)
-# TODO: we probably want this, copied from CMPlone:
-# from Products.CMFCore.utils import registerToolInterface
-# registerToolInterface('portal_quickinstaller', IQuickInstallerTool)

@@ -73,6 +73,8 @@ def addQuickInstallerTool(self, REQUEST=None):
 class HiddenProducts(object):
 
     def getNonInstallableProducts(self):
+        # We can't really install ourselves: that would be weird.
+        # So hide ourselves from ourselves.
         return ['CMFQuickInstallerTool', 'Products.CMFQuickInstallerTool']
 
 
@@ -81,11 +83,20 @@ if INonInstallablePlone is not None:
     class HiddenProductsForPlone(object):
 
         def getNonInstallableProducts(self):
+            # Even though the Plone add-ons control panel is only using
+            # GenericSetup, it seems best not to advertise ourselves as an
+            # installable product there.
             return ['Products.CMFQuickInstallerTool']
 
         def getNonInstallableProfiles(self):
             return [
-                'Products.CMFQuickInstallerTool:CMFQuickInstallerTool',
+                # When CMFPlone no longer depends on us,
+                # but some other add-on (or an admin) pulls us in anyway,
+                # we *do* want to be visible in the advanced form
+                # when adding a Plone Site.  So we keep our main profile
+                # visible:
+                # 'Products.CMFQuickInstallerTool:CMFQuickInstallerTool',
+                # But our uninstall profile should not be shown.
                 'Products.CMFQuickInstallerTool:uninstall',
             ]
 

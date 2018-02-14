@@ -19,21 +19,31 @@ class TestQuickInstaller(unittest.TestCase):
 
     def testIsNotInstalled(self):
         self.assertFalse(self.qi.isProductInstalled('CMFQuickInstallerTool'))
+        self.assertFalse(self.qi.isProductInstalled(
+            'Products.CMFQuickInstallerTool'))
 
     def testIsNotListedAsInstallable(self):
         prods = self.qi.listInstallableProducts()
         prods = [x['id'] for x in prods]
         self.assertFalse('CMFQuickInstallerTool' in prods)
+        self.assertFalse('Products.CMFQuickInstallerTool' in prods)
 
     def testIsNotListedAsInstalled(self):
         prods = self.qi.listInstalledProducts()
         prods = [x['id'] for x in prods]
         self.assertFalse('CMFQuickInstallerTool' in prods)
+        self.assertFalse('Products.CMFQuickInstallerTool' in prods)
 
     def test_getToolByName(self):
         from Products.CMFCore.utils import getToolByName
         self.assertIsNotNone(
             getToolByName(self.portal, 'portal_quickinstaller', None))
+
+    def test_uninstall_self_via_portal_setup(self):
+        setup_tool = self.portal.portal_setup
+        setup_tool.runAllImportStepsFromProfile(
+            'Products.CMFQuickInstallerTool:uninstall')
+        self.assertFalse('portal_quickinstaller' in self.portal.objectIds())
 
 
 class TestInstalledProduct(unittest.TestCase):

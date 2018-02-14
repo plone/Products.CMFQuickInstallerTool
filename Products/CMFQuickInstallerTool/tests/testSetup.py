@@ -2,14 +2,13 @@
 #
 # Setup tests
 #
-from Products.CMFPlone.testing import PRODUCTS_CMFPLONE_INTEGRATION_TESTING
-from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
 import unittest
 
 
 class TestQuickInstaller(unittest.TestCase):
 
-    layer = PRODUCTS_CMFPLONE_INTEGRATION_TESTING
+    layer = CQI_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
@@ -31,16 +30,23 @@ class TestQuickInstaller(unittest.TestCase):
         prods = [x['id'] for x in prods]
         self.assertFalse('CMFQuickInstallerTool' in prods)
 
+    def test_getToolByName(self):
+        from Products.CMFCore.utils import getToolByName
+        self.assertIsNotNone(
+            getToolByName(self.portal, 'portal_quickinstaller', None))
+
 
 class TestInstalledProduct(unittest.TestCase):
 
-    layer = PRODUCTS_CMFPLONE_INTEGRATION_TESTING
+    layer = CQI_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer['portal']
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testSlotsMigration(self):
+        from Products.CMFQuickInstallerTool.InstalledProduct import \
+            InstalledProduct
         # leftslots and rightslots have been class variables ones. Make sure
         # using old instances without these properties doesn't break.
 

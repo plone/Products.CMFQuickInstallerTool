@@ -14,6 +14,13 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="uninstall CMFQuickInstallerTool"
+      directory="profiles/uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
   <subscriber
       zcml:condition="installed Products.GenericSetup.events"
       handler=".events.handleBeforeProfileImportEvent" />
@@ -24,6 +31,11 @@
 
   <utility
       factory=".QuickInstallerTool.HiddenProducts"
+      name="Products.CMFQuickInstallerTool"
+      />
+  <utility
+      factory=".QuickInstallerTool.HiddenProductsForPlone"
+      zcml:condition="installed Products.CMFQuickInstallerTool.QuickInstallerTool.HiddenProductsForPlone"
       name="Products.CMFQuickInstallerTool"
       />
 

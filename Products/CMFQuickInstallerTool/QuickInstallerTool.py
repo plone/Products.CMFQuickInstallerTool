@@ -37,8 +37,11 @@ try:
     pkg_resources.get_distribution('Products.CMFPlone')
 except pkg_resources.DistributionNotFound:
     from Products.CMFCore.interfaces import ISiteRoot
+    INonInstallablePlone = None
 else:
     from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
+    from Products.CMFPlone.interfaces import INonInstallable as \
+        INonInstallablePlone
 
 _ = MessageFactory("plone")
 
@@ -71,6 +74,20 @@ class HiddenProducts(object):
 
     def getNonInstallableProducts(self):
         return ['CMFQuickInstallerTool', 'Products.CMFQuickInstallerTool']
+
+
+if INonInstallablePlone is not None:
+    @implementer(INonInstallablePlone)
+    class HiddenProductsForPlone(object):
+
+        def getNonInstallableProducts(self):
+            return ['Products.CMFQuickInstallerTool']
+
+        def getNonInstallableProfiles(self):
+            return [
+                'Products.CMFQuickInstallerTool:CMFQuickInstallerTool',
+                'Products.CMFQuickInstallerTool:uninstall',
+            ]
 
 
 def _product_sort_key(product):

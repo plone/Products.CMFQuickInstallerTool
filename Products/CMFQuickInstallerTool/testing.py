@@ -24,9 +24,56 @@ else:
 TEST_PATCHES = {}
 
 
-class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
+class QuickInstallerInstalledFixture(testing.PloneSandboxLayer):
 
     defaultBases = (TESTING_FIXTURE, )
+    installed_self = False
+
+    def setUpZope(self, app, configurationContext):
+        sm = zope.component.getSiteManager()
+        sm.registerHandler(handleBeforeProfileImportEvent)
+        sm.registerHandler(handleProfileImportedEvent)
+
+        profile_registry.registerProfile(
+            'test',
+            'CMFQI test profile',
+            'Test profile for CMFQuickInstallerTool',
+            'profiles/test',
+            'Products.CMFQuickInstallerTool',
+            EXTENSION,
+            for_=None)
+
+    def setUpPloneSite(self, portal):
+        qi = getattr(portal, 'portal_quickinstaller', None)
+        if qi is None:
+            setup_tool = portal.portal_setup
+            setup_tool.runAllImportStepsFromProfile(
+                'Products.CMFQuickInstallerTool:CMFQuickInstallerTool')
+            self.installed_self = True
+
+    def tearDownPloneSite(self, portal):
+        if self.installed_self:
+            setup_tool = portal.portal_setup
+            setup_tool.runAllImportStepsFromProfile(
+                'Products.CMFQuickInstallerTool:uninstall')
+
+    def tearDownZope(self, app):
+        profile_registry.unregisterProfile(
+            'test',
+            'Products.CMFQuickInstallerTool'
+        )
+        sm = zope.component.getSiteManager()
+        sm.unregisterHandler(handleBeforeProfileImportEvent)
+        sm.unregisterHandler(handleProfileImportedEvent)
+
+BASE_CQI_FIXTURE = QuickInstallerInstalledFixture()
+CQI_INTEGRATION_TESTING = testing.IntegrationTesting(
+    bases=(BASE_CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Integration')
+
+
+class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
+
+    defaultBases = (BASE_CQI_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
         sm = zope.component.getSiteManager()
@@ -68,7 +115,5 @@ class QuickInstallerCaseFixture(testing.PloneSandboxLayer):
 
 
 CQI_FIXTURE = QuickInstallerCaseFixture()
-CQI_INTEGRATION_TESTING = testing.IntegrationTesting(
-    bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Integration')
 CQI_FUNCTIONAL_TESTING = testing.FunctionalTesting(
     bases=(CQI_FIXTURE, ), name='CMFQuickInstallerToolTest:Functional')

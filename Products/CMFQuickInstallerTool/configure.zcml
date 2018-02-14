@@ -35,7 +35,7 @@
       />
   <utility
       factory=".QuickInstallerTool.HiddenProductsForPlone"
-      zcml:condition="installed Products.CMFQuickInstallerTool.QuickInstallerTool.HiddenProductsForPlone"
+      zcml:condition="installed Products.CMFPlone"
       name="Products.CMFQuickInstallerTool"
       />
 

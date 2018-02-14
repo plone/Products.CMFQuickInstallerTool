@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from plone.testing import layered
-from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
 from Products.CMFQuickInstallerTool.testing import CQI_FUNCTIONAL_TESTING
+from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
+
 import doctest
 import unittest
 

@@ -3,6 +3,7 @@
 # Setup tests
 #
 from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
+
 import unittest
 
 

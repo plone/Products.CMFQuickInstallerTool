@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from Products.CMFQuickInstallerTool import tests
-from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
+from Products.CMFQuickInstallerTool import tests
+from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
 from zope.configuration import xmlconfig
+
 import unittest
 
 

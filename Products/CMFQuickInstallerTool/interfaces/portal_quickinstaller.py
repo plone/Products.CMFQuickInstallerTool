@@ -22,7 +22,10 @@ class IQuickInstallerTool(Interface):
 
     def isProductAvailable(productname):
         ''' is the product directory present (to check if it has been deleted
-            from the Filesystem '''
+            from the Filesystem
+
+        Deprecated: use isProductInstallable instead.
+        '''
 
     def installProduct(productname, locked=False, hidden=False,
                        swallowExceptions=False, forceProfile=False,

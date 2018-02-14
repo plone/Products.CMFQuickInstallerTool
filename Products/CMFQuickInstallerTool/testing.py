@@ -34,7 +34,10 @@ class QuickInstallerInstalledFixture(testing.PloneSandboxLayer):
         sm = zope.component.getSiteManager()
         sm.registerHandler(handleBeforeProfileImportEvent)
         sm.registerHandler(handleProfileImportedEvent)
-        z2.installProduct(app, 'Products.CMFQuickInstallerTool.tests')
+        # Install a dummy product.  Quietly, because it is not a real product,
+        # so it cannot be found.
+        z2.installProduct(
+            app, 'Products.CMFQuickInstallerTool.tests', quiet=True)
         profile_registry.registerProfile(
             'default',
             'CMFQI test profile',

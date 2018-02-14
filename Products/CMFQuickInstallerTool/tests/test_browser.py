@@ -122,6 +122,6 @@ class QIBrowserTest(unittest.TestCase):
             product, csrf_token)
         self.assertRaises(Forbidden, self.browser.open, url)
         # The product must NOT have successfully been installed.
-        self.failIf(
+        self.assertFalse(
             qi.isProductInstalled(product),
             'Should not have installed %s using GET request.' % product)

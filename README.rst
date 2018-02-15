@@ -1,6 +1,13 @@
 Products.CMFQuickInstallerTool
 ==============================
 
+.. warning::
+
+    This package is end-of-life.
+    You should use ``GenericSetup`` profiles instead.
+    See the `Plone 5.1 upgrade guide <https://docs.plone.org/develop/addons/upgrade_to_51.html#from-cmfquickinstallertool-to-genericsetup>`_.
+
+
 Features
 --------
 

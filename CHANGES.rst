@@ -6,14 +6,17 @@ Changelog
 
 Breaking changes:
 
-- *add item here*
-
-New features:
-
 - Added functionality and tests from CMFPlone.
   Added uninstall profile.
   And no longer count on being installed by CMFPlone, especially in tests.
+  Marked for Plone 5.2 as minimum version.
+  This package is end-of-life.
+  You should use ``GenericSetup`` profiles instead.
   [maurits]
+
+New features:
+
+- *add item here*
 
 Bug fixes:
 

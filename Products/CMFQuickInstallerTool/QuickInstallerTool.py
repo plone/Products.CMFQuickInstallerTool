@@ -37,8 +37,11 @@ try:
     pkg_resources.get_distribution('Products.CMFPlone')
 except pkg_resources.DistributionNotFound:
     from Products.CMFCore.interfaces import ISiteRoot
+    INonInstallablePlone = None
 else:
     from Products.CMFPlone.interfaces import IPloneSiteRoot as ISiteRoot
+    from Products.CMFPlone.interfaces import INonInstallable as \
+        INonInstallablePlone
 
 _ = MessageFactory("plone")
 
@@ -70,7 +73,32 @@ def addQuickInstallerTool(self, REQUEST=None):
 class HiddenProducts(object):
 
     def getNonInstallableProducts(self):
+        # We can't really install ourselves: that would be weird.
+        # So hide ourselves from ourselves.
         return ['CMFQuickInstallerTool', 'Products.CMFQuickInstallerTool']
+
+
+if INonInstallablePlone is not None:
+    @implementer(INonInstallablePlone)
+    class HiddenProductsForPlone(object):
+
+        def getNonInstallableProducts(self):
+            # Even though the Plone add-ons control panel is only using
+            # GenericSetup, it seems best not to advertise ourselves as an
+            # installable product there.
+            return ['Products.CMFQuickInstallerTool']
+
+        def getNonInstallableProfiles(self):
+            return [
+                # When CMFPlone no longer depends on us,
+                # but some other add-on (or an admin) pulls us in anyway,
+                # we *do* want to be visible in the advanced form
+                # when adding a Plone Site.  So we keep our main profile
+                # visible:
+                # 'Products.CMFQuickInstallerTool:CMFQuickInstallerTool',
+                # But our uninstall profile should not be shown.
+                'Products.CMFQuickInstallerTool:uninstall',
+            ]
 
 
 def _product_sort_key(product):
@@ -124,7 +152,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         profiles = portal_setup.listProfileInfo()
 
         # We are only interested in extension profiles for the product
-        # TODO Remove the manual Products.* check here. It is still needed.
+        # We keep the manual Products.* check here.  It is still needed.
         profiles = [
             prof for prof in profiles
             if prof['type'] == EXTENSION
@@ -147,7 +175,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """
         profiles = self._install_profile_info(productname)
 
-        # XXX Currently QI always uses the first profile
+        # QI always uses the first profile
         if profiles:
             return profiles[0]
         return None
@@ -204,7 +232,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
 
         setup_tool = getToolByName(self, 'portal_setup')
         try:
-            # XXX Currently QI always uses the first profile
+            # QI always uses the first profile
             setup_tool.getProfileDependencyChain(profiles[0])
         except KeyError as e:
             self._init_errors()
@@ -460,7 +488,6 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         if len(after['adapters']) > len(before['adapters']):
             registrations = [reg for reg in after['adapters']
                              if reg not in before['adapters']]
-            # TODO: expand this to actually cover adapter registrations
 
         utilities = []
         if len(after['utilities']) > len(before['utilities']):
@@ -554,7 +581,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         else:
             reqstorage = None
 
-        # XXX We can not use getToolByName since that returns a utility
+        # We can not use getToolByName since that might return a utility
         # without a RequestContainer. This breaks import steps that need
         # to run tools which request self.REQUEST.
         portal_setup = aq_get(portal, 'portal_setup', None, 1)
@@ -816,6 +843,92 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         """Return location of $INSTANCE_HOME
         """
         return os.environ.get('INSTANCE_HOME')
+
+    @security.protected(ManagePortal)
+    def upgradeInfo(self, pid):
+        # Returns a dict with two booleans values, stating if an upgrade
+        # required and available.
+        available = self.isProductInstallable(pid)
+        if not available:
+            return False
+        # Product version as per version.txt or fallback on metadata file
+        product_version = str(self.getProductVersion(pid))
+        installed_product_version = self._getOb(pid).getInstalledVersion()
+        profile = self.getInstallProfile(pid)
+        if profile is None:
+            # No GS profile, simple case as before, we can always upgrade
+            return dict(
+                required=product_version != installed_product_version,
+                available=True,
+                hasProfile=False,
+                installedVersion=installed_product_version,
+                newVersion=product_version,
+            )
+        profile_id = profile['id']
+        setup = getToolByName(self, 'portal_setup')
+        profile_version = str(setup.getVersionForProfile(profile_id))
+        if profile_version == 'latest':
+            profile_version = self.getLatestUpgradeStep(profile_id)
+        if profile_version == 'unknown':
+            # If a profile doesn't have a metadata.xml use product version
+            profile_version = product_version
+        installed_profile_version = setup.getLastVersionForProfile(profile_id)
+        # getLastVersionForProfile returns the version as a tuple or unknown.
+        if installed_profile_version != 'unknown':
+            installed_profile_version = str(
+                '.'.join(installed_profile_version))
+        return dict(
+            required=profile_version != installed_profile_version,
+            available=len(setup.listUpgrades(profile_id)) > 0,
+            hasProfile=True,
+            installedVersion=installed_profile_version,
+            newVersion=profile_version,
+        )
+
+    @security.protected(ManagePortal)
+    def getLatestUpgradeStep(self, profile_id):
+        """
+        Get the highest ordered upgrade step available to
+        a specific profile.
+
+        If anything errors out then go back to "old way"
+        by returning 'unknown'
+        """
+        setup = getToolByName(self, 'portal_setup')
+        profile_version = 'unknown'
+        try:
+            available = setup.listUpgrades(profile_id, True)
+            if available:  # could return empty sequence
+                latest = available[-1]
+                profile_version = max(latest['dest'],
+                                      key=pkg_resources.parse_version)
+        except Exception:
+            pass
+
+        return profile_version
+
+    @security.protected(ManagePortal)
+    def upgradeProduct(self, pid):
+        profile = self.getInstallProfile(pid)
+        if profile is None:
+            # No upgrade profiles
+            return self.reinstallProducts(products=[pid])
+        profile_id = profile['id']
+        setup = getToolByName(self, 'portal_setup')
+        upgrades = setup.listUpgrades(profile_id)
+        for upgrade in upgrades:
+            # An upgrade may be a single step (for a bare upgradeStep)
+            # or a list of steps (for upgradeSteps containing upgradeStep
+            # directives).
+            if not isinstance(upgrade, list):
+                upgrade = [upgrade]
+            for upgradestep in upgrade:
+                step = upgradestep['step']
+                step.doStep(setup)
+        version = str(profile['version'])
+        if version == 'latest':
+            version = self.getLatestUpgradeStep(profile_id)
+        setup.setLastVersionForProfile(profile_id, version)
 
 
 InitializeClass(QuickInstallerTool)

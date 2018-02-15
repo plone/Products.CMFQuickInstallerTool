@@ -6,7 +6,7 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.protect import createToken
 from plone.testing import z2
-from Products.CMFQuickInstallerTool.tests.test_install import CQI_FUNCTIONAL_TESTING  # noqa
+from Products.CMFQuickInstallerTool.testing import CQI_FUNCTIONAL_TESTING
 from zExceptions import Forbidden
 
 import unittest
@@ -46,6 +46,11 @@ class QIBrowserTest(unittest.TestCase):
                 return known
         # Fall back to the first one.
         return installable_ids[0]
+
+    def test_portal_quickinstaller(self):
+        url = 'portal_quickinstaller/manage_installProductsForm'
+        view = self.portal.restrictedTraverse(url)
+        self.assertTrue(view(), msg='{0} is broken'.format(url))
 
     def test_installProducts_call(self):
         # It should work fine without a REQUEST argument.
@@ -117,6 +122,6 @@ class QIBrowserTest(unittest.TestCase):
             product, csrf_token)
         self.assertRaises(Forbidden, self.browser.open, url)
         # The product must NOT have successfully been installed.
-        self.failIf(
+        self.assertFalse(
             qi.isProductInstalled(product),
             'Should not have installed %s using GET request.' % product)

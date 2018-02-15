@@ -10,15 +10,16 @@ AlreadyInstalled
 def initialize(context):
     from Products.CMFQuickInstallerTool.QuickInstallerTool import QuickInstallerTool  # noqa
     from Products.CMFQuickInstallerTool.QuickInstallerTool import addQuickInstallerTool  # noqa
+
     ToolInit(
         'CMF QuickInstaller Tool',
         tools=(QuickInstallerTool, ),
-        icon='tool.gif'
+        icon='tool.png'
     ).initialize(context)
 
     context.registerClass(
         QuickInstallerTool,
         meta_type="CMFQuickInstallerTool",
         constructors=(addQuickInstallerTool, ),
-        icon='tool.gif'
+        icon='tool.png'
     )

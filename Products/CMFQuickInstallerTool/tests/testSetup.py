@@ -2,45 +2,69 @@
 #
 # Setup tests
 #
-from plone.app.testing.bbb import PloneTestCase
-from Products.CMFQuickInstallerTool.InstalledProduct import InstalledProduct
+from Products.CMFQuickInstallerTool.testing import CQI_INTEGRATION_TESTING
+
+import unittest
 
 
-class TestQuickInstaller(PloneTestCase):
+class TestQuickInstaller(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = CQI_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testTool(self):
-        self.failUnless('portal_quickinstaller' in self.portal.objectIds())
+        self.assertTrue('portal_quickinstaller' in self.portal.objectIds())
 
     def testIsNotInstalled(self):
-        self.failIf(self.qi.isProductInstalled('CMFQuickInstallerTool'))
+        self.assertFalse(self.qi.isProductInstalled('CMFQuickInstallerTool'))
+        self.assertFalse(self.qi.isProductInstalled(
+            'Products.CMFQuickInstallerTool'))
 
     def testIsNotListedAsInstallable(self):
         prods = self.qi.listInstallableProducts()
         prods = [x['id'] for x in prods]
-        self.failIf('CMFQuickInstallerTool' in prods)
+        self.assertFalse('CMFQuickInstallerTool' in prods)
+        self.assertFalse('Products.CMFQuickInstallerTool' in prods)
 
     def testIsNotListedAsInstalled(self):
         prods = self.qi.listInstalledProducts()
         prods = [x['id'] for x in prods]
-        self.failIf('CMFQuickInstallerTool' in prods)
+        self.assertFalse('CMFQuickInstallerTool' in prods)
+        self.assertFalse('Products.CMFQuickInstallerTool' in prods)
+
+    def test_getToolByName(self):
+        from Products.CMFCore.utils import getToolByName
+        self.assertIsNotNone(
+            getToolByName(self.portal, 'portal_quickinstaller', None))
+
+    def test_uninstall_self_via_portal_setup(self):
+        setup_tool = self.portal.portal_setup
+        setup_tool.runAllImportStepsFromProfile(
+            'Products.CMFQuickInstallerTool:uninstall')
+        self.assertFalse('portal_quickinstaller' in self.portal.objectIds())
 
 
-class TestInstalledProduct(PloneTestCase):
+class TestInstalledProduct(unittest.TestCase):
 
-    def afterSetUp(self):
+    layer = CQI_INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
         self.qi = getattr(self.portal, 'portal_quickinstaller', None)
 
     def testSlotsMigration(self):
+        from Products.CMFQuickInstallerTool.InstalledProduct import \
+            InstalledProduct
         # leftslots and rightslots have been class variables ones. Make sure
         # using old instances without these properties doesn't break.
 
         # New instances should have the properties
         new = InstalledProduct('new')
-        self.failUnless(hasattr(new, 'leftslots'))
-        self.failUnless(hasattr(new, 'rightslots'))
+        self.assertTrue(hasattr(new, 'leftslots'))
+        self.assertTrue(hasattr(new, 'rightslots'))
 
         # Now emulate an old instance
         old = InstalledProduct('old')
@@ -50,12 +74,12 @@ class TestInstalledProduct(PloneTestCase):
         # Make sure calling the API will give you no error but silently
         # add the property
         left = old.getLeftSlots()
-        self.failUnless(left == [])
-        self.failUnless(old.leftslots == [])
+        self.assertTrue(left == [])
+        self.assertTrue(old.leftslots == [])
 
         right = old.getRightSlots()
-        self.failUnless(right == [])
-        self.failUnless(old.rightslots == [])
+        self.assertTrue(right == [])
+        self.assertTrue(old.rightslots == [])
 
         slots = old.getSlots()
-        self.failUnless(slots == [])
+        self.assertTrue(slots == [])

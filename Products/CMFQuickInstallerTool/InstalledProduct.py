@@ -259,8 +259,9 @@ class InstalledProduct(SimpleItem):
         """
         portal = getToolByName(self, 'portal_url').getPortalObject()
 
-        # TODO eventually we will land Event system and could remove
-        # this 'removal_inprogress' hack
+        # Years ago we wanted to remove this 'removal_inprogress' hack
+        # after an Event system was landed, but no one did that,
+        # so let's just keep it.
         if self.isLocked() and getattr(portal, 'removal_inprogress', False):
             raise ValueError(
                 'The product is locked and cannot be uninstalled!'
@@ -276,7 +277,6 @@ class InstalledProduct(SimpleItem):
             uninstaller = uninstaller.__of__(portal)
             try:
                 res = uninstaller(portal, reinstall=reinstall)
-                # XXX log it
             except TypeError:
                 res = uninstaller(portal)
         elif not reinstall:
@@ -375,11 +375,12 @@ class InstalledProduct(SimpleItem):
                     logger.warning("Failed to delete '%s' from content type "
                                    "registry" % pred)
 
-        if 'adapters' in cascade:
-            adapters = getattr(aq_base(self), 'adapters', [])
-            if adapters:
-                sm = getSiteManager()
-                # TODO: expand this to actually cover adapter registrations
+        # We could have expanded this to actually cover adapter registrations,
+        # but no one wanted this enough to implement it.
+        # if 'adapters' in cascade:
+        #     adapters = getattr(aq_base(self), 'adapters', [])
+        #     if adapters:
+        #         sm = getSiteManager()
 
         if 'utilities' in cascade:
             utilities = getattr(aq_base(self), 'utilities', [])

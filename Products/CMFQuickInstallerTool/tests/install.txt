@@ -213,8 +213,9 @@ Installing the product should not run any profile and thus set no properties.
 
 Register a 'default'-profile that points to profiles/test
 
-  >>> interfaces_path = interfaces.__path__[0]
-  >>> default_path = interfaces_path[:-11] + '/profiles/test'
+  >>> from Products.CMFQuickInstallerTool import tests
+  >>> tests_path = tests.__path__[0]
+  >>> default_path = tests_path + '/profiles/test'
   >>> _profile_registry.registerProfile('default', 'UninstallTest', '', default_path, 'QITest4', 2)
 
 Installing the product now runs the default-profile.
@@ -240,7 +241,7 @@ Install again.
 
 Register a uninstall profile that points to the profiles/test_uninstall
 
-  >>> uninstall_path = interfaces_path[:-11] + '/profiles/test_uninstall'
+  >>> uninstall_path = tests_path + '/profiles/test_uninstall'
   >>> _profile_registry.registerProfile('uninstall', 'UninstallTest', '', uninstall_path, 'QITest4', 2)
 
   >>> uninstall = qi.getUninstallProfile('QITest4')

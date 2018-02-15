@@ -110,14 +110,14 @@
                 class="form-help">
               product version
             </td>
-            <td tal:condition="python:here.isProductAvailable(product['id'])"
+            <td tal:condition="python:here.isProductInstallable(product['id'])"
                 class="form-help">
               <font tal:attributes="color python:test(prodver != product['installedVersion'],'#ff0000','#000000')"
                     tal:content="prodver">
                 product version
               </font>
             </td>
-            <td tal:condition="python:not here.isProductAvailable(product['id'])"
+            <td tal:condition="python:not here.isProductInstallable(product['id'])"
                 class="form-help">
               <font color="#ff0000">
                 removed from Products folder

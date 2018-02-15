@@ -10,7 +10,10 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Added functionality and tests from CMFPlone.
+  Added uninstall profile.
+  And no longer count on being installed by CMFPlone, especially in tests.
+  [maurits]
 
 Bug fixes:
 

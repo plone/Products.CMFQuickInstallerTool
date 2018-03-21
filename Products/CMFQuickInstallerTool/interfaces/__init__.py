@@ -1,5 +1,5 @@
-from installable import INonInstallable
-from portal_quickinstaller import IQuickInstallerTool
+from .installable import INonInstallable
+from .portal_quickinstaller import IQuickInstallerTool
 
 
 INonInstallable   # pyflakes

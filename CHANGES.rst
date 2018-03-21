@@ -20,7 +20,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix relative imports for py3
+  [pbauer]
 
 
 3.0.16 (2018-01-30)

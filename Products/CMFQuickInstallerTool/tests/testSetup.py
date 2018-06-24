@@ -41,6 +41,18 @@ class TestQuickInstaller(unittest.TestCase):
             getToolByName(self.portal, 'portal_quickinstaller', None))
 
     def test_uninstall_self_via_portal_setup(self):
+        self.assertTrue('portal_quickinstaller' in self.portal.objectIds())
+        from Products.GenericSetup import profile_registry
+        from Products.GenericSetup import EXTENSION
+        profile_registry.registerProfile(
+            'uninstall',
+            'CMFQI uninstall profile',
+            'Uninstall profile for CMFQuickInstallerTool',
+            'profiles/uninstall',
+            'Products.CMFQuickInstallerTool',
+            EXTENSION,
+            for_=None)
+
         setup_tool = self.portal.portal_setup
         setup_tool.runAllImportStepsFromProfile(
             'Products.CMFQuickInstallerTool:uninstall')

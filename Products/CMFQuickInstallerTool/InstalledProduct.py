@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
-from App.class_init import InitializeClass
+from AccessControl.class_init import InitializeClass
 from DateTime import DateTime
 from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.permissions import ManagePortal

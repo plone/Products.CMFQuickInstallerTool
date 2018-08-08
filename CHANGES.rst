@@ -20,8 +20,8 @@ New features:
 
 Bug fixes:
 
-- Fix relative imports for py3
-  [pbauer]
+- Python 2 / 3 compatability
+  [ale-rt, jensens, pbauer]
 
 
 3.0.16 (2018-01-30)

@@ -225,13 +225,13 @@ Installing the product now runs the default-profile.
 
 Make sure the property was set by the default-profile.
 
-  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  >>> b'UninstallTest' in sp.getProperty('default_page_types', [])
   True
 
 There is no uninstall-profile yet, so the property is kept on uninstalling.
 
   >>> qi.getUninstallProfile('QITest4')
-  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  >>> b'UninstallTest' in sp.getProperty('default_page_types', [])
   True
 
 Install again.
@@ -251,5 +251,5 @@ Register a uninstall profile that points to the profiles/test_uninstall
 Uninstalling now runs the uninstall-profile, thus removing the property.
 
   >>> qi.uninstallProducts(products=['QITest4'])
-  >>> 'UninstallTest' in sp.getProperty('default_page_types', [])
+  >>> b'UninstallTest' in sp.getProperty('default_page_types', [])
   False

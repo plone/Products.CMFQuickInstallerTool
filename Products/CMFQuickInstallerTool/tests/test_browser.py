@@ -97,7 +97,7 @@ class QIBrowserTest(unittest.TestCase):
         # First we need to get a url so we have a referer to get back to.
         # Otherwise we get a redirect to '', which means to 'installProducts',
         # which will fail because it is a GET request.
-        self.browser.open(qi.absolute_url())
+        self.browser.open(qi.absolute_url() + '/manage_installProductsForm')
         # Now the POST.
         self.browser.post(url, 'products:list=%s&_authenticator=%s' % (
             product, csrf_token))
@@ -106,7 +106,7 @@ class QIBrowserTest(unittest.TestCase):
                         'Failed to install %s' % product)
         self.assertEqual(
             self.browser.url,
-            'http://nohost/plone/portal_quickinstaller')
+            'http://nohost/plone/portal_quickinstaller/manage_installProductsForm')
 
     def test_installProducts_get(self):
         # Now with a GET request.

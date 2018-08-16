@@ -5,7 +5,7 @@ from Acquisition import aq_base
 from Acquisition import aq_get
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from App.class_init import InitializeClass
+from AccessControl.class_init import InitializeClass
 from App.config import getConfiguration
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import SimpleItem

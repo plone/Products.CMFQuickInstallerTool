@@ -30,7 +30,7 @@ setup(
     maintainer_email='hannosch@plone.org',
     url='https://pypi.org/project/Products.CMFQuickInstallerTool',
     license='GPL',
-    packages=find_packages(exclude=['ez_setup']),
+    packages=find_packages(),
     namespace_packages=['Products'],
     include_package_data=True,
     zip_safe=False,

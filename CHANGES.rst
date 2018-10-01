@@ -1,27 +1,12 @@
 Changelog
 =========
 
-4.0.0 (unreleased)
-------------------
+.. You should *NOT* be adding new change log entries to this file.
+   You should create a file in the news directory instead.
+   For helpful instructions, please see:
+   https://github.com/plone/plone.releaser/blob/master/ADD-A-NEWS-ITEM.rst
 
-Breaking changes:
-
-- Added functionality and tests from CMFPlone.
-  Added uninstall profile.
-  And no longer count on being installed by CMFPlone, especially in tests.
-  Marked for Plone 5.2 as minimum version.
-  This package is end-of-life.
-  You should use ``GenericSetup`` profiles instead.
-  [maurits]
-
-New features:
-
-- *add item here*
-
-Bug fixes:
-
-- Python 2 / 3 compatability
-  [ale-rt, jensens, pbauer]
+.. towncrier release notes start
 
 
 3.0.16 (2018-01-30)

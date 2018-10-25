@@ -20,8 +20,8 @@ First we set three convenience variables for later use:
   <PloneSite at /plone>
 
   >>> qi = getattr(portal, 'portal_quickinstaller', None)
-  >>> qi
-  <QuickInstallerTool at /plone/portal_quickinstaller>
+  >>> qi.__name__
+  'portal_quickinstaller'
 
   >>> actions_tool = portal.portal_actions
   >>> actions_tool

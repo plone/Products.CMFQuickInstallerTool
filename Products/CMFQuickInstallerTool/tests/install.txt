@@ -12,8 +12,8 @@ First we set three convenience variables for later use:
   <PloneSite at /plone>
 
   >>> qi = getattr(portal, 'portal_quickinstaller', None)
-  >>> qi
-  <QuickInstallerTool at /plone/portal_quickinstaller>
+  >>> qi.__name__
+  'portal_quickinstaller'
 
 And register the QI tool as a utility:
 

@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+4.0.0 (2018-11-05)
+------------------
+
+Breaking changes:
+
+
+- Added functionality and tests from CMFPlone. Added uninstall profile. And no
+  longer count on being installed by CMFPlone, especially in tests. Marked for
+  Plone 5.2 as minimum version. This package is end-of-life. You should use
+  ``GenericSetup`` profiles instead. [maurits] (#18)
+
+
+Bug fixes:
+
+
+- Python 2 / 3 compatibility. [ale-rt, jensens, pbauer] (#20)
+
 
 3.0.16 (2018-01-30)
 -------------------

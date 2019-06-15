@@ -475,9 +475,12 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         state['utilities'] = tuple(getSiteManager().registeredUtilities())
 
         jstool = getToolByName(portal, 'portal_javascripts', None)
-        state['resources_js'] = jstool and jstool.getResourceIds() or []
         csstool = getToolByName(portal, 'portal_css', None)
-        state['resources_css'] = csstool and csstool.getResourceIds() or []
+        try:
+            state['resources_js'] = jstool and jstool.getResourceIds() or []
+            state['resources_css'] = csstool and csstool.getResourceIds() or []
+        except AttributeError:
+            pass
         return state
 
     @security.protected(ManagePortal)
@@ -528,7 +531,7 @@ class QuickInstallerTool(UniqueObject, ObjectManager, SimpleItem):
         )
 
         jstool = getToolByName(self, 'portal_javascripts', None)
-        if jstool is not None:
+        if jstool is not None and 'resources_js' in after:
             settings['resources_js'] = [
                 r for r in after['resources_js']
                 if r not in before['resources_js']

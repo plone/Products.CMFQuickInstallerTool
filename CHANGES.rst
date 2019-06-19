@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+4.0.1 (2019-06-19)
+------------------
+
+Bug fixes:
+
+
+- Fix issues during migration form Plone 4.3 to 5.2.
+  [pbauer] (#22)
+
+
 4.0.0 (2018-11-05)
 ------------------
 

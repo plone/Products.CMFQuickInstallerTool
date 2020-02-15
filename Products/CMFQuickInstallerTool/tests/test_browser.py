@@ -94,11 +94,14 @@ class QIBrowserTest(unittest.TestCase):
         product = self._get_product_for_install(qi)
         url = '%s/installProducts' % qi.absolute_url()
         csrf_token = createToken()
+        qs = 'products:list=%s&_authenticator=%s' % (product, csrf_token)
+        referrer = qi.absolute_url() + '/manage_installProductsForm'
         # z.testbrowser will choose POST if we provide data
-        self.browser.open(
-            url, 'products:list=%s&_authenticator=%s' % (
-                product, csrf_token),
-            referrer=qi.absolute_url() + '/manage_installProductsForm')
+        try:
+            self.browser.open(url, qs, referrer=referrer)
+        except TypeError:
+            # old version of z.testbrowser w/o referrer
+            self.browser.open(url, qs)
         # The product must have successfully been installed.
         self.assertTrue(qi.isProductInstalled(product),
                         'Failed to install %s' % product)

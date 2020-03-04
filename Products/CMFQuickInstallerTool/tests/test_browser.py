@@ -96,12 +96,11 @@ class QIBrowserTest(unittest.TestCase):
         csrf_token = createToken()
         qs = 'products:list=%s&_authenticator=%s' % (product, csrf_token)
         referrer = qi.absolute_url() + '/manage_installProductsForm'
+        # Passing a referrer has changed in recent versions of zope.testbrowser.
+        # If we set it explicitly in the browser, it always works:
+        self.browser.addHeader('Referer', referrer)
         # z.testbrowser will choose POST if we provide data
-        try:
-            self.browser.open(url, qs, referrer=referrer)
-        except TypeError:
-            # old version of z.testbrowser w/o referrer
-            self.browser.open(url, qs)
+        self.browser.open(url, qs)
         # The product must have successfully been installed.
         self.assertTrue(qi.isProductInstalled(product),
                         'Failed to install %s' % product)

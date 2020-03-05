@@ -94,19 +94,19 @@ class QIBrowserTest(unittest.TestCase):
         product = self._get_product_for_install(qi)
         url = '%s/installProducts' % qi.absolute_url()
         csrf_token = createToken()
-        # First we need to get a url so we have a referer to get back to.
-        # Otherwise we get a redirect to '', which means to 'installProducts',
-        # which will fail because it is a GET request.
-        self.browser.open(qi.absolute_url() + '/manage_installProductsForm')
-        # Now the POST.
-        self.browser.post(url, 'products:list=%s&_authenticator=%s' % (
-            product, csrf_token))
+        qs = 'products:list=%s&_authenticator=%s' % (product, csrf_token)
+        referrer = qi.absolute_url() + '/manage_installProductsForm'
+        # Passing a referrer has changed in recent versions of zope.testbrowser.
+        # If we set it explicitly in the browser, it always works:
+        self.browser.addHeader('Referer', referrer)
+        # z.testbrowser will choose POST if we provide data
+        self.browser.open(url, qs)
         # The product must have successfully been installed.
         self.assertTrue(qi.isProductInstalled(product),
                         'Failed to install %s' % product)
         self.assertEqual(
             self.browser.url,
-            'http://nohost/plone/portal_quickinstaller/manage_installProductsForm')
+            'http://nohost/plone/portal_quickinstaller/manage_installProductsForm')  # noqa: E501
 
     def test_installProducts_get(self):
         # Now with a GET request.

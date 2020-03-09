@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+4.0.2 (2020-03-09)
+------------------
+
+Bug fixes:
+
+
+- Fix failing test.
+  [tschorr] (#23)
+
+
 4.0.1 (2019-06-19)
 ------------------
 
